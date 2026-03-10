@@ -1,0 +1,84 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello HomeController!{% endblock %}
+
+{% block stylesheets %}
+<style>
+@import url('https://fonts.adobe.com/fonts/futura-pt');
+  @import url('https://fonts.adobe.com/fonts/sofia-pro');
+  @import url('https://fonts.adobe.com/fonts/acumin-pro');
+  @import url("https://use.typekit.net/tqp0iic.css");
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #000000;
+    --surface:   #111113;
+    --border:    #2a2a2d;
+    --orange:    #ff5a00;
+    --orange-h:  #ff7020;
+    --red:       #e02434;
+    --text:      #ffffff;
+    --muted:     #8a8a8e;
+    --input-bg:  #3a3c41;
+
+    --font-heading:    'futura-pt', 'Outfit', sans-serif;
+    --font-subheading: 'sofia-pro', 'Outfit', sans-serif;
+    --font-body:       'acumin-pro', 'Outfit', sans-serif;
+    
+  }
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+
+    h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-style: italic;
+}
+
+  body {
+    min-height: 100vh;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-body);
+    font-weight: 500;
+    color: var(--text);
+    overflow: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 50% at 50% 40%, rgba(224,36,52,.10) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 480px;
+    padding: 56px 48px 48px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow: 0 32px 80px rgba(0,0,0,.8);
+    animation: fadeUp .5s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+{% endblock %}
+
+{% block body %}
+
+<div>
+    </div>
+    <div class="example-wrapper">
+        <h1>Hello  {{ app.user.username}}! ✅</h1>    
+    </div>
+{% endblock %}
