@@ -1,0 +1,423 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Registrieren{% endblock %}
+
+{% block stylesheets %}
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  @import url("https://use.typekit.net/tqp0iic.css");
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #000000;
+    --surface:  #111113;
+    --border:   #2a2a2d;
+    --orange:   #ff5a00;
+    --orange-h: #ff7020;
+    --red:      #e02434;
+    --text:     #ffffff;
+    --muted:    #8a8a8e;
+    --input-bg: #3a3c41;
+
+    --font-heading:    'futura-pt', 'Outfit', sans-serif;
+    --font-subheading: 'sofia-pro', 'Outfit', sans-serif;
+    --font-body:       'acumin-pro', 'Outfit', sans-serif;
+  }
+
+  body {
+    min-height: 100vh;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-body);
+    font-weight: 500;
+    color: var(--text);
+    overflow: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 50% at 50% 40%, rgba(224,36,52,.10) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .register-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 72px;
+    width: 100%;
+    max-width: 960px;
+    padding: 40px 24px;
+    animation: fadeUp .5s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Branding ── */
+  .register-branding { flex: 1; min-width: 0; }
+
+  .register-branding .logo {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 4rem;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 16px;
+  }
+
+  .register-branding .tagline {
+    font-family: var(--font-subheading);
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--orange);
+    margin-bottom: 20px;
+    line-height: 1.3;
+  }
+
+  .register-branding .description {
+    font-family: var(--font-body);
+    font-size: .95rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.65;
+  }
+
+  /* ── Karte ── */
+  .register-card {
+    width: 100%;
+    max-width: 460px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 48px 40px 40px;
+    box-shadow: 0 32px 80px rgba(0,0,0,.8);
+  }
+
+  /* ── Flash-Meldungen ── */
+  .flash-error,
+  .flash-success {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    border-radius: 10px;
+    padding: 13px 16px;
+    margin-bottom: 16px;
+    font-family: var(--font-body);
+    font-size: .88rem;
+    font-weight: 500;
+    animation: flashIn .3s ease both;
+  }
+
+  @keyframes flashIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .flash-error {
+    background: rgba(224,36,52,.12);
+    border: 1px solid rgba(224,36,52,.4);
+    color: #ff6070;
+  }
+
+  .flash-success {
+    background: rgba(0,200,80,.10);
+    border: 1px solid rgba(0,200,80,.3);
+    color: #00d966;
+  }
+
+  .flash-icon {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
+  }
+
+  /* ── Feld-Wrapper ── */
+  .field-wrap { margin-bottom: 14px; }
+  .field-wrap label { display: none; }
+
+  .input-shell { position: relative; }
+
+  .field-wrap input[type="text"],
+  .field-wrap input[type="email"],
+  .field-wrap input[type="password"] {
+    width: 100%;
+    background: var(--input-bg);
+    border: 1.5px solid transparent;
+    border-radius: 10px;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: .95rem;
+    font-weight: 500;
+    padding: 15px 48px 15px 18px;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+  }
+
+  .field-wrap input::placeholder { color: var(--muted); }
+
+  .field-wrap input:focus {
+    border-color: var(--orange);
+    box-shadow: 0 0 0 3px rgba(255,90,0,.18);
+  }
+
+  .field-wrap.has-error input {
+    border-color: rgba(224,36,52,.6);
+    box-shadow: 0 0 0 3px rgba(224,36,52,.12);
+  }
+
+  /* ── Auge-Button ── */
+  .toggle-pw {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--muted);
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color .2s;
+    line-height: 0;
+  }
+  .toggle-pw:hover { color: var(--text); }
+  .toggle-pw svg { width: 20px; height: 20px; pointer-events: none; }
+
+  /* Standardzustand: durchgestrichenes Auge sichtbar (Passwort verborgen) */
+  .toggle-pw .eye-off { display: none; }
+  .toggle-pw .eye-on  { display: block; }
+
+  /* Nach Klick: normales Auge sichtbar (Text sichtbar) */
+  .toggle-pw.visible .eye-on  { display: none; }
+  .toggle-pw.visible .eye-off { display: block; }
+
+  /* ── Feld-Fehlermeldungen ── */
+  .field-errors {
+    list-style: none;
+    margin-top: 7px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .field-errors li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-body);
+    font-size: .82rem;
+    font-weight: 500;
+    color: #ff6070;
+    animation: flashIn .25s ease both;
+  }
+
+  .field-errors li::before {
+    content: '';
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e02434' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cline x1='12' y1='8' x2='12' y2='12'/%3E%3Cline x1='12' y1='16' x2='12.01' y2='16'/%3E%3C/svg%3E") center/contain no-repeat;
+  }
+
+  /* ── Submit ── */
+  .btn-primary {
+    width: 100%;
+    background: var(--orange);
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-family: var(--font-subheading);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    padding: 17px;
+    cursor: pointer;
+    margin-top: 6px;
+    transition: background .2s, transform .1s, box-shadow .2s;
+    box-shadow: 0 4px 20px rgba(255,90,0,.35);
+  }
+  .btn-primary:hover {
+    background: var(--orange-h);
+    box-shadow: 0 6px 28px rgba(255,90,0,.5);
+  }
+  .btn-primary:active { transform: scale(.98); }
+
+  /* ── Login-Link ── */
+  .login-hint {
+    text-align: center;
+    font-family: var(--font-body);
+    font-size: .92rem;
+    color: var(--muted);
+    margin-top: 22px;
+  }
+  .login-hint a {
+    color: var(--orange);
+    font-weight: 600;
+    text-decoration: underline;
+    transition: color .2s;
+  }
+  .login-hint a:hover { color: var(--orange-h); }
+
+  /* ── Responsive ── */
+  @media (max-width: 700px) {
+    .register-wrapper  { flex-direction: column; gap: 32px; }
+    .register-branding .logo { font-size: 2.8rem; }
+    .register-card { padding: 36px 24px 28px; }
+  }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="register-wrapper">
+
+  <!-- Branding -->
+  <div class="register-branding">
+    <div class="logo">TrackStar</div>
+    <div class="tagline">Erstelle deinen Account und<br>werde ein TrackStar!</div>
+    <p class="description">
+      Werde Teil unserer exklusiven Community und
+      genieße die Vorteile, die dir nur TrackStar
+      bieten kann. Melde dich an, erhalte Zugang zu
+      besonderen Funktionen und lass uns gemeinsam
+      durchstarten!
+    </p>
+  </div>
+
+  <!-- Formular -->
+  <div class="register-card">
+
+    {% for msg in app.flashes('error') %}
+      <div class="flash-error">
+        <svg class="flash-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        {{ msg }}
+      </div>
+    {% endfor %}
+
+    {% for msg in app.flashes('success') %}
+      <div class="flash-success">
+        <svg class="flash-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/>
+        </svg>
+        {{ msg }}
+      </div>
+    {% endfor %}
+
+    {{ form_start(registrationForm) }}
+
+      {# Username #}
+      {% set f = registrationForm.username %}
+      <div class="field-wrap{{ f.vars.errors|length ? ' has-error' : '' }}">
+        <div class="input-shell">
+          {{ form_widget(f, { attr: { placeholder: 'Benutzername' } }) }}
+        </div>
+        {% if f.vars.errors|length %}
+          <ul class="field-errors">
+            {% for error in f.vars.errors %}<li>{{ error.message }}</li>{% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+
+      {# E-Mail #}
+      {% set f = registrationForm.email %}
+      <div class="field-wrap{{ f.vars.errors|length ? ' has-error' : '' }}">
+        <div class="input-shell">
+          {{ form_widget(f, { attr: { placeholder: 'E-Mail-Adresse' } }) }}
+        </div>
+        {% if f.vars.errors|length %}
+          <ul class="field-errors">
+            {% for error in f.vars.errors %}<li>{{ error.message }}</li>{% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+
+      {# Passwort #}
+      {% set f = registrationForm.plainPassword.first %}
+      <div class="field-wrap{{ f.vars.errors|length ? ' has-error' : '' }}">
+        <div class="input-shell">
+          {{ form_widget(f, { attr: { placeholder: 'Passwort' } }) }}
+          <button type="button" class="toggle-pw" aria-label="Passwort anzeigen">
+            <!-- durchgestrichen = Standard: Passwort verborgen, Klick zeigt es -->
+            <svg class="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+              <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+              <line x1="1" y1="1" x2="23" y2="23"/>
+            </svg>
+            <!-- normales Auge = nach Klick: Text sichtbar -->
+            <svg class="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+        {% if f.vars.errors|length %}
+          <ul class="field-errors">
+            {% for error in f.vars.errors %}<li>{{ error.message }}</li>{% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+
+      {# Passwort bestätigen #}
+      {% set f = registrationForm.plainPassword.second %}
+      <div class="field-wrap{{ f.vars.errors|length ? ' has-error' : '' }}">
+        <div class="input-shell">
+          {{ form_widget(f, { attr: { placeholder: 'Passwort bestätigen' } }) }}
+          <button type="button" class="toggle-pw" aria-label="Passwort anzeigen">
+            <svg class="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+              <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+              <line x1="1" y1="1" x2="23" y2="23"/>
+            </svg>
+            <svg class="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+        {% if f.vars.errors|length %}
+          <ul class="field-errors">
+            {% for error in f.vars.errors %}<li>{{ error.message }}</li>{% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+
+      <button type="submit" class="btn-primary">Registrieren</button>
+
+    {{ form_end(registrationForm) }}
+
+    <p class="login-hint">
+      Du hast bereits ein Konto? <a href="{{ path('app_login') }}">Jetzt anmelden</a>
+    </p>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.toggle-pw').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = btn.previousElementSibling;
+      if (!input) return;
+      const show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      btn.classList.toggle('visible', show);
+      btn.setAttribute('aria-label', show ? 'Passwort verbergen' : 'Passwort anzeigen');
+    });
+  });
+</script>
+{% endblock %}
