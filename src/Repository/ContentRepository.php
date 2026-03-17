@@ -19,7 +19,7 @@ class ContentRepository extends ServiceEntityRepository
     public function findByCategory($category_id): array
     {
         return $this->createQueryBuilder('c')
-            ->andWhere('c.type_id = :val')
+            ->andWhere('c.type = :val')
             ->setParameter('val', $category_id)
             ->orderBy('c.id', 'ASC')
             ->setMaxResults(8)

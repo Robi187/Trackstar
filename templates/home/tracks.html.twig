@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Content List{% endblock %}
+
+{% block body %}
+    <h1>Inhalte anzeigen</h1>
+
+    {% if contents is not empty %}
+        <div class="content-list">
+            {% for content in contents %}
+                <div class="content-item">
+                    <h2>{{ content.title }}</h2>
+                    <p>{{ content.description }}</p>
+                   {#  <a href="{{ path('content_detail', {'id': content.id}) }}">Mehr erfahren</a> #}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Es gibt keine Inhalte zur Anzeige.</p>
+    {% endif %}
+    
+{% endblock %}
