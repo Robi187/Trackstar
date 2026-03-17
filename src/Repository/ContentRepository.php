@@ -15,7 +15,18 @@ class ContentRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Content::class);
     }
-
+    
+    public function findByCategory($category_id): array
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.type_id = :val')
+            ->setParameter('val', $category_id)
+            ->orderBy('c.id', 'ASC')
+            ->setMaxResults(8)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 //    /**
 //     * @return Content[] Returns an array of Content objects
 //     */

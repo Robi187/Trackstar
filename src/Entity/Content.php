@@ -23,8 +23,9 @@ class Content
     #[ORM\Column(length: 255)]
     private ?string $file_path = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $type = null;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Category $type = null;
 
     #[ORM\Column]
     private ?\DateTime $created_at = null;
@@ -34,8 +35,8 @@ class Content
     private ?User $fk_user = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Category $fk_category = null;
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Tag $fk_tag = null;
 
     public function getId(): ?int
     {
@@ -78,12 +79,12 @@ class Content
         return $this;
     }
 
-    public function getType(): ?string
+    public function getType(): ?Category
     {
         return $this->type;
     }
 
-    public function setType(string $type): static
+    public function setType(?Category $type): static
     {
         $this->type = $type;
 
@@ -114,14 +115,14 @@ class Content
         return $this;
     }
 
-    public function getFkCategory(): ?Category
+    public function getFkTag(): ?Tag
     {
-        return $this->fk_category;
+        return $this->fk_tag;
     }
 
-    public function setFkCategory(?Category $fk_category): static
+    public function setFkTag(?Tag $fk_tag): static
     {
-        $this->fk_category = $fk_category;
+        $this->fk_tag = $fk_tag;
 
         return $this;
     }
