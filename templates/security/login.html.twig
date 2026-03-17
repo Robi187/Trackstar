@@ -220,7 +220,7 @@
   <div class="logo">TrackStar</div>
   <p class="subtitle">Willkommen bei TrackStar!</p>
 
-  <form method="post">
+  <form method="post" novalidate>
     {% if error %}
       <div class="alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
     {% endif %}
