@@ -4,20 +4,65 @@
 
 {% block body %}
     {{ parent() }}
-    <h1>Inhalte anzeigen</h1>
+<main class="main">
+    <h1 class="section-title">Entdecke Soundkits</h1>
 
-    {% if contents is not empty %}
-        <div class="content-list">
-            {% for content in contents %}
-                <div class="content-item">
-                    <h2>{{ content.title }}</h2>
-                    <p>{{ content.description }}</p>
-                   {#  <a href="{{ path('content_detail', {'id': content.id}) }}">Mehr erfahren</a> #}
+    {% if contents is defined and contents|length > 0 %}
+        <div class="content-grid">
+            {% for item in contents %}
+                <div class="card" onclick="window.location.href='/content/{{ item.id }}'">
+
+                    {# Cover Image #}
+                    {% if item.file_path %}
+                        <img
+                            class="card-cover"
+                            src="{{ asset(item.file_path) }}"
+                            alt="{{ item.title }}"
+                            loading="lazy"
+                        />
+                    {% else %}
+                        <div class="card-cover-placeholder">&#127925;</div>
+                    {% endif %}
+
+                    <div class="card-body">
+
+                        {# Title #}
+                        <div class="card-title" title="{{ item.title }}">
+                            {{ item.title }}
+                        </div>
+
+                        {# Producer / User #}
+                        {% if item.user %}
+                            <div class="card-user">{{ item.user }}</div>
+                        {% endif %}
+
+                        {# Footer: price badge + optional tag #}
+                        <div class="card-footer">
+                            {% if item.description %}
+                                <span class="card-price">
+                                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                                    </svg>
+                                    {{ item.description }}
+                                </span>
+                            {% endif %}
+
+                            {% if item.tag %}
+                                <span class="card-tag">{{ item.tag }}</span>
+                            {% endif %}
+                        </div>
+
+                    </div>
                 </div>
             {% endfor %}
         </div>
+
     {% else %}
-        <p>Es gibt keine Inhalte zur Anzeige.</p>
+        <div class="empty-state">
+            Noch keine Inhalte verfügbar.
+        </div>
     {% endif %}
+
+</main>
     
 {% endblock %}
