@@ -11,15 +11,19 @@ final class HomeController extends AbstractController
     #[Route('/home', name: 'app_home')]
     public function index(): Response
     {
+        $response = $this->forward('App\Controller\ContentController::getContentByCategory', [
+            'category_name' => 'Tracks',
+        ]);
+        $contents = json_decode($response->getContent(), true);
         return $this->render('home/index.html.twig', [
-            'controller_name' => 'HomeController',
+            'contents' => $contents,
         ]);
     }
 
-    #[Route('/entdecke-tracks', name: 'app_home')]
+    #[Route('/entdecke-tracks', name: 'app_tracks')]
     public function exploreTracks(): Response
     {
-        $response =  $this->forward('App\Controller\ContentController::getContentByCategory', [
+        $response = $this->forward('App\Controller\ContentController::getContentByCategory', [
             'category_name' => 'Tracks',
         ]);
         $contents = json_decode($response->getContent(), true);
