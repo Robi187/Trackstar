@@ -38,6 +38,9 @@ class Content
     #[ORM\JoinColumn(nullable: true)]
     private ?Tag $fk_tag = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $image_file = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -123,6 +126,18 @@ class Content
     public function setFkTag(?Tag $fk_tag): static
     {
         $this->fk_tag = $fk_tag;
+
+        return $this;
+    }
+
+    public function getImageFile(): ?string
+    {
+        return $this->image_file;
+    }
+
+    public function setImageFile(string $image_file): static
+    {
+        $this->image_file = $image_file;
 
         return $this;
     }

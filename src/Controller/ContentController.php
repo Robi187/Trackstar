@@ -55,6 +55,7 @@ final class ContentController extends AbstractController
                 'created_at' => $content->getCreatedAt()->format('Y-m-d H:i:s'),
                 'user' => $content->getFkUser() ? $content->getFkUser()->getUsername() : null, // Beispiel für den User
                 'tag' => $content->getFkTag() ? $content->getFkTag()->getName() : null, // Beispiel für das Tag
+                'image_path' => $content->getImageFile(),
             ];
         }
 
