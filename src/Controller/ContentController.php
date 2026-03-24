@@ -13,7 +13,7 @@ use App\Entity\Content;
 
 final class ContentController extends AbstractController
 {
-    #[Route('/content/{id}', name: 'app_content')]
+    #[Route('/content/{id}', name: 'app_content_detail', requirements: ['id' => '\d+'])]
     public function index(int $id, EntityManagerInterface $em): Response
     {
         $content = $em->getRepository(Content::class)->find($id);
@@ -27,18 +27,18 @@ final class ContentController extends AbstractController
         ]);
     }
 
-    #[Route('/content/{category_name}', name: 'app_content')]
+    #[Route('/content/{category_name}', name: 'app_content_category', requirements: ['category_name' => '[a-zA-Z]+' ])]
     public function getContentByCategory(string $category_name, EntityManagerInterface $em): Response
     {
-        $category = $em->getRepository(Category::class)->findByName($category_name);
+        $category = $em->getRepository(Category::class)->findOneBy(['name' => $category_name]);
 
         if (!$category) {
             return new JsonResponse(['error' => 'Category not found'], 404);
         }
 
         // Hole die Inhalte basierend auf der Kategorie ID
-        $contents = $em->getRepository(Content::class)->findByCategory($category[0]->getId());
-
+        $contents = $em->getRepository(Content::class)->findBy(['type' => $category]);
+        
         if (!$contents) {
             return new JsonResponse(['error' => 'Content not found'], 404);
         }

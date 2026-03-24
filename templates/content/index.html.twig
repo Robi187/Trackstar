@@ -1,9 +1,10 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello ContentController!{% endblock %}
+
+{% block title %} {{ content.title }} {% endblock %}
 
 {% block body %}
 <h1>{{ content.title }}</h1>
 <p>{{ content.description }}</p>
-<p>{{ content.type }}</p>
+<p>{{ content.type.name }}</p>
 {% endblock %}
