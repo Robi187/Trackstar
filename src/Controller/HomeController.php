@@ -41,7 +41,6 @@ final class HomeController extends AbstractController
             'category_name' => 'Beats',
         ]);
         $contents = json_decode($response->getContent(), true);
-
         return $this->render('home/beats.html.twig', [
             'contents' => $contents,
 

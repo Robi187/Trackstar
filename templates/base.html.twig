@@ -212,6 +212,7 @@
     }
 
     .card-title {
+        text-align: center;
         font-size: 0.85rem;
         font-weight: 600;
         color: #ffffff;
@@ -223,6 +224,7 @@
     }
 
     .card-user {
+        text-align: center;
         font-size: 0.78rem;
         color: #888888;
         margin-bottom: 10px;
@@ -230,6 +232,7 @@
 
     .card-footer {
         display: flex;
+        justify-content: center;
         align-items: center;
         gap: 6px;
     }
@@ -254,6 +257,8 @@
     }
 
     .card-tag {
+        align-items: center;
+        text-align: center;
         font-size: 0.72rem;
         color: #666;
         background-color: #222;
@@ -279,7 +284,7 @@
         {% block body %}
         {# ── NAVBAR ── #}
 <nav class="navbar">
-    <a href="/" class="navbar-logo">Track<span>Star</span></a>
+    <a href="/home" class="navbar-logo">Track<span>Star</span></a>
 
     <div class="navbar-search">
         <span class="search-icon">&#128269;</span>

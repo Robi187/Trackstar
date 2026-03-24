@@ -13,10 +13,10 @@
                 <div class="card" onclick="window.location.href='/content/{{ item.id }}'">
 
                     {# Cover Image #}
-                    {% if item.file_path %}
+                    {% if item.image_path %}
                         <img
                             class="card-cover"
-                            src="{{ asset(item.file_path) }}"
+                            src="{{ asset(item.image_path) }}"
                             alt="{{ item.title }}"
                             loading="lazy"
                         />
@@ -38,14 +38,7 @@
 
                         {# Footer: price badge + optional tag #}
                         <div class="card-footer">
-                            {% if item.description %}
-                                <span class="card-price">
-                                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
-                                    </svg>
-                                    {{ item.description }}
-                                </span>
-                            {% endif %}
+                           
 
                             {% if item.tag %}
                                 <span class="card-tag">{{ item.tag }}</span>
