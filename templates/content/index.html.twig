@@ -1,10 +1,144 @@
 {% extends 'base.html.twig' %}
 
-
-{% block title %} {{ content.title }} {% endblock %}
-
 {% block body %}
-<h1>{{ content.title }}</h1>
-<p>{{ content.description }}</p>
-<p>{{ content.type.name }}</p>
+{{ parent() }}
+
+
+<style>
+body {
+    background: #0f0f0f;
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+.content-page {
+    display: flex;
+    justify-content: center;
+    gap: 80px;
+    margin-top: 60px;
+}
+
+/* LEFT */
+.left {
+    width: 300px;
+}
+
+.cover {
+    width: 100%;
+    border-radius: 15px;
+    border: 3px solid white;
+}
+
+.player {
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.play-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.wave {
+    flex: 1;
+    height: 20px;
+    background: repeating-linear-gradient(
+        to right,
+        white,
+        white 2px,
+        transparent 2px,
+        transparent 6px
+    );
+}
+
+.artist {
+    color: red;
+    margin-top: 5px;
+}
+
+/* RIGHT */
+.right {
+    width: 400px;
+}
+
+.download {
+    display: block;
+    background: red;
+    color: white;
+    text-align: center;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 20px;
+    text-decoration: none;
+    margin-bottom: 20px;
+}
+
+.stats {
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+hr {
+    border: 1px solid #444;
+    margin: 20px 0;
+}
+
+.rating {
+    margin-top: 20px;
+    font-size: 24px;
+}
+</style>
+
+<div class="content-page">
+
+    <!-- LEFT -->
+    <div class="left">
+         {% if content.image_file %}
+                        <img
+                            class="card-cover"
+                            src="{{ asset(content.image_file) }}"
+                            alt="{{ content.title }}"
+                            loading="lazy"
+                        />
+                    {% else %}
+                        <div class="card-cover-placeholder">&#127925;</div>
+        {% endif %} 
+        <div class="player">
+            <button class="play-btn">▶</button>
+            <div class="wave"></div>
+        </div>
+
+        <h2>{{ content.title }}</h2>
+        <p class="artist">
+            {{ content.fkUser ? content.fkUser.username : 'Unknown' }}
+        </p>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="right">
+        <a href="{{ asset(content.filePath) }}" class="download">Download</a>
+
+        <div class="stats">
+            ❤️ 300 <span>|</span> ⬇ 20
+        </div>
+
+        <hr>
+
+        <p><b>Genre:</b> {{ content.type.name }}</p>
+        <p><b>Tempo:</b> 100 BPM</p>
+        <p><b>Kategorie:</b> {{ content.type.name }}</p>
+
+        <div class="rating">
+            ⭐ ⭐ ⭐ ⭐ ⭐
+        </div>
+    </div>
+
+</div>
+
 {% endblock %}

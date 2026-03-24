@@ -17,11 +17,11 @@ final class ContentController extends AbstractController
     public function index(int $id, EntityManagerInterface $em): Response
     {
         $content = $em->getRepository(Content::class)->find($id);
-
+        
         if (!$content) {
             throw $this->createNotFoundException('Content not found');
         }
-
+        var_dump($content);
         return $this->render('content/index.html.twig', [
             'content' => $content,
         ]);
@@ -38,7 +38,7 @@ final class ContentController extends AbstractController
 
         // Hole die Inhalte basierend auf der Kategorie ID
         $contents = $em->getRepository(Content::class)->findBy(['type' => $category]);
-        
+
         if (!$contents) {
             return new JsonResponse(['error' => 'Content not found'], 404);
         }
