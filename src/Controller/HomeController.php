@@ -27,7 +27,6 @@ final class HomeController extends AbstractController
             'category_name' => 'Tracks',
         ]);
         $contents = json_decode($response->getContent(), true);
-        var_dump($contents);
 
         return $this->render('home/tracks.html.twig', [
             'contents' => $contents,
@@ -42,7 +41,6 @@ final class HomeController extends AbstractController
             'category_name' => 'Beats',
         ]);
         $contents = json_decode($response->getContent(), true);
-        var_dump($contents);
 
         return $this->render('home/beats.html.twig', [
             'contents' => $contents,
@@ -57,7 +55,6 @@ final class HomeController extends AbstractController
             'category_name' => 'Sound Kits',
         ]);
         $contents = json_decode($response->getContent(), true);
-        var_dump($contents);
 
         return $this->render('home/soundkits.html.twig', [
             'contents' => $contents,
@@ -72,7 +69,6 @@ final class HomeController extends AbstractController
             'category_name' => 'Samples',
         ]);
         $contents = json_decode($response->getContent(), true);
-        var_dump($contents);
 
         return $this->render('home/samples.html.twig', [
             'contents' => $contents,
