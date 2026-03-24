@@ -34,4 +34,49 @@ final class HomeController extends AbstractController
 
         ]);
     }
+
+    #[Route('/entdecke-beats', name: 'app_beats')]
+    public function exploreBeats(): Response
+    {
+        $response = $this->forward('App\Controller\ContentController::getContentByCategory', [
+            'category_name' => 'Beats',
+        ]);
+        $contents = json_decode($response->getContent(), true);
+        var_dump($contents);
+
+        return $this->render('home/beats.html.twig', [
+            'contents' => $contents,
+
+        ]);
+    }
+
+    #[Route('/entdecke-sound-kits', name: 'app_sound_kits')]
+    public function exploreSoundKits(): Response
+    {
+        $response = $this->forward('App\Controller\ContentController::getContentByCategory', [
+            'category_name' => 'Sound Kits',
+        ]);
+        $contents = json_decode($response->getContent(), true);
+        var_dump($contents);
+
+        return $this->render('home/soundkits.html.twig', [
+            'contents' => $contents,
+
+        ]);
+    }
+
+    #[Route('/entdecke-loop-und-samples', name: 'app_loop_und_samples')]
+    public function exploreLoopUndSamples(): Response
+    {
+        $response = $this->forward('App\Controller\ContentController::getContentByCategory', [
+            'category_name' => 'Samples',
+        ]);
+        $contents = json_decode($response->getContent(), true);
+        var_dump($contents);
+
+        return $this->render('home/samples.html.twig', [
+            'contents' => $contents,
+
+        ]);
+    }
 }
