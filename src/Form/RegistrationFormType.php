@@ -12,6 +12,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Validator\Constraints\Email;
+
 
 
 class RegistrationFormType extends AbstractType
@@ -20,10 +22,24 @@ class RegistrationFormType extends AbstractType
     {
         $builder
             ->add('username', TextType::class, [
-                'label' => 'Username'
+                'label' => 'Username',
+                'constraints' => [
+                    new NotBlank(message: 'Bitte gib einen Benutzernamen ein.'),
+                    new Length(
+                        min: 3,
+                        minMessage: 'Der Benutzername muss mindestens {{ limit }} Zeichen lang sein.',
+                        max: 50,
+                        maxMessage: 'Der Benutzername darf maximal {{ limit }} Zeichen lang sein.',
+                    ),
+                ],
             ])
             ->add('email', EmailType::class, [
                 'label' => 'E-Mail',
+                'constraints' => [
+                    new NotBlank(message: 'Bitte gib eine E-Mail-Adresse ein.'),
+                    new Email(message: 'Bitte gib eine gültige E-Mail-Adresse ein.'),
+
+                ],
             ])
             ->add('plainPassword', RepeatedType::class, [
                 'type' => PasswordType::class,
