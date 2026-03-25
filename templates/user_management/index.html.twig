@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Benutzermanagement{% endblock %}
+
+{% block body %}
+{{parent()}}
+
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+</style>
+
+<div class="example-wrapper">
+    <h1>Hello {{ controller_name }}! ✅</h1>
+    <h2>Benutzerdaten:</h2>
+        <ul>
+                Email: {{ user_data.getEmail() }}<button><a href="{{ path('app_edit_email') }}">Ändern</a></button> <br>
+                Username: {{ user_data.getUsername() }}<button><a href="{{ path('app_edit_username') }}">Ändern</a></button> <br>
+                Biography: {{ user_data.getBiography() }}<button><a href="{{ path('app_edit_bio') }}">Ändern</a></button>
+        </ul>
+</div>
+{% endblock %}
