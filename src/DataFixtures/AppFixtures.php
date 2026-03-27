@@ -79,18 +79,18 @@ class AppFixtures extends Fixture
         // --- CONTENT ---
         $contentsData = [
             // [title, description, file_path, catIdx, userIdx, tagIdx, image_file]
-            ['Midnight Vibes', 'Chill Afro Track mit smoothen Vocals.', 'tracks/midnight_vibes.mp3', 0, 0, 0, 'uploads/midnight_vibes.jpg'],
-            ['Trap God Beat', 'Harter Trap Beat mit 808s und Hi-Hats.', 'beats/trap_god.mp3', 1, 1, 1, 'uploads/trap_god.jpg'],
-            ['Drill Season', 'Dark UK Drill Instrumental.', 'beats/drill_season.mp3', 1, 2, 2, 'uploads/drill_season.jpg'],
-            ['Balkan Fire', 'Energetischer Balkan-inspirierter Track.', 'tracks/balkan_fire.mp3', 0, 3, 6, 'uploads/balkan_fire.jpg'],
-            ['808 Bass Sample Pack', 'Fette 808 Basslines für deine Beats.', 'samples/808_bass_pack.zip', 2, 0, 1, 'uploads/808_bass_pack.jpg'],
-            ['Detroit Techno Kit', 'Classic Detroit Sound Kit mit Drums.', 'soundkits/detroit_techno.zip', 3, 1, 4, 'uploads/detroit_techno.jpg'],
-            ['RnB Melodie', 'Smooth RnB Loop mit Piano und Strings.', 'tracks/rnb_melodie.mp3', 0, 2, 5, 'uploads/rnb_melodie.jpg'],
-            ['Latin Heat', 'Feuriger Latin Beat mit Percussion.', 'beats/latin_heat.mp3', 1, 3, 7, 'uploads/latin_heat.jpg'],
-            ['Skrilla Flow', null, 'tracks/skrilla_flow.mp3', 0, 0, 8, 'uploads/skrilla_flow.jpg'],
-            ['Drill Hi-Hat Loops', 'Crispy Hi-Hat Loops für Drill Beats.', 'samples/drill_hihats.zip', 2, 1, 2, 'uploads/drill_hihats.jpg'],
-            ['Trap Drum Kit Vol.1', 'Komplettes Trap Drum Kit mit Claps.', 'soundkits/trap_drums_vol1.zip', 3, 2, 1, 'uploads/trap_drums_vol1.jpg'],
-            ['House Groove', 'Deep House Loop mit klassischem Feel.', 'tracks/house_groove.mp3', 0, 3, 3, 'uploads/house_groove.jpg'],
+            ['Midnight Vibes', 'Chill Afro Track mit smoothen Vocals.', 'tracks/midnight-vibes_adminuser_1.wav', 0, 0, 0, 'uploads/content_images/midnight_vibes.jpg'],
+            ['Trap God Beat', 'Harter Trap Beat mit 808s und Hi-Hats.', 'beats/trap-god-beat_alice_2.wav', 1, 1, 1, 'uploads/content_images/trap_god.jpg'],
+            ['Drill Season', 'Dark UK Drill Instrumental.', 'beats/drill-season_bob_3.wav', 1, 2, 2, 'uploads/content_images/drill_season.jpg'],
+            ['Balkan Fire', 'Energetischer Balkan-inspirierter Track.', 'tracks/balkan-fire_carol_4.wav', 0, 3, 6, 'uploads/content_images/balkan_fire.jpg'],
+            ['808 Bass Sample Pack', 'Fette 808 Basslines für deine Beats.', 'samples/808_bass_pack.zip', 2, 0, 1, 'uploads/content_images/808_bass_pack.jpg'],
+            ['Detroit Techno Kit', 'Classic Detroit Sound Kit mit Drums.', 'soundkits/detroit_techno.zip', 3, 1, 4, 'uploads/content_images/detroit_techno.jpg'],
+            ['RnB Melodie', 'Smooth RnB Loop mit Piano und Strings.', 'tracks/rnb-melodie_bob_7.wav', 0, 2, 5, 'uploads/content_images/rnb_melodie.jpg'],
+            ['Latin Heat', 'Feuriger Latin Beat mit Percussion.', 'beats/latin-heat_carol_8.wav', 1, 3, 7, 'uploads/content_images/latin_heat.jpg'],
+            ['Skrilla Flow', null, 'tracks/skrilla-flow_adminuser_9.wav', 0, 0, 8, 'uploads/content_images/skrilla_flow.jpg'],
+            ['Drill Hi-Hat Loops', 'Crispy Hi-Hat Loops für Drill Beats.', 'samples/drill_hihats.zip', 2, 1, 2, 'uploads/content_images/drill_hihats.jpg'],
+            ['Trap Drum Kit Vol.1', 'Komplettes Trap Drum Kit mit Claps.', 'soundkits/trap_drums_vol1.zip', 3, 2, 1, 'uploads/content_images/trap_drums_vol1.jpg'],
+            ['House Groove', 'Deep House Loop mit klassischem Feel.', 'tracks/house-groove_carol_12.wav', 0, 3, 3, 'uploads/content_images/house_groove.jpg'],
         ];
         $contents = [];
         foreach ($contentsData as [$title, $desc, $path, $catIdx, $userIdx, $tagIdx, $imageFile]) {

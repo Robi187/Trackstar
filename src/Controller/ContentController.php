@@ -12,6 +12,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Content;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 
 final class ContentController extends AbstractController
@@ -65,5 +67,28 @@ final class ContentController extends AbstractController
 
         // Gib das Array als JSON zurück
         return new JsonResponse($contentArray);
+    }
+
+
+    #[Route('/content/{id}/download', name: 'content_download')]
+    public function download(Content $content, EntityManagerInterface $em): BinaryFileResponse
+    {   
+        var_dump($content->getFilePath());
+        $filePath = $this->getParameter('kernel.project_dir') . '/public/uploads/' . $content->getFilePath();
+        var_dump($filePath);
+        if (!file_exists($filePath)) {
+            throw $this->createNotFoundException('Datei nicht gefunden.');
+        }
+
+        $content->incrementDownloadCount();
+        $em->flush();
+
+        $response = new BinaryFileResponse($filePath);
+        $response->setContentDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            basename($filePath)
+        );
+
+        return $response;
     }
 }

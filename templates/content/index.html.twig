@@ -370,7 +370,7 @@
 		<!-- RIGHT PANEL -->
 		<div class="right-panel">
 
-			<a href="{{ asset(content.filePath) }}" class="download-btn-right">
+			<a href="{{ path('content_download', { id: content.id }) }}" class="download-btn-right">
 				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 					<path d="M12 16l-5-5h3.5V4h3v7H17l-5 5zm-7 2h14v2H5v-2z"/>
 				</svg>
