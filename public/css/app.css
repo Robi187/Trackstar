@@ -1,3 +1,33 @@
 body {
     background-color: black;
 }
+
+@import url('https://fonts.adobe.com/fonts/futura-pt');
+  @import url('https://fonts.adobe.com/fonts/sofia-pro');
+  @import url('https://fonts.adobe.com/fonts/acumin-pro');
+  @import url("https://use.typekit.net/tqp0iic.css");
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #000000;
+    --surface:   #111113;
+    --border:    #2a2a2d;
+    --orange:    #ff5a00;
+    --orange-h:  #ff7020;
+    --red:       #e02434;
+    --text:      #ffffff;
+    --muted:     #8a8a8e;
+    --input-bg:  #3a3c41;
+
+    --font-heading:    'futura-pt', 'Outfit', sans-serif;
+    --font-subheading: 'sofia-pro', 'Outfit', sans-serif;
+    --font-body:       'acumin-pro', 'Outfit', sans-serif;
+    
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-style: italic;
+}

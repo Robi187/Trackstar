@@ -41,6 +41,9 @@ class Content
     #[ORM\Column(length: 255)]
     private ?string $image_file = null;
 
+    #[ORM\Column]
+    private ?int $downloadCount = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -140,5 +143,21 @@ class Content
         $this->image_file = $image_file;
 
         return $this;
+    }
+
+    public function getDownloadCount(): ?int
+    {
+        return $this->downloadCount;
+    }
+
+    public function setDownloadCount(int $downloadCount): static
+    {
+        $this->downloadCount = $downloadCount;
+
+        return $this;
+    }
+    public function incrementDownloadCount(): void
+    {
+        $this->downloadCount++;
     }
 }

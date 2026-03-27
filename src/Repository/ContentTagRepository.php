@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\ContentTag;
+use App\Entity\Content;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -14,6 +15,17 @@ class ContentTagRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, ContentTag::class);
+    }
+
+    // src/Repository/ContentTagRepository.php
+
+    public function findTagsByContent(Content $content): array
+    {
+        return $this->createQueryBuilder('ct')
+            ->where('ct.fk_content = :content')
+            ->setParameter('content', $content)
+            ->getQuery()
+            ->getResult();
     }
 
     //    /**

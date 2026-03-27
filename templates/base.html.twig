@@ -1,328 +1,384 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-            <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-            <style>
-            * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
+	<head>
+		<meta charset="UTF-8">
+		<title>
+			{% block title %}Trackstar
+			{% endblock %}
+		</title>
+		<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+		{% block stylesheets %}
+			<link rel="stylesheet" href="{{ asset('css/app.css') }}">
+			<style>
+				* {
+					margin: 0;
+					padding: 0;
+					box-sizing: border-box;
+				}
 
-    body {
-        background-color: #1a1a1a;
-        color: #ffffff;
-        font-family: 'Arial', sans-serif;
-        min-height: 100vh;
-    }
 
-    /* ── NAVBAR ── */
-    .navbar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 14px 32px;
-        background-color: #111111;
-        border-bottom: 1px solid #2a2a2a;
-    }
+				@import url('https://fonts.adobe.com/fonts/futura-pt');
+				@import url('https://fonts.adobe.com/fonts/sofia-pro');
+				@import url('https://fonts.adobe.com/fonts/acumin-pro');
+				@import url("https://use.typekit.net/tqp0iic.css");
 
-    .navbar-logo {
-        font-size: 1.4rem;
-        font-weight: 800;
-        letter-spacing: -0.5px;
-        text-decoration: none;
-        color: #ffffff;
-    }
+				*,
+				*::before,
+				*::after {
+					box-sizing: border-box;
+					margin: 0;
+					padding: 0;
+				}
 
-    .navbar-logo span {
-        color: #e63946;
-    }
+				:root {
+					--bg: #000000;
+					--surface: #111113;
+					--border: #2a2a2d;
+					--orange: #ff5a00;
+					--orange-h: #ff7020;
+					--red: #e02434;
+					--text: #ffffff;
+					--muted: #8a8a8e;
+					--input-bg: #3a3c41;
 
-    .navbar-search {
-        flex: 1;
-        max-width: 360px;
-        margin: 0 40px;
-        position: relative;
-    }
+					--font-heading: 'futura-pt', 'Outfit', sans-serif;
+					--font-subheading: 'sofia-pro', 'Outfit', sans-serif;
+					--font-body: 'acumin-pro', 'Outfit', sans-serif;
 
-    .navbar-search input {
-        width: 100%;
-        background-color: #2a2a2a;
-        border: 1px solid #3a3a3a;
-        border-radius: 6px;
-        color: #ccc;
-        font-size: 0.85rem;
-        padding: 8px 14px 8px 36px;
-        outline: none;
-        transition: border-color 0.2s;
-    }
+				}
 
-    .navbar-search input::placeholder {
-        color: #666;
-    }
+				h1,
+				h2,
+				h3,
+				h4,
+				h5,
+				h6 {
+					font-family: var(--font-heading);
+					font-weight: 600;
+					font-style: italic;
+				}
 
-    .navbar-search input:focus {
-        border-color: #e63946;
-    }
+				body {
+					background-color: #1a1a1a;
+					color: #ffffff;
+					font-family: 'Arial', sans-serif;
+					min-height: 100vh;
+				}
 
-    .navbar-search .search-icon {
-        position: absolute;
-        left: 11px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #666;
-        font-size: 0.85rem;
-    }
+				/* ── NAVBAR ── */
+				.navbar {
+					display: flex;
+					align-items: center;
+					justify-content: space-between;
+					padding: 14px 32px;
+					background-color: #111111;
+					border-bottom: 1px solid #2a2a2a;
+				}
 
-    .navbar-right {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-    }
+				.navbar-logo {
+					font-size: 1.4rem;
+					font-weight: 800;
+					letter-spacing: -0.5px;
+					text-decoration: none;
+					color: #ffffff;
+				}
 
-    .navbar-shop {
-        color: #ffffff;
-        text-decoration: none;
-        font-size: 0.9rem;
-        font-weight: 500;
-        transition: color 0.2s;
-    }
+				.navbar-logo span {
+					color: var(--orange);
+				}
 
-    .navbar-shop:hover {
-        color: #e63946;
-    }
+				.navbar-search {
+					flex: 1;
+					max-width: 360px;
+					margin: 0 40px;
+					position: relative;
+				}
 
-    .navbar-avatar {
-        width: 34px;
-        height: 34px;
-        background-color: #2a2a2a;
-        border: 1px solid #3a3a3a;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        color: #aaa;
-        font-size: 1rem;
-        transition: border-color 0.2s;
-    }
+				.navbar-search input {
+					width: 100%;
+					background-color: #2a2a2a;
+					border: 1px solid #3a3a3a;
+					border-radius: 6px;
+					color: #ccc;
+					font-size: 0.85rem;
+					padding: 8px 14px 8px 36px;
+					outline: none;
+					transition: border-color 0.2s;
+				}
 
-    .navbar-avatar:hover {
-        border-color: #e63946;
-        color: #ffffff;
-    }
+				.navbar-search input::placeholder {
+					color: #666;
+				}
 
-    /* ── SUBNAV ── */
-    .subnav {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 48px;
-        padding: 14px 32px;
-        background-color: #111111;
-        border-bottom: 1px solid #2a2a2a;
-    }
+				.navbar-search input:focus {
+					border-color: var(--orange);
+				}
 
-    .subnav a {
-        color: #cccccc;
-        text-decoration: none;
-        font-size: 0.9rem;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        gap: 7px;
-        transition: color 0.2s;
-    }
+				.navbar-search .search-icon {
+					position: absolute;
+					left: 11px;
+					top: 50%;
+					transform: translateY(-50%);
+					color: #666;
+					font-size: 0.85rem;
+				}
 
-    .subnav a:hover {
-        color: #ffffff;
-    }
+				.navbar-right {
+					display: flex;
+					align-items: center;
+					gap: 16px;
+				}
 
-    .subnav a.active {
-        color: #ffffff;
-    }
+				.navbar-shop {
+					color: #ffffff;
+					text-decoration: none;
+					font-size: 0.9rem;
+					font-weight: 500;
+					transition: color 0.2s;
+				}
 
-    .subnav a svg {
-        width: 15px;
-        height: 15px;
-        fill: currentColor;
-    }
+				.navbar-shop:hover {
+					color: var(--orange);
+				}
 
-    /* ── MAIN ── */
-    .main {
-        padding: 48px 32px 64px;
-        max-width: 1200px;
-        margin: 0 auto;
-    }
+				.navbar-avatar {
+					width: 34px;
+					height: 34px;
+					background-color: #2a2a2a;
+					border: 1px solid #3a3a3a;
+					border-radius: 50%;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					cursor: pointer;
+					color: #aaa;
+					font-size: 1rem;
+					transition: border-color 0.2s;
+				}
 
-    .section-title {
-        font-size: 1.75rem;
-        font-weight: 700;
-        text-align: center;
-        margin-bottom: 40px;
-        color: #ffffff;
-    }
+				.navbar-avatar:hover {
+					border-color: var(--orange);
+					color: var(--orange);
+				}
 
-    /* ── GRID ── */
-    .content-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 28px;
-    }
+				/* ── SUBNAV ── */
+				.subnav {
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					gap: 48px;
+					padding: 14px 32px;
+					background-color: #111111;
+					border-bottom: 1px solid #2a2a2a;
+				}
 
-    /* ── CARD ── */
-    .card {
-        background-color: #111111;
-        border-radius: 8px;
-        overflow: hidden;
-        cursor: pointer;
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
+				.subnav a {
+					color: #cccccc;
+					text-decoration: none;
+					font-size: 0.9rem;
+					font-weight: 500;
+					display: flex;
+					align-items: center;
+					gap: 7px;
+					transition: color 0.2s;
+				}
 
-    .card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-    }
+				.subnav a:hover {
+					color: var(--orange-h);
+				}
 
-    .card-cover {
-        width: 100%;
-        aspect-ratio: 1 / 1;
-        object-fit: cover;
-        display: block;
-        background-color: #2a2a2a;
-    }
+				.subnav a.active {
+					color: #ffffff;
+				}
 
-    .card-cover-placeholder {
-        width: 100%;
-        aspect-ratio: 1 / 1;
-        background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #444;
-        font-size: 2.5rem;
-    }
+				.subnav a svg {
+					width: 15px;
+					height: 15px;
+					fill: currentColor;
+				}
 
-    .card-body {
-        padding: 12px 12px 14px;
-    }
+				/* ── MAIN ── */
+				.main {
+					padding: 48px 32px 64px;
+					max-width: 1200px;
+					margin: 0 auto;
+				}
 
-    .card-title {
-        text-align: center;
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: #ffffff;
-        margin-bottom: 3px;
-        line-height: 1.35;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
+				.section-title {
+					font-size: 1.75rem;
+					font-weight: 700;
+					text-align: center;
+					margin-bottom: 40px;
+					color: #ffffff;
+				}
 
-    .card-user {
-        text-align: center;
-        font-size: 0.78rem;
-        color: #888888;
-        margin-bottom: 10px;
-    }
+				/* ── GRID ── */
+				.content-grid {
+					display: grid;
+					grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+					gap: 28px;
+				}
 
-    .card-footer {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 6px;
-    }
+				/* ── CARD ── */
+				.card {
+					background-color: #111111;
+					border-radius: 8px;
+					overflow: hidden;
+					cursor: pointer;
+					transition: transform 0.2s, box-shadow 0.2s;
+				}
 
-    .card-price {
-        background-color: #2a2a2a;
-        border-radius: 4px;
-        padding: 4px 10px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        color: #ffffff;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-    }
+				.card:hover {
+					transform: translateY(-4px);
+					box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+				}
 
-    .card-price svg {
-        width: 12px;
-        height: 12px;
-        fill: currentColor;
-        color: #aaa;
-    }
+				.card-cover {
+					width: 100%;
+					aspect-ratio: 1 / 1;
+					object-fit: cover;
+					display: block;
+					background-color: #2a2a2a;
+				}
 
-    .card-tag {
-        align-items: center;
-        text-align: center;
-        font-size: 0.72rem;
-        color: #666;
-        background-color: #222;
-        border-radius: 3px;
-        padding: 3px 7px;
-    }
+				.card-cover-placeholder {
+					width: 100%;
+					aspect-ratio: 1 / 1;
+					background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					color: #444;
+					font-size: 2.5rem;
+				}
 
-    /* ── EMPTY STATE ── */
-    .empty-state {
-        text-align: center;
-        color: #555;
-        padding: 80px 0;
-        font-size: 1rem;
-    }
-            </style>
-        {% endblock %}
+				.card-body {
+					padding: 12px 12px 14px;
+				}
 
-        {% block javascripts %}
-        {% endblock %}
-    </head>
-    <body>
-    
-        {% block body %}
-        {# ── NAVBAR ── #}
-<nav class="navbar">
-    <a href="/home" class="navbar-logo">Track<span>Star</span></a>
+				.card-title {
+					text-align: center;
+					font-size: 0.85rem;
+					font-weight: 600;
+					color: #ffffff;
+					margin-bottom: 3px;
+					line-height: 1.35;
+					white-space: nowrap;
+					overflow: hidden;
+					text-overflow: ellipsis;
+				}
 
-    <div class="navbar-search">
-        <span class="search-icon">&#128269;</span>
-        <input type="text" placeholder="Suche" />
-    </div>
+				.card-user {
+					text-align: center;
+					font-size: 0.78rem;
+					color: #888888;
+					margin-bottom: 10px;
+				}
 
-    <div class="navbar-right">
-        <a href="/shop" class="navbar-shop">Dein Shop</a>
-        <div class="navbar-avatar">&#128100;</div>
-    </div>
-</nav>
+				.card-footer {
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					gap: 6px;
+				}
 
-{# ── SUBNAV ── #}
-<nav class="subnav">
-    <a href="/entdecke-tracks">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/>
-        </svg>
-        Tracks
-    </a>
-    <a href="/entdecke-sound-kits">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20 2H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zm-9 13H9V9h2v6zm4 0h-2V9h2v6z"/>
-        </svg>
-        SoundKits
-    </a>
-    <a href="/entdecke-loop-und-samples">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
-        </svg>
-        Loops&Samples
-    </a>
-    <a href="/entdecke-beats">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/>
-        </svg>
-        Beats
-    </a>
-</nav>{% endblock %}
-    </body>
+				.card-price {
+					background-color: #2a2a2a;
+					border-radius: 4px;
+					padding: 4px 10px;
+					font-size: 0.8rem;
+					font-weight: 600;
+					color: #ffffff;
+					display: inline-flex;
+					align-items: center;
+					gap: 5px;
+				}
+
+				.card-price svg {
+					width: 12px;
+					height: 12px;
+					fill: currentColor;
+					color: #aaa;
+				}
+
+				.card-tag {
+					align-items: center;
+					text-align: center;
+					font-size: 0.72rem;
+					color: #666;
+					background-color: #222;
+					border-radius: 3px;
+					padding: 3px 7px;
+				}
+
+				/* ── EMPTY STATE ── */
+				.empty-state {
+					text-align: center;
+					color: #555;
+					padding: 80px 0;
+					font-size: 1rem;
+				}
+
+				.tag-badge {
+					display: inline-block;
+					border: 1px solid var(--orange);
+					color: var(--orange);
+					border-radius: 5px;
+					padding: 3px 10px;
+					font-size: 0.8rem;
+					margin: 2px;
+				}
+			</style>
+		{% endblock %}
+
+		{% block javascripts %}{% endblock %}
+	</head>
+	<body>
+
+		{% block body %}
+			{# ── NAVBAR ── #}
+			<nav class="navbar">
+				<a href="/home" class="navbar-logo">Track<span>Star</span>
+				</a>
+
+				<div class="navbar-search">
+					<span class="search-icon">&#128269;</span>
+					<input type="text" placeholder="Suche"/>
+				</div>
+
+				<div class="navbar-right">
+					<a href="/shop" class="navbar-shop">Deine Inhalte</a>
+					<div class="navbar-avatar">&#128100;</div>
+				</div>
+			</nav>
+
+			{# ── SUBNAV ── #}
+			<nav class="subnav">
+				<a href="/entdecke-tracks">
+					<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+						<path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/>
+					</svg>
+					Tracks
+				</a>
+				<a href="/entdecke-sound-kits">
+					<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+						<path d="M20 2H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zm-9 13H9V9h2v6zm4 0h-2V9h2v6z"/>
+					</svg>
+					SoundKits
+				</a>
+				<a href="/entdecke-loop-und-samples">
+					<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+						<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+					</svg>
+					Loops&Samples
+				</a>
+				<a href="/entdecke-beats">
+					<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+						<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/>
+					</svg>
+					Beats
+				</a>
+			</nav>
+		{% endblock %}
+	</body>
 </html>

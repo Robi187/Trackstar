@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Favorite;
+use App\Entity\Content;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -14,6 +15,16 @@ class FavoriteRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Favorite::class);
+    }
+
+    public function countByContent(Content $content): int
+    {
+        return $this->createQueryBuilder('f')
+            ->select('COUNT(f.fk_content)')
+            ->where('f.fk_content = :content')
+            ->setParameter('content', $content)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 
     //    /**
