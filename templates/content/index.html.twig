@@ -1,144 +1,430 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-{{ parent() }}
+	{{ parent() }}
 
+	<style>
+		@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
 
-<style>
-body {
-    background: #0f0f0f;
-    color: white;
-    font-family: Arial, sans-serif;
-}
+		body {
+			background: #0a0a0a;
+			color: white;
+			font-family: 'DM Sans', sans-serif;
+		}
 
-.content-page {
-    display: flex;
-    justify-content: center;
-    gap: 80px;
-    margin-top: 60px;
-}
+		.page-wrapper {
+			display: flex;
+			justify-content: center;
+			align-items: flex-start;
+			padding: 60px 20px;
+			gap: 24px;
+		}
 
-/* LEFT */
-.left {
-    width: 300px;
-}
+		/* ── LEFT PANEL ── */
+		.left-panel {
+			width: 320px;
+			background: #161616;
+			border-radius: 16px;
+			overflow: hidden;
+			border: 1px solid #2a2a2a;
+		}
 
-.cover {
-    width: 100%;
-    border-radius: 15px;
-    border: 3px solid white;
-}
+		.cover-wrapper {
+			position: relative;
+			width: 100%;
+			aspect-ratio: 1;
+			overflow: hidden;
+		}
 
-.player {
-    margin: 20px 0;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
+		.cover-wrapper img,
+		.cover-placeholder {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+			display: block;
+		}
 
-.play-btn {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-}
+		.cover-placeholder {
+			background: #1e1e1e;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 72px;
+		}
 
-.wave {
-    flex: 1;
-    height: 20px;
-    background: repeating-linear-gradient(
-        to right,
-        white,
-        white 2px,
-        transparent 2px,
-        transparent 6px
-    );
-}
+		.play-overlay {
+			position: absolute;
+			inset: 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background: rgba(0, 0, 0, 0.35);
+			opacity: 0;
+			transition: opacity 0.2s;
+		}
 
-.artist {
-    color: red;
-    margin-top: 5px;
-}
+		.cover-wrapper:hover .play-overlay {
+			opacity: 1;
+		}
 
-/* RIGHT */
-.right {
-    width: 400px;
-}
+		.play-circle {
+			width: 64px;
+			height: 64px;
+			border-radius: 50%;
+			background: #e63946;
+			border: none;
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 22px;
+			color: white;
+			transition: transform 0.15s;
+			box-shadow: 0 4px 20px rgba(230, 57, 70, 0.5);
+		}
 
-.download {
-    display: block;
-    background: red;
-    color: white;
-    text-align: center;
-    padding: 15px;
-    border-radius: 10px;
-    font-size: 20px;
-    text-decoration: none;
-    margin-bottom: 20px;
-}
+		.play-circle:hover {
+			transform: scale(1.08);
+		}
 
-.stats {
-    font-size: 22px;
-    margin-bottom: 10px;
-}
+		.track-meta {
+			padding: 18px 20px 8px;
+		}
 
-hr {
-    border: 1px solid #444;
-    margin: 20px 0;
-}
+		.track-meta h2 {
+			margin: 0 0 4px;
+			font-size: 18px;
+			font-weight: 700;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
 
-.rating {
-    margin-top: 20px;
-    font-size: 24px;
-}
-</style>
+		.track-meta .artist {
+			color: #e63946;
+			font-size: 14px;
+			margin: 0;
+		}
 
-<div class="content-page">
+		/* Waveform */
+		.waveform-bar {
+			margin: 14px 20px;
+			height: 36px;
+			background: repeating-linear-gradient(
+				to right,
+				#3a3a3a 0px,
+				#3a3a3a 2px,
+				transparent 2px,
+				transparent 5px
+			);
+			border-radius: 4px;
+			position: relative;
+			overflow: hidden;
+		}
 
-    <!-- LEFT -->
-    <div class="left">
-         {% if content.image_file %}
-                        <img
-                            class="card-cover"
-                            src="{{ asset(content.image_file) }}"
-                            alt="{{ content.title }}"
-                            loading="lazy"
-                        />
-                    {% else %}
-                        <div class="card-cover-placeholder">&#127925;</div>
-        {% endif %} 
-        <div class="player">
-            <button class="play-btn">▶</button>
-            <div class="wave"></div>
-        </div>
+		.waveform-bar::before {
+			content: '';
+			position: absolute;
+			left: 0; top: 0; bottom: 0;
+			width: 40%;
+			background: repeating-linear-gradient(
+				to right,
+				#e63946 0px,
+				#e63946 2px,
+				transparent 2px,
+				transparent 5px
+			);
+		}
 
-        <h2>{{ content.title }}</h2>
-        <p class="artist">
-            {{ content.fkUser ? content.fkUser.username : 'Unknown' }}
-        </p>
-    </div>
+		/* Social row */
+		.social-row {
+			display: flex;
+			align-items: center;
+			gap: 20px;
+			padding: 14px 20px;
+			border-top: 1px solid #2a2a2a;
+		}
 
-    <!-- RIGHT -->
-    <div class="right">
-        <a href="{{ asset(content.filePath) }}" class="download">Download</a>
+		.social-btn {
+			display: flex;
+			align-items: center;
+			gap: 6px;
+			background: none;
+			border: none;
+			color: #aaa;
+			font-size: 13px;
+			cursor: pointer;
+			font-family: inherit;
+			transition: color 0.15s;
+			padding: 0;
+		}
 
-        <div class="stats">
-            ❤️ 300 <span>|</span> ⬇ 20
-        </div>
+		.social-btn:hover { color: #e63946; }
+		.social-btn:hover svg { fill: #e63946; }
 
-        <hr>
+		.social-btn svg {
+			width: 18px;
+			height: 18px;
+			fill: #aaa;
+			transition: fill 0.15s;
+		}
 
-        <p><b>Genre:</b> {{ content.type.name }}</p>
-        <p><b>Tempo:</b> 100 BPM</p>
-        <p><b>Kategorie:</b> {{ content.type.name }}</p>
+		.social-btn.liked svg { fill: #e63946; }
+		.social-btn.liked { color: #e63946; }
 
-        <div class="rating">
-            ⭐ ⭐ ⭐ ⭐ ⭐
-        </div>
-    </div>
+		/* Divider between social buttons */
+		.social-divider {
+			width: 1px;
+			height: 18px;
+			background: #2a2a2a;
+		}
 
-</div>
+		.download-btn-right {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 10px;
+			padding: 16px;
+			background: #e63946;
+			color: white;
+			border-radius: 12px;
+			font-size: 16px;
+			font-weight: 600;
+			text-decoration: none;
+			transition: background 0.15s, transform 0.1s;
+		}
+
+		.download-btn-right:hover {
+			background: #c1121f;
+			transform: translateY(-1px);
+		}
+
+		.download-btn-right svg {
+			width: 18px;
+			height: 18px;
+			fill: white;
+		}
+
+		/* Info table */
+		.info-table {
+			border-top: 1px solid #2a2a2a;
+			padding: 16px 20px 20px;
+		}
+
+		.info-row {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 8px 0;
+			font-size: 13px;
+			border-bottom: 1px solid #1f1f1f;
+		}
+
+		.info-row:last-child { border-bottom: none; }
+		.info-row .label { color: #666; }
+		.info-row .value { color: #ddd; font-weight: 500; }
+
+		/* ── RIGHT PANEL ── */
+		.right-panel {
+			width: 420px;
+			display: flex;
+			flex-direction: column;
+			gap: 16px;
+		}
+
+		.panel-box {
+			background: #161616;
+			border-radius: 16px;
+			border: 1px solid #2a2a2a;
+			padding: 24px;
+		}
+
+		.panel-box h3 {
+			margin: 0 0 18px;
+			font-size: 17px;
+			font-weight: 700;
+			color: #fff;
+			letter-spacing: 0.02em;
+		}
+
+		/* Description box */
+		.description-text {
+			font-size: 14px;
+			line-height: 1.7;
+			color: #bbb;
+			margin: 0 0 16px;
+		}
+
+		.meta-line {
+			font-size: 13px;
+			color: #888;
+			margin-bottom: 12px;
+		}
+
+		.meta-line b { color: #ccc; }
+
+		.tag-list {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 6px;
+			margin-top: 4px;
+		}
+
+		.tag-badge {
+			border: 1px solid #e63946;
+			color: #e63946;
+			border-radius: 6px;
+			padding: 4px 12px;
+			font-size: 12px;
+			font-weight: 500;
+			letter-spacing: 0.02em;
+		}
+
+		/* Rating box */
+		.rating-box {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
+
+		.stars {
+			display: flex;
+			gap: 4px;
+		}
+
+		.stars svg {
+			width: 26px;
+			height: 26px;
+		}
+
+		.star-filled { fill: #f5a623; }
+		.star-empty { fill: none; stroke: #f5a623; stroke-width: 1.5; }
+
+		.rating-score {
+			font-size: 22px;
+			font-weight: 700;
+			color: #f5a623;
+		}
+
+		.rating-max {
+			font-size: 14px;
+			color: #666;
+		}
+	</style>
+
+	<div class="page-wrapper">
+
+		<!-- LEFT PANEL -->
+		<div class="left-panel">
+
+			<div class="cover-wrapper">
+				{% if content.imageFile %}
+					<img src="{{ asset(content.imageFile) }}" alt="{{ content.title }}"/>
+				{% else %}
+					<div class="cover-placeholder">&#127925;</div>
+				{% endif %}
+				<div class="play-overlay">
+					<button class="play-circle">▶</button>
+				</div>
+			</div>
+
+			<div class="track-meta">
+				<h2>{{ content.title }}</h2>
+				<p class="artist">{{ content.fkUser ? content.fkUser.username : 'Unknown' }}</p>
+			</div>
+
+			<div class="waveform-bar"></div>
+
+			<div class="social-row">
+				<!-- Likes -->
+				<button class="social-btn liked">
+					<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+						<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
+						         2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09
+						         C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5
+						         c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+					</svg>
+					{{ favoriteCount }}
+				</button>
+
+				<div class="social-divider"></div>
+
+				<!-- Downloads -->
+				<span class="social-btn">
+					<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+						<path d="M12 16l-5-5h3.5V4h3v7H17l-5 5zm-7 2h14v2H5v-2z"/>
+					</svg>
+					{{ content.downloadCount }}
+				</span>
+			</div>
+
+			<div class="info-table">
+				<div class="info-row">
+					<span class="label">Kategorie</span>
+					<span class="value">{{ content.type.name }}</span>
+				</div>
+			</div>
+
+		</div>
+
+		<!-- RIGHT PANEL -->
+		<div class="right-panel">
+
+			<a href="{{ asset(content.filePath) }}" class="download-btn-right">
+				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+					<path d="M12 16l-5-5h3.5V4h3v7H17l-5 5zm-7 2h14v2H5v-2z"/>
+				</svg>
+				Download
+			</a>
+
+			<!-- Description + Tags -->
+			<div class="panel-box">
+				<h3>Informationen</h3>
+				<p class="description-text">{{ content.description }}</p>
+
+				<div class="meta-line">
+					<b>Tags</b>
+				</div>
+				<div class="tag-list">
+					{% for tag in tags %}
+						<span class="tag-badge">{{ tag.fkTag.name }}</span>
+					{% endfor %}
+				</div>
+			</div>
+
+			<!-- Rating -->
+			<div class="panel-box">
+				<h3>Bewertung</h3>
+				<div class="rating-box">
+					<div class="stars">
+						{% for i in 1..5 %}
+							{% if averageRating >= i %}
+								<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+									<polygon class="star-filled" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+								</svg>
+							{% elseif averageRating >= i - 0.5 %}
+								<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+									<defs>
+										<linearGradient id="half{{ i }}">
+											<stop offset="50%" stop-color="#f5a623"/>
+											<stop offset="50%" stop-color="transparent"/>
+										</linearGradient>
+									</defs>
+									<polygon fill="url(#half{{ i }})" stroke="#f5a623" stroke-width="1.5" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+								</svg>
+							{% else %}
+								<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+									<polygon class="star-empty" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+								</svg>
+							{% endif %}
+						{% endfor %}
+					</div>
+					<span class="rating-score">{{ averageRating|number_format(1) }}</span>
+					<span class="rating-max">/ 5.0</span>
+				</div>
+			</div>
+
+		</div>
+	</div>
 
 {% endblock %}

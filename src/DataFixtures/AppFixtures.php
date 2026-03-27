@@ -15,6 +15,7 @@ use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Faker\Factory;
 
 class AppFixtures extends Fixture
 {
@@ -24,7 +25,8 @@ class AppFixtures extends Fixture
     }
 
     public function load(ObjectManager $manager): void
-    {
+    {   
+        $faker = Factory::create();
         // --- CATEGORIES ---
         $categoryNames = ['Tracks', 'Beats', 'Samples', 'Sound Kits', 'Andere'];
         $categories = [];
@@ -101,6 +103,7 @@ class AppFixtures extends Fixture
             $content->setFkTag($tags[$tagIdx]);
             $content->setImageFile($imageFile);
             $content->setCreatedAt(new \DateTime(sprintf('-%d days', random_int(1, 30))));
+            $content->setDownloadCount($faker->numberBetween(0, 10));
             $manager->persist($content);
             $contents[] = $content;
         }

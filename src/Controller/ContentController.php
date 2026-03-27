@@ -3,6 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Category;
+use App\Entity\Favorite;
+use App\Entity\Rating;
+use App\Entity\ContentTag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -17,17 +20,18 @@ final class ContentController extends AbstractController
     public function index(int $id, EntityManagerInterface $em): Response
     {
         $content = $em->getRepository(Content::class)->find($id);
-        
         if (!$content) {
             throw $this->createNotFoundException('Content not found');
         }
-        var_dump($content);
         return $this->render('content/index.html.twig', [
             'content' => $content,
+            'favoriteCount' => $em->getRepository(Favorite::class)->countByContent($content),
+            'averageRating' => $em->getRepository(Rating::class)->averageByContent($content),
+            'tags' => $em->getRepository(ContentTag::class)->findTagsByContent($content),
         ]);
     }
 
-    #[Route('/content/{category_name}', name: 'app_content_category', requirements: ['category_name' => '[a-zA-Z]+' ])]
+    #[Route('/content/{category_name}', name: 'app_content_category', requirements: ['category_name' => '[a-zA-Z]+'])]
     public function getContentByCategory(string $category_name, EntityManagerInterface $em): Response
     {
         $category = $em->getRepository(Category::class)->findOneBy(['name' => $category_name]);
