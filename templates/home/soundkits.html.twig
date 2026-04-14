@@ -36,11 +36,12 @@
 
 							{# Footer: price badge + optional tag #}
 							<div class="card-footer">
-
-
-								<span class="card-tag">{{ item.tag }}</span>
-
-							</div>
+                            {% if tagsByContent[item.id] is defined %}
+                                {% for tag in tagsByContent[item.id] %}
+                                    <span class="card-tag">{{ tag.fkTag.name }}</span>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
 
 						</div>
 					</div>
