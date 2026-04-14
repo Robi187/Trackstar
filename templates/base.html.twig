@@ -3,8 +3,7 @@
 	<head>
 		<meta charset="UTF-8">
 		<title>
-			{% block title %}Trackstar
-			{% endblock %}
+			{% block title %}Trackstar{% endblock %}
 		</title>
 		<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
 		{% block stylesheets %}
@@ -16,10 +15,6 @@
 					box-sizing: border-box;
 				}
 
-
-				@import url('https://fonts.adobe.com/fonts/futura-pt');
-				@import url('https://fonts.adobe.com/fonts/sofia-pro');
-				@import url('https://fonts.adobe.com/fonts/acumin-pro');
 				@import url("https://use.typekit.net/tqp0iic.css");
 
 				*,
@@ -44,15 +39,9 @@
 					--font-heading: 'futura-pt', 'Outfit', sans-serif;
 					--font-subheading: 'sofia-pro', 'Outfit', sans-serif;
 					--font-body: 'acumin-pro', 'Outfit', sans-serif;
-
 				}
 
-				h1,
-				h2,
-				h3,
-				h4,
-				h5,
-				h6 {
+				h1, h2, h3, h4, h5, h6 {
 					font-family: var(--font-heading);
 					font-weight: 600;
 					font-style: italic;
@@ -83,9 +72,7 @@
 					color: #ffffff;
 				}
 
-				.navbar-logo span {
-					color: var(--orange);
-				}
+				.navbar-logo span { color: var(--orange); }
 
 				.navbar-search {
 					flex: 1;
@@ -106,13 +93,8 @@
 					transition: border-color 0.2s;
 				}
 
-				.navbar-search input::placeholder {
-					color: #666;
-				}
-
-				.navbar-search input:focus {
-					border-color: var(--orange);
-				}
+				.navbar-search input::placeholder { color: #666; }
+				.navbar-search input:focus { border-color: var(--orange); }
 
 				.navbar-search .search-icon {
 					position: absolute;
@@ -137,9 +119,7 @@
 					transition: color 0.2s;
 				}
 
-				.navbar-shop:hover {
-					color: var(--orange);
-				}
+				.navbar-shop:hover { color: var(--orange); }
 
 				.navbar-avatar {
 					width: 34px;
@@ -183,13 +163,8 @@
 					transition: color 0.2s;
 				}
 
-				.subnav a:hover {
-					color: var(--orange-h);
-				}
-
-				.subnav a.active {
-					color: #ffffff;
-				}
+				.subnav a:hover { color: var(--orange-h); }
+				.subnav a.active { color: #ffffff; }
 
 				.subnav a svg {
 					width: 15px;
@@ -252,9 +227,7 @@
 					font-size: 2.5rem;
 				}
 
-				.card-body {
-					padding: 12px 12px 14px;
-				}
+				.card-body { padding: 12px 12px 14px; }
 
 				.card-title {
 					text-align: center;
@@ -311,7 +284,6 @@
 					padding: 3px 7px;
 				}
 
-				/* ── EMPTY STATE ── */
 				.empty-state {
 					text-align: center;
 					color: #555;
@@ -335,50 +307,55 @@
 	</head>
 	<body>
 
-		{% block body %}
-			{# ── NAVBAR ── #}
-			<nav class="navbar">
-				<a href="/home" class="navbar-logo">Track<span>Star</span>
-				</a>
+		{# ── NAVBAR ── #}
+		<nav class="navbar">
+			<a href="/home" class="navbar-logo">Track<span>Star</span></a>
 
-				<div class="navbar-search">
-					<span class="search-icon">&#128269;</span>
-					<input type="text" placeholder="Suche"/>
-				</div>
+			<div class="navbar-search">
+				<span class="search-icon">&#128269;</span>
+				<input type="text" placeholder="Suche"/>
+			</div>
 
-				<div class="navbar-right">
-					<a href="/shop" class="navbar-shop">Deine Inhalte</a>
-					<div class="navbar-avatar">&#128100;</div>
-				</div>
-			</nav>
+			<div class="navbar-right">
+				<a href="/upload" class="navbar-shop">+</a>
+			</div>
 
-			{# ── SUBNAV ── #}
-			<nav class="subnav">
-				<a href="/entdecke-tracks">
-					<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-						<path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/>
-					</svg>
-					Tracks
-				</a>
-				<a href="/entdecke-sound-kits">
-					<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-						<path d="M20 2H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zm-9 13H9V9h2v6zm4 0h-2V9h2v6z"/>
-					</svg>
-					SoundKits
-				</a>
-				<a href="/entdecke-loop-und-samples">
-					<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-						<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
-					</svg>
-					Loops&Samples
-				</a>
-				<a href="/entdecke-beats">
-					<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-						<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/>
-					</svg>
-					Beats
-				</a>
-			</nav>
-		{% endblock %}
+			<div class="navbar-right">
+				<a href="/shop" class="navbar-shop">Deine Inhalte</a>
+				<div class="navbar-avatar">&#128100;</div>
+			</div>
+		</nav>
+
+		{# ── SUBNAV ── #}
+		<nav class="subnav">
+			<a href="/entdecke-tracks">
+				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+					<path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/>
+				</svg>
+				Tracks
+			</a>
+			<a href="/entdecke-sound-kits">
+				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+					<path d="M20 2H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zm-9 13H9V9h2v6zm4 0h-2V9h2v6z"/>
+				</svg>
+				SoundKits
+			</a>
+			<a href="/entdecke-loop-und-samples">
+				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+					<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+				</svg>
+				Loops&amp;Samples
+			</a>
+			<a href="/entdecke-beats">
+				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+					<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/>
+				</svg>
+				Beats
+			</a>
+		</nav>
+
+		{# ── PAGE CONTENT ── #}
+		{% block body %}{% endblock %}
+
 	</body>
 </html>
