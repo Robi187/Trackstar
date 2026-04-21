@@ -265,7 +265,7 @@
             <div class="ts-flash error">✗ {{ message }}</div>
         {% endfor %}
 
-        {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'enctype': 'multipart/form-data', 'id': 'upload-form'}}) }}
+        {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'enctype': 'multipart/form-data', 'id': 'upload-form', 'method': 'post'}}) }}
 
         {# Title #}
         <div class="ts-field">

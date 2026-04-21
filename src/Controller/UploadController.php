@@ -11,6 +11,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Psr\Log\LoggerInterface;
+
  
 class UploadController extends AbstractController
 {
@@ -19,54 +21,86 @@ class UploadController extends AbstractController
         Request $request,
         EntityManagerInterface $em,
         SluggerInterface $slugger,
-        Security $security
+        Security $security,
+        LoggerInterface $logger
     ): Response {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
  
         $content = new Content();
         $form = $this->createForm(ContentUploadType::class, $content);
         $form->handleRequest($request);
- 
-        if ($form->isSubmitted() && $form->isValid()) {
-            // Handle audio/beat file upload
-            $audioFile = $form->get('audioFile')->getData();
-            if ($audioFile) {
-                $originalFilename = pathinfo($audioFile->getClientOriginalName(), PATHINFO_FILENAME);
-                $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename . '-' . uniqid() . '.' . $audioFile->guessExtension();
- 
-                $audioFile->move(
-                    $this->getParameter('uploads_directory'),
-                    $newFilename
-                );
- 
-                $content->setFilePath('uploads/' . $newFilename);
+        
+        if ($form->isSubmitted()) {
+            $logger->error('Form abgeschickt');
+            if (!$form->isValid()) {
+                // Gibt alle Validierungsfehler aus
+                foreach ($form->getErrors(true) as $error) {
+                    $logger->error('Form error: ' . $error->getMessage() . ' (field: ' . $error->getOrigin()->getName() . ')');
+                }
             }
- 
-            // Handle cover image upload
-            $imageFile = $form->get('imageFile')->getData();
-            if ($imageFile) {
-                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
-                $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
- 
-                $imageFile->move(
-                    $this->getParameter('images_directory'),
-                    $newFilename
-                );
- 
-                $content->setImageFile('images/' . $newFilename);
+            if ($form->isValid()) {
+                $user = $security->getUser();
+                $userId = $user->getId();
+
+                // Kategorie → Unterordner
+                $category = $content->getType();
+                $categoryName = strtolower($category->getName());
+
+                $folderMap = [
+                    'beat'     => 'beats',
+                    'beats'    => 'beats',
+                    'sample'   => 'samples',
+                    'samples'  => 'samples',
+                    'soundkit' => 'soundkits',
+                    'soundkits'=> 'soundkits',
+                    'track'    => 'tracks',
+                    'tracks'   => 'tracks',
+                ];
+
+                $subfolder = $folderMap[$categoryName] ?? 'misc';
+                $uploadBase = $this->getParameter('uploads_directory'); // z.B. public/uploads
+
+                // Audio-Datei
+                $audioFile = $form->get('audioFile')->getData();
+                if ($audioFile) {
+                    $originalFilename = pathinfo($audioFile->getClientOriginalName(), PATHINFO_FILENAME);
+                    $safeFilename = $slugger->slug($originalFilename);
+                    $newFilename = $safeFilename . '_' . $userId . '.' . $audioFile->guessExtension();
+
+                    $audioFile->move(
+                        $uploadBase . '/' . $subfolder,  // → public/uploads/beats
+                        $newFilename
+                    );
+
+                    $content->setFilePath($subfolder . '/' . $newFilename);
+                    // → uploads/beats/drill-season_bob_3.wav
+                }
+
+                // Cover-Bild
+                $imageFile = $form->get('imageFile')->getData();
+                if ($imageFile) {
+                    $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                    $safeFilename = $slugger->slug($originalFilename);
+                    $newFilename = $safeFilename . '_' . $userId . '.' . $imageFile->guessExtension();
+
+                    $imageFile->move(
+                        $this->getParameter('images_directory'),
+                        $newFilename
+                    );
+
+                    $content->setImageFile('images/' . $newFilename);
+                }
+
+                $content->setCreatedAt(new \DateTime());
+                $content->setDownloadCount(0);
+                $content->setFkUser($user);
+
+                $em->persist($content);
+                $em->flush();
+
+                $this->addFlash('success', 'Dein Upload war erfolgreich!');
+                return $this->redirectToRoute('app_upload');
             }
- 
-            $content->setCreatedAt(new \DateTime());
-            $content->setDownloadCount(0);
-            $content->setFkUser($security->getUser());
- 
-            $em->persist($content);
-            $em->flush();
- 
-            $this->addFlash('success', 'Dein Upload war erfolgreich!');
-            return $this->redirectToRoute('app_upload');
         }
  
         return $this->render('upload/index.html.twig', [

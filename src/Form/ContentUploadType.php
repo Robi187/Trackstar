@@ -66,13 +66,19 @@ class ContentUploadType extends AbstractType
                     new NotBlank(message: 'Bitte lade eine Audio-Datei hoch.'),
                     new File(
                         maxSize: '50M',
-                        mimeTypes: [
+                         mimeTypes: [
                             'audio/mpeg',
-                            'audio/wav',
-                            'audio/flac',
-                            'audio/aiff',
-                            'audio/x-wav',
                             'audio/mp3',
+                            'audio/wav',
+                            'audio/x-wav',
+                            'audio/wave',
+                            'audio/vnd.wave',
+                            'audio/flac',
+                            'audio/x-flac',
+                            'audio/aiff',
+                            'audio/x-aiff',
+                            'audio/ogg',
+                            'application/octet-stream', // Fallback bei falsch erkannten Dateien
                         ],
                         mimeTypesMessage: 'Bitte lade eine gültige Audio-Datei hoch (MP3, WAV, FLAC, AIFF).',
                     ),
