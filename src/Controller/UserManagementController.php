@@ -10,7 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 
 final class UserManagementController extends AbstractController
 {
-    #[Route('/user/management', name: 'app_user_management')]
+    #[Route('/kontoüberischt', name: 'app_user_management')]
     public function index(EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
