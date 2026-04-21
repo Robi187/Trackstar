@@ -330,7 +330,13 @@
 
 			<div class="track-meta">
 				<h2>{{ content.title }}</h2>
-				<p class="artist">{{ content.fkUser ? content.fkUser.username : 'Unknown' }}</p>
+				{% if content.fkUser %}
+					<a href="{{ path('app_userprofile', { username: content.fkUser.username }) }}" class="artist">
+						{{ content.fkUser.username }}
+					</a>
+				{% else %}
+					<span class="artist">Unknown</span>
+				{% endif %}
 			</div>
 
 			<div class="waveform-bar"></div>
