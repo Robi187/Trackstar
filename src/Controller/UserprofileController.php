@@ -13,6 +13,7 @@ use App\Entity\ContentTag;
 final class UserprofileController extends AbstractController
 {
     #[Route('/benutzer/{username}', name: 'app_userprofile')]
+    #[Route('/Benutzer/{username}', name: 'app_userprofile')]
     public function index(ContentRepository $contentRepository, UserRepository $userRepository, string $username): Response
     {
         $user = $userRepository->findOneBy(['username' => $username]);
