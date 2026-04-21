@@ -11,7 +11,7 @@ use App\Repository\UserRepository;
 
 final class UserprofileController extends AbstractController
 {
-    #[Route('/Benutzer/{username}', name: 'app_userprofile')]
+    #[Route('/benutzer/{username}', name: 'app_userprofile')]
     public function index(ContentRepository $contentRepository, UserRepository $userRepository, string $username): Response
     {
         $user = $userRepository->findOneBy(['username' => $username]);
