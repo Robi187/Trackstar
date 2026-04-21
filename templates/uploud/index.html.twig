@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Kontoübersicht{% endblock %}
+{% block title %}Uploudüberblick{% endblock %}
 
 {% block body %}
 {{ parent() }}
@@ -40,11 +40,11 @@
       </div>
       <div class="ku-username">{{ user_data.getUsername() }}</div>
 
-      <a href="{{ path('app_user_management') }}" class="ku-nav-btn active">
+      <a href="{{ path('app_user_management') }}" class="ku-nav-btn">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
         Übersicht
       </a>
-      <a href="{{ path('app_uploud') }}" class="ku-nav-btn">
+      <a href="{{ path('app_uploud') }}" class="ku-nav-btn active">
         <svg viewBox="0 0 24 24"><path d="M12 16V4m0 0l-4 4m4-4l4 4"/><path d="M4 20h16"/></svg>
         Meine Uploads
       </a>
@@ -66,31 +66,31 @@
     </div>
 
     <div class="ku-main">
-      <h1 class="ku-title">Kontoübersicht</h1>
-      <p class="ku-subtitle">Hier findest du deine Kontoinformationen und eine Übersicht deiner Aktivitäten</p>
-
-      <div class="ku-card">
-        <div class="ku-card-title">Persönliche Informationen</div>
-
-        <div class="ku-row">
-          <span class="ku-row-label">Benutzername:</span>
-          <span class="ku-row-value">{{ user_data.getUsername() }}</span>
-          <a href="{{ path('app_edit_username') }}" class="ku-row-action">ändern</a>
-        </div>
-
-        <div class="ku-row">
-          <span class="ku-row-label">E-Mail-Adresse:</span>
-          <span class="ku-row-value">{{ user_data.getEmail() }}</span>
-          <a href="{{ path('app_edit_email') }}" class="ku-row-action">ändern</a>
-        </div>
-
-        <div class="ku-row">
-          <span class="ku-row-label">Passwort:</span>
-          <span class="ku-row-value">••••••••••••••••</span>
-          <a href="{{ path('app_edit_username') }}" class="ku-row-action">ändern</a>
-        </div>
-      </div>
+      <h1 class="ku-title">Uploadüberblick</h1>
+      <p class="ku-subtitle">Hier werden deine hochgeladenen Inhalte angezeigt</p>
+      
+        {% for upload in uploads %}
+        {{ upload.getFilePath() }}
+            <div class="ku-card">
+                <h2 class="ku-card-title">{{ upload.title }}</h2>
+                <div class="ku-row">
+                    <img
+                            class="card-cover"
+                            src="{{ asset(upload.getFilePath) }}"
+                            alt="{{ upload.getTitle }}"
+                            loading="lazy"
+                        />
+                </div>
+                <div class="ku-row">
+                    <div class="ku-row-label">Beschreibung:</div>
+                    <div class="ku-row-value">{{ upload.description }}</div>
+                </div>
+            </div>
+        {% else %}
+            <p>Du hast noch keine Inhalte hochgeladen.</p>
+        {% endfor %}
     </div>
+
   </div>
 </div>
 {% endblock %}
