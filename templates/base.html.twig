@@ -308,6 +308,7 @@
 	<body>
 
 		{# ── NAVBAR ── #}
+		{% block navbar %}
 		<nav class="navbar">
 			<a href="/home" class="navbar-logo">Track<span>Star</span></a>
 
@@ -353,7 +354,7 @@
 				Beats
 			</a>
 		</nav>
-
+		{% endblock %}
 		{# ── PAGE CONTENT ── #}
 		{% block body %}{% endblock %}
 
