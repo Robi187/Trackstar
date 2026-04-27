@@ -3,8 +3,7 @@
 	<head>
 		<meta charset="UTF-8">
 		<title>
-			{% block title %}Trackstar
-			{% endblock %}
+			{% block title %}Trackstar{% endblock %}
 		</title>
 		<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
 		{% block stylesheets %}
@@ -16,9 +15,6 @@
 					box-sizing: border-box;
 				}
 
-				@import url('https://fonts.adobe.com/fonts/futura-pt');
-				@import url('https://fonts.adobe.com/fonts/sofia-pro');
-				@import url('https://fonts.adobe.com/fonts/acumin-pro');
 				@import url("https://use.typekit.net/tqp0iic.css");
 
 				*,
@@ -66,8 +62,6 @@
 					padding: 14px 32px;
 					background-color: #111111;
 					border-bottom: 1px solid #2a2a2a;
-					position: relative;
-					z-index: 100;
 				}
 
 				.navbar-logo {
@@ -78,9 +72,7 @@
 					color: #ffffff;
 				}
 
-				.navbar-logo span {
-					color: var(--orange);
-				}
+				.navbar-logo span { color: var(--orange); }
 
 				.navbar-search {
 					flex: 1;
@@ -101,13 +93,8 @@
 					transition: border-color 0.2s;
 				}
 
-				.navbar-search input::placeholder {
-					color: #666;
-				}
-
-				.navbar-search input:focus {
-					border-color: var(--orange);
-				}
+				.navbar-search input::placeholder { color: #666; }
+				.navbar-search input:focus { border-color: var(--orange); }
 
 				.navbar-search .search-icon {
 					position: absolute;
@@ -132,9 +119,7 @@
 					transition: color 0.2s;
 				}
 
-				.navbar-shop:hover {
-					color: var(--orange);
-				}
+				.navbar-shop:hover { color: var(--orange); }
 
 				.navbar-avatar {
 					width: 34px;
@@ -154,259 +139,6 @@
 				.navbar-avatar:hover {
 					border-color: var(--orange);
 					color: var(--orange);
-				}
-
-				/* ── MENU BUTTON ── */
-				.navbar-menu-btn {
-					width: 34px;
-					height: 34px;
-					background: none;
-					border: none;
-					cursor: pointer;
-					display: flex;
-					flex-direction: column;
-					align-items: center;
-					justify-content: center;
-					gap: 5px;
-					padding: 4px;
-					border-radius: 6px;
-					transition: background-color 0.2s;
-				}
-
-				.navbar-menu-btn:hover {
-					background-color: #2a2a2a;
-				}
-
-				.navbar-menu-btn span {
-					display: block;
-					width: 20px;
-					height: 2px;
-					background-color: #cccccc;
-					border-radius: 2px;
-					transition: all 0.3s ease;
-					transform-origin: center;
-				}
-
-				.navbar-menu-btn.is-open span:nth-child(1) {
-					transform: translateY(7px) rotate(45deg);
-				}
-
-				.navbar-menu-btn.is-open span:nth-child(2) {
-					opacity: 0;
-					transform: scaleX(0);
-				}
-
-				.navbar-menu-btn.is-open span:nth-child(3) {
-					transform: translateY(-7px) rotate(-45deg);
-				}
-
-				/* ── SLIDE-IN OVERLAY ── */
-				.menu-overlay {
-					position: fixed;
-					inset: 0;
-					background-color: rgba(0, 0, 0, 0.55);
-					z-index: 200;
-					opacity: 0;
-					pointer-events: none;
-					transition: opacity 0.3s ease;
-				}
-
-				.menu-overlay.is-open {
-					opacity: 1;
-					pointer-events: all;
-				}
-
-				/* ── SLIDE-IN SIDEBAR ── */
-				.menu-sidebar {
-					position: fixed;
-					top: 0;
-					right: 0;
-					width: 300px;
-					height: 100vh;
-					background-color: #111111;
-					border-left: 1px solid #2a2a2a;
-					z-index: 300;
-					transform: translateX(100%);
-					transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-					display: flex;
-					flex-direction: column;
-				}
-
-				.menu-sidebar.is-open {
-					transform: translateX(0);
-				}
-
-				/* ── SIDEBAR HEADER ── */
-				.sidebar-header {
-					display: flex;
-					align-items: center;
-					justify-content: space-between;
-					padding: 18px 24px;
-					border-bottom: 1px solid #2a2a2a;
-				}
-
-				.sidebar-header-title {
-					font-size: 0.95rem;
-					font-weight: 700;
-					color: #ffffff;
-					letter-spacing: 0.02em;
-					text-transform: uppercase;
-					font-family: var(--font-heading);
-					font-style: italic;
-				}
-
-				.sidebar-close-btn {
-					width: 30px;
-					height: 30px;
-					background: none;
-					border: 1px solid #2a2a2a;
-					border-radius: 6px;
-					cursor: pointer;
-					display: flex;
-					align-items: center;
-					justify-content: center;
-					color: #888;
-					font-size: 1.1rem;
-					line-height: 1;
-					transition: all 0.2s;
-				}
-
-				.sidebar-close-btn:hover {
-					border-color: var(--orange);
-					color: var(--orange);
-				}
-
-				/* ── SIDEBAR USER INFO ── */
-				.sidebar-user {
-					display: flex;
-					align-items: center;
-					gap: 14px;
-					padding: 20px 24px;
-					border-bottom: 1px solid #2a2a2a;
-				}
-
-				.sidebar-user-avatar {
-					width: 46px;
-					height: 46px;
-					background: linear-gradient(135deg, var(--orange), #cc3a00);
-					border-radius: 50%;
-					display: flex;
-					align-items: center;
-					justify-content: center;
-					font-size: 1.2rem;
-					flex-shrink: 0;
-				}
-
-				.sidebar-user-name {
-					font-size: 0.95rem;
-					font-weight: 600;
-					color: #ffffff;
-					margin-bottom: 2px;
-				}
-
-				.sidebar-user-handle {
-					font-size: 0.78rem;
-					color: #666;
-				}
-
-				/* ── SIDEBAR NAV ── */
-				.sidebar-nav {
-					flex: 1;
-					padding: 12px 0;
-					overflow-y: auto;
-				}
-
-				.sidebar-nav-item {
-					display: flex;
-					align-items: center;
-					gap: 14px;
-					padding: 14px 24px;
-					color: #cccccc;
-					text-decoration: none;
-					font-size: 0.9rem;
-					font-weight: 500;
-					transition: all 0.18s;
-					cursor: pointer;
-					border: none;
-					background: none;
-					width: 100%;
-					text-align: left;
-				}
-
-				.sidebar-nav-item:hover {
-					background-color: #1a1a1a;
-					color: #ffffff;
-				}
-
-				.sidebar-nav-item:hover .sidebar-nav-icon {
-					color: var(--orange);
-				}
-
-				.sidebar-nav-icon {
-					width: 20px;
-					height: 20px;
-					display: flex;
-					align-items: center;
-					justify-content: center;
-					color: #555;
-					flex-shrink: 0;
-					transition: color 0.18s;
-				}
-
-				.sidebar-nav-icon svg {
-					width: 18px;
-					height: 18px;
-					fill: currentColor;
-				}
-
-				/* ── SIDEBAR DIVIDER ── */
-				.sidebar-divider {
-					height: 1px;
-					background-color: #1e1e1e;
-					margin: 8px 24px;
-				}
-
-				/* ── SIDEBAR FOOTER ── */
-				.sidebar-footer {
-					padding: 16px 24px;
-					border-top: 1px solid #2a2a2a;
-				}
-
-				.sidebar-footer-link {
-					display: flex;
-					align-items: center;
-					gap: 10px;
-					font-size: 0.78rem;
-					color: #555;
-					text-decoration: none;
-					transition: color 0.18s;
-					margin-bottom: 8px;
-				}
-
-				.sidebar-footer-link:last-child {
-					margin-bottom: 0;
-				}
-
-				.sidebar-footer-link:hover {
-					color: #888;
-				}
-
-				/* ── LOGOUT ITEM ── */
-				.sidebar-nav-item.logout {
-					color: #cc3333;
-				}
-
-				.sidebar-nav-item.logout .sidebar-nav-icon {
-					color: #cc3333;
-				}
-
-				.sidebar-nav-item.logout:hover {
-					background-color: rgba(224, 36, 52, 0.08);
-					color: var(--red);
-				}
-
-				.sidebar-nav-item.logout:hover .sidebar-nav-icon {
-					color: var(--red);
 				}
 
 				/* ── SUBNAV ── */
@@ -431,13 +163,8 @@
 					transition: color 0.2s;
 				}
 
-				.subnav a:hover {
-					color: var(--orange-h);
-				}
-
-				.subnav a.active {
-					color: #ffffff;
-				}
+				.subnav a:hover { color: var(--orange-h); }
+				.subnav a.active { color: #ffffff; }
 
 				.subnav a svg {
 					width: 15px;
@@ -500,9 +227,7 @@
 					font-size: 2.5rem;
 				}
 
-				.card-body {
-					padding: 12px 12px 14px;
-				}
+				.card-body { padding: 12px 12px 14px; }
 
 				.card-title {
 					text-align: center;
@@ -559,7 +284,6 @@
 					padding: 3px 7px;
 				}
 
-				/* ── EMPTY STATE ── */
 				.empty-state {
 					text-align: center;
 					color: #555;
@@ -576,10 +300,6 @@
 					font-size: 0.8rem;
 					margin: 2px;
 				}
-
-				.subnav a.active {
-					color: var(--orange);
-				}
 			</style>
 		{% endblock %}
 
@@ -587,174 +307,55 @@
 	</head>
 	<body>
 
-		{% block body %}
-			{# ── NAVBAR ── #}
-			<nav class="navbar">
-				<a href="/home" class="navbar-logo">Track<span>Star</span></a>
+		{# ── NAVBAR ── #}
+		<nav class="navbar">
+			<a href="/home" class="navbar-logo">Track<span>Star</span></a>
 
-				<div class="navbar-search">
-					<span class="search-icon">&#128269;</span>
-					<input type="text" placeholder="Suche"/>
-				</div>
+			<div class="navbar-search">
+				<span class="search-icon">&#128269;</span>
+				<input type="text" placeholder="Suche"/>
+			</div>
 
-				<div class="navbar-right">
-					<a href="/shop" class="navbar-shop">Deine Inhalte</a>
-					
+			<div class="navbar-right">
+				<a href="/upload" class="navbar-shop">+</a>
+			</div>
 
-					{# ── MENU TOGGLE BUTTON ── #}
-					<button class="navbar-menu-btn" id="menuToggle" aria-label="Menü öffnen">
-						<span></span>
-						<span></span>
-						<span></span>
-					</button>
-				</div>
-			</nav>
+			<div class="navbar-right">
+				<a href="/shop" class="navbar-shop">Deine Inhalte</a>
+				<div class="navbar-avatar">&#128100;</div>
+			</div>
+		</nav>
 
-			{# ── OVERLAY ── #}
-			<div class="menu-overlay" id="menuOverlay"></div>
+		{# ── SUBNAV ── #}
+		<nav class="subnav">
+			<a href="/entdecke-tracks">
+				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+					<path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/>
+				</svg>
+				Tracks
+			</a>
+			<a href="/entdecke-sound-kits">
+				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+					<path d="M20 2H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zm-9 13H9V9h2v6zm4 0h-2V9h2v6z"/>
+				</svg>
+				SoundKits
+			</a>
+			<a href="/entdecke-loop-und-samples">
+				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+					<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+				</svg>
+				Loops&amp;Samples
+			</a>
+			<a href="/entdecke-beats">
+				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+					<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/>
+				</svg>
+				Beats
+			</a>
+		</nav>
 
-			{# ── SLIDE-IN SIDEBAR ── #}
-			<aside class="menu-sidebar" id="menuSidebar" aria-hidden="true">
+		{# ── PAGE CONTENT ── #}
+		{% block body %}{% endblock %}
 
-				{# Sidebar Header #}
-				<div class="sidebar-header">
-					<span class="sidebar-header-title">Menü</span>
-					<button class="sidebar-close-btn" id="menuClose" aria-label="Menü schließen">&#x2715;</button>
-				</div>
-
-				{# User Info #}
-				<div class="sidebar-user">
-					<div class="sidebar-user-avatar">&#128100;</div>
-					<div>
-					{% if app.user %}
-						<div class="sidebar-user-name">{{ app.user.username }}</div>
-						<div class="sidebar-user-handle">{{ app.user.email }}</div>
-					{% endif %}
-					</div>
-				</div>
-
-				{# Navigation Items #}
-				<nav class="sidebar-nav">
-
-					<a href="/Benutzer/{{app.user.username}}" class="sidebar-nav-item">
-						<span class="sidebar-nav-icon">
-							<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-								<path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
-							</svg>
-						</span>
-						Benutzerprofil
-					</a>
-
-					<a href="/konto" class="sidebar-nav-item">
-						<span class="sidebar-nav-icon">
-							<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-								<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
-							</svg>
-						</span>
-						Kontodetails
-					</a>
-
-					<a href="/favoriten" class="sidebar-nav-item">
-						<span class="sidebar-nav-icon">
-							<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-								<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-							</svg>
-						</span>
-						Favorisierte Inhalte
-					</a>
-
-					<div class="sidebar-divider"></div>
-
-					<a href="/impressum" class="sidebar-nav-item">
-						<span class="sidebar-nav-icon">
-							<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-								<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
-							</svg>
-						</span>
-						Impressum &amp; Datenschutz
-					</a>
-
-					<div class="sidebar-divider"></div>
-
-					<a href="/logout" class="sidebar-nav-item logout">
-						<span class="sidebar-nav-icon">
-							<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-								<path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
-							</svg>
-						</span>
-						Abmelden
-					</a>
-
-				</nav>
-			</aside>
-
-			{# ── SUBNAV ── #}
-			<nav class="subnav">
-				<a href="/entdecke-tracks" class="{{ app.request.pathinfo == '/entdecke-tracks' ? 'active' : '' }}">
-					<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-						<path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/>
-					</svg>
-					Tracks
-				</a>
-				<a href="/entdecke-sound-kits" class="{{ app.request.pathinfo == '/entdecke-sound-kits' ? 'active' : '' }}">
-					<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-						<path d="M20 2H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zm-9 13H9V9h2v6zm4 0h-2V9h2v6z"/>
-					</svg>
-					SoundKits
-				</a>
-				<a href="/entdecke-loop-und-samples" class="{{ app.request.pathinfo == '/entdecke-loop-und-samples' ? 'active' : '' }}">
-					<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-						<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
-					</svg>
-					Loops&amp;Samples
-				</a>
-				<a href="/entdecke-beats" class="{{ app.request.pathinfo == '/entdecke-beats' ? 'active' : '' }}">
-					<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-						<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/>
-					</svg>
-					Beats
-				</a>
-			</nav>
-
-			{# ── MENU JAVASCRIPT ── #}
-			<script>
-				(function () {
-					const toggle   = document.getElementById('menuToggle');
-					const sidebar  = document.getElementById('menuSidebar');
-					const overlay  = document.getElementById('menuOverlay');
-					const closeBtn = document.getElementById('menuClose');
-
-					function openMenu() {
-						sidebar.classList.add('is-open');
-						overlay.classList.add('is-open');
-						toggle.classList.add('is-open');
-						sidebar.setAttribute('aria-hidden', 'false');
-						toggle.setAttribute('aria-label', 'Menü schließen');
-						document.body.style.overflow = 'hidden';
-					}
-
-					function closeMenu() {
-						sidebar.classList.remove('is-open');
-						overlay.classList.remove('is-open');
-						toggle.classList.remove('is-open');
-						sidebar.setAttribute('aria-hidden', 'true');
-						toggle.setAttribute('aria-label', 'Menü öffnen');
-						document.body.style.overflow = '';
-					}
-
-					toggle.addEventListener('click', function () {
-						sidebar.classList.contains('is-open') ? closeMenu() : openMenu();
-					});
-
-					closeBtn.addEventListener('click', closeMenu);
-					overlay.addEventListener('click', closeMenu);
-
-					document.addEventListener('keydown', function (e) {
-						if (e.key === 'Escape') closeMenu();
-					});
-				})();
-			</script>
-
-		{% endblock %}
 	</body>
 </html>
