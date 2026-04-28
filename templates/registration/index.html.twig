@@ -326,14 +326,16 @@
 
       {# Username #}
       {% set f = registrationForm.username %}
-      <div class="field-wrap{{ f.vars.errors|length ? ' has-error' : '' }}">
+      <div class="field-wrap{{ f.vars.errors|length ? ' has-error' : '' }}" id="username-wrap">
         <div class="input-shell">
-          {{ form_widget(f, { attr: { placeholder: 'Benutzername' } }) }}
+          {{ form_widget(f, { attr: { placeholder: 'Benutzername', autocomplete: 'off' } }) }}
         </div>
         {% if f.vars.errors|length %}
           <ul class="field-errors">
             {% for error in f.vars.errors %}<li>{{ error.message }}</li>{% endfor %}
           </ul>
+        {% else %}
+          <ul class="field-errors" id="username-ajax-errors"></ul>
         {% endif %}
       </div>
 
@@ -411,6 +413,54 @@
 </div>
 
 <script>
+  (function () {
+    const wrap   = document.getElementById('username-wrap');
+    const input  = wrap ? wrap.querySelector('input') : null;
+    const errors = document.getElementById('username-ajax-errors');
+    const submit = document.querySelector('.btn-primary');
+
+    if (!input || !errors) return;
+
+    let timer;
+    let blocked = false;
+
+    input.addEventListener('input', () => {
+      clearTimeout(timer);
+      const val = input.value.trim();
+
+      if (val.length < 3) {
+        clearError();
+        return;
+      }
+
+      timer = setTimeout(() => {
+        fetch('/check-username?username=' + encodeURIComponent(val))
+          .then(r => r.json())
+          .then(data => {
+            if (data.taken) {
+              setError('Dieser Benutzername ist bereits vergeben.');
+            } else {
+              clearError();
+            }
+          });
+      }, 400);
+    });
+
+    function setError(msg) {
+      blocked = true;
+      wrap.classList.add('has-error');
+      errors.innerHTML = '<li>' + msg + '</li>';
+      if (submit) submit.disabled = true;
+    }
+
+    function clearError() {
+      blocked = false;
+      wrap.classList.remove('has-error');
+      errors.innerHTML = '';
+      if (submit) submit.disabled = false;
+    }
+  })();
+
   document.querySelectorAll('.toggle-pw').forEach(btn => {
     btn.addEventListener('click', () => {
       const input = btn.previousElementSibling;

@@ -1,0 +1,280 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ user_data.username }} – Profil{% endblock %}
+
+{% block body %}
+    {{ parent() }}
+
+<style>
+    .profile-page {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 48px 32px 64px;
+    }
+
+    /* ── PROFILE HEADER ── */
+    .profile-header {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 32px;
+        margin-bottom: 56px;
+    }
+
+    .profile-card {
+        background: #111111;
+        border: 1px solid #2a2a2a;
+        border-radius: 16px;
+        padding: 36px 28px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 14px;
+    }
+
+    .profile-avatar {
+        width: 96px;
+        height: 96px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--orange), #cc3a00);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.4rem;
+        font-weight: 700;
+        color: #fff;
+        font-family: var(--font-heading);
+        font-style: italic;
+        flex-shrink: 0;
+    }
+
+    .profile-username {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #ffffff;
+        font-family: var(--font-heading);
+        font-style: italic;
+        margin: 0;
+    }
+
+    .profile-role-badge {
+        display: inline-block;
+        background: rgba(255, 90, 0, 0.15);
+        border: 1px solid var(--orange);
+        color: var(--orange);
+        border-radius: 20px;
+        padding: 4px 16px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+
+    .profile-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+        margin-top: 4px;
+    }
+
+    .profile-meta-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.85rem;
+        color: #8a8a8e;
+    }
+
+    .profile-meta-row svg {
+        width: 16px;
+        height: 16px;
+        fill: #555;
+        flex-shrink: 0;
+    }
+
+    .profile-stats {
+        display: flex;
+        gap: 24px;
+        justify-content: center;
+        padding-top: 16px;
+        border-top: 1px solid #2a2a2a;
+        width: 100%;
+    }
+
+    .stat-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+    }
+
+    .stat-value {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #ffffff;
+        font-family: var(--font-heading);
+    }
+
+    .stat-label {
+        font-size: 0.72rem;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    /* ── ABOUT BOX ── */
+    .about-box {
+        background: #111111;
+        border: 1px solid #2a2a2a;
+        border-radius: 16px;
+        padding: 32px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .about-box h2 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #ffffff;
+        font-family: var(--font-heading);
+        font-style: italic;
+        margin: 0;
+        letter-spacing: 0.02em;
+    }
+
+    .about-text {
+        font-size: 0.92rem;
+        line-height: 1.75;
+        color: #aaaaaa;
+        margin: 0;
+        flex: 1;
+    }
+
+    .about-empty {
+        font-size: 0.9rem;
+        color: #555;
+        font-style: italic;
+    }
+
+    /* ── SECTION HEADING ── */
+    .works-heading {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 28px;
+    }
+
+    .works-heading h2 {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #ffffff;
+        font-family: var(--font-heading);
+        font-style: italic;
+        margin: 0;
+    }
+
+    .works-count {
+        background: #2a2a2a;
+        color: #888;
+        border-radius: 20px;
+        padding: 3px 12px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+</style>
+
+<div class="profile-page">
+
+    {# ── PROFILE HEADER ── #}
+    <div class="profile-header">
+
+        {# Left: Profile Card #}
+        <div class="profile-card">
+            <div class="profile-avatar">
+                {{ user_data.username|first|upper }}
+            </div>
+
+            <h1 class="profile-username">{{ user_data.username }}</h1>
+            <div class="profile-meta">
+                {% if user_data.createdAt %}
+                <div class="profile-meta-row">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm0 18H5V8h14v13z"/>
+                    </svg>
+                    Mitglied seit {{ user_data.createdAt|date('d. F Y') }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="profile-stats">
+                <div class="stat-item">
+                    <span class="stat-value">{{ contents|length }}</span>
+                    <span class="stat-label">Werke</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">
+                        {{ contents|reduce((carry, c) => carry + c.downloadCount, 0) }}
+                    </span>
+                    <span class="stat-label">Downloads</span>
+                </div>
+            </div>
+        </div>
+
+        {# Right: About #}
+        <div class="about-box">
+            <h2>Über mich</h2>
+            {% if user_data.biography %}
+                <p class="about-text">{{ user_data.biography }}</p>
+            {% else %}
+                <p class="about-empty">Dieser Benutzer hat noch keine Biografie hinzugefügt.</p>
+            {% endif %}
+        </div>
+
+    </div>
+
+    {# ── PUBLISHED WORKS ── #}
+    <div class="works-heading">
+        <h2>Veröffentlichte Werke</h2>
+        <span class="works-count">{{ contents|length }}</span>
+    </div>
+
+    {% if contents|length > 0 %}
+        <div class="content-grid">
+            {% for item in contents %}
+                <div class="card" onclick="window.location.href='/content/{{ item.id }}'">
+
+                    {% if item.imageFile %}
+                        <img
+                            class="card-cover"
+                            src="{{ asset(item.imageFile) }}"
+                            alt="{{ item.title }}"
+                            loading="lazy"
+                        />
+                    {% else %}
+                        <div class="card-cover-placeholder">&#127925;</div>
+                    {% endif %}
+
+                    <div class="card-body">
+                        <div class="card-title" title="{{ item.title }}">{{ item.title }}</div>
+                        <div class="card-user">{{ user_data.username }}</div>
+                        <div class="card-footer">
+                            {% if item.type %}
+                                <span class="card-tag">{{ item.type.name }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            Noch keine Inhalte veröffentlicht.
+        </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}
