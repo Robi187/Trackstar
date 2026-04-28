@@ -1,0 +1,134 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Kontoübersicht{% endblock %}
+
+{% block body %}
+{{ parent() }}
+
+<style>
+  .ku-back { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #888; text-decoration: none; margin-bottom: 4px; }
+  .ku-back:hover { color: #fff; }
+  .ku-page { display: flex; justify-content: center; align-items: flex-start; padding: 40px 20px; }
+  .ku-wrap { display: flex; gap: 40px; align-items: flex-start; max-width: 900px; width: 100%; }
+  .ku-sidebar { width: 210px; min-width: 210px; background: #1a1a1a; border: 1.5px solid #3a3a3a; border-radius: 20px; padding: 28px 16px 20px; display: flex; flex-direction: column; gap: 6px; }
+  .ku-avatar { width: 72px; height: 72px; border-radius: 14px; background: #2a2a2a; border: 1.5px solid #3a3a3a; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; }
+  .ku-avatar svg { width: 36px; height: 36px; stroke: #aaa; fill: none; stroke-width: 1.5; }
+  .ku-username { text-align: center; font-size: 15px; font-weight: 500; margin-bottom: 10px; color: #fff; }
+  .ku-nav-btn { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; font-size: 14px; font-weight: 400; cursor: pointer; border: 1px solid #3a3a3a; background: transparent; color: #ccc; width: 100%; text-align: left; text-decoration: none; box-sizing: border-box; }
+  .ku-nav-btn.active { background: #e85d04; border-color: #e85d04; color: #fff; font-weight: 500; }
+  .ku-nav-btn:hover:not(.active) { background: #2a2a2a; color: #fff; }
+  .ku-nav-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; flex-shrink: 0; }
+  .ku-divider { border: none; border-top: 1px solid #2a2a2a; margin: 6px 0; }
+  .ku-nav-btn.danger { color: #e85d04; border: 1px solid #e85d04; }
+  .ku-nav-btn.danger:hover { background: rgba(232,93,4,0.12); }
+  .ku-main { flex: 1; padding-top: 4px; }
+  .ku-title { font-size: 26px; font-weight: 700; margin: 0 0 6px; color: #fff; }
+  .ku-subtitle { font-size: 14px; color: #888; margin: 0 0 24px; line-height: 1.5; }
+  .ku-card { background: #1e1e1e; border-radius: 14px; padding: 22px 24px; }
+  .ku-card-title { font-size: 15px; font-weight: 600; margin: 0 0 16px; color: #fff; }
+  .ku-row { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #2a2a2a; }
+  .ku-row:last-child { border-bottom: none; }
+  .ku-row-label { width: 130px; font-size: 14px; color: #aaa; }
+  .ku-row-value { flex: 1; font-size: 14px; color: #fff; }
+  .ku-row-action { font-size: 13px; color: #777; cursor: pointer; text-decoration: none; }
+  .ku-row-action:hover { color: #e85d04; }
+  .ku-flash { display: flex; align-items: center; gap: 10px; border-radius: 10px; padding: 13px 16px; margin-bottom: 16px; font-size: .88rem; font-weight: 500; }
+  .ku-flash svg { flex-shrink: 0; width: 18px; height: 18px; }
+  .ku-flash.success { background: rgba(0,200,80,.10); border: 1px solid rgba(0,200,80,.3); color: #00d966; }
+  .ku-flash.error { background: rgba(224,36,52,.12); border: 1px solid rgba(224,36,52,.4); color: #ff6070; }
+  .ku-flash.warning { background: rgba(255,90,0,.12); border: 1px solid rgba(255,90,0,.4); color: #ff7a30; }
+  .ku-field-wrap { margin-bottom: 14px; }
+  .ku-field-wrap label { font-size: 13px; color: #aaa; display: block; margin-bottom: 6px; }
+  .ku-field-wrap input { width: 100%; background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px; color: #fff; font-size: 14px; padding: 10px 14px; outline: none; box-sizing: border-box; }
+  .ku-field-wrap input:focus { border-color: #e85d04; }
+  .ku-field-wrap.has-error input { border-color: #e02434; }
+  .ku-field-errors { list-style: none; margin-top: 5px; padding: 0; }
+  .ku-field-errors li { font-size: 12px; color: #ff6070; }
+</style>
+
+<div class="ku-page">
+  <div class="ku-wrap">
+
+    <div class="ku-sidebar">
+      <div class="ku-avatar">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      </div>
+      <div class="ku-username">{{ user_data.getUsername() }}</div>
+
+      <a href="{{ path('app_user_management') }}" class="ku-nav-btn {{ app.request.attributes.get('_route') == 'app_user_management' ? 'active' : '' }}">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    Übersicht
+    </a>
+    <a href="{{ path('app_uploud') }}" class="ku-nav-btn {{ app.request.attributes.get('_route') == 'app_uploud' ? 'active' : '' }}">
+        <svg viewBox="0 0 24 24"><path d="M12 16V4m0 0l-4 4m4-4l4 4"/><path d="M4 20h16"/></svg>
+        Meine Uploads
+    </a>
+    <a href="{{ path('app_favorites') }}" class="ku-nav-btn {{ app.request.attributes.get('_route') == 'app_favorites' ? 'active' : '' }}">
+        <svg viewBox="0 0 24 24"><path d="M12 21C12 21 3 14 3 8a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 6-9 13-9 13z"/></svg>
+        Meine Favoriten
+    </a>
+
+      <hr class="ku-divider">
+
+      <button class="ku-nav-btn">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Abmelden
+      </button>
+      <button class="ku-nav-btn danger">
+        <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6m4-6v6"/><path d="M9 6V4h6v2"/></svg>
+        Konto Löschen
+      </button>
+    </div>
+
+    <div class="ku-main">
+      {% block ku_content %}
+        <h1 class="ku-title">Kontoübersicht</h1>
+        <p class="ku-subtitle">Hier findest du deine Kontoinformationen und eine Übersicht deiner Aktivitäten</p>
+
+        {% for msg in app.flashes('success') %}
+          <div class="ku-flash success">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/>
+            </svg>
+            {{ msg }}
+          </div>
+        {% endfor %}
+
+        {% for msg in app.flashes('error') %}
+          <div class="ku-flash error">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            {{ msg }}
+          </div>
+        {% endfor %}
+
+        <div class="ku-card">
+          <div class="ku-card-title">Persönliche Informationen</div>
+          <div class="ku-row">
+            <span class="ku-row-label">Benutzername:</span>
+            <span class="ku-row-value">{{ user_data.getUsername() }}</span>
+            <a href="{{ path('app_edit_username') }}" class="ku-row-action">ändern</a>
+          </div>
+          <div class="ku-row">
+            <span class="ku-row-label">E-Mail-Adresse:</span>
+            <span class="ku-row-value">{{ user_data.getEmail() }}</span>
+            <a href="{{ path('app_edit_email') }}" class="ku-row-action">ändern</a>
+          </div>
+          <div class="ku-row">
+            <span class="ku-row-label">Passwort:</span>
+            <span class="ku-row-value">••••••••••••••••</span>
+            <a href="{{ path('app_edit_password') }}" class="ku-row-action">ändern</a>
+          </div>
+          <div class="ku-row">
+            <span class="ku-row-label">Bio:</span>
+            <span class="ku-row-value">{{ user_data.getBiography() }}</span>
+            <a href="{{ path('app_edit_bio') }}" class="ku-row-action">ändern</a>
+          </div>
+        </div>
+      {% endblock %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}
