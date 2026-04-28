@@ -5,6 +5,7 @@ services:
     restart: unless-stopped
     environment:
       SERVER_NAME: ${SERVER_NAME:-localhost}, php:80
+      CADDY_SERVER_EXTRA_DIRECTIVES: "request_body max_size 100MB"
       DEFAULT_URI: https://${SERVER_NAME:-localhost}:${HTTPS_PORT:-443}
       MERCURE_PUBLISHER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
       MERCURE_SUBSCRIBER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
@@ -21,6 +22,7 @@ services:
       - caddy_data:/data
       - caddy_config:/config
       - ./public/uploads:/var/www/html/public/uploads
+      - ./frankenphp/conf.d/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
     ports:
       - name: http
         target: 80

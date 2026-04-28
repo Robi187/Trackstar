@@ -34,9 +34,7 @@ class Content
     #[ORM\JoinColumn(nullable: false)]
     private ?User $fk_user = null;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: true)]
-    private ?Tag $fk_tag = null;
+   
 
     #[ORM\Column(length: 255)]
     private ?string $image_file = null;
@@ -121,17 +119,7 @@ class Content
         return $this;
     }
 
-    public function getFkTag(): ?Tag
-    {
-        return $this->fk_tag;
-    }
-
-    public function setFkTag(?Tag $fk_tag): static
-    {
-        $this->fk_tag = $fk_tag;
-
-        return $this;
-    }
+    
 
     public function getImageFile(): ?string
     {
