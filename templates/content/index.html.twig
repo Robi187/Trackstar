@@ -107,33 +107,9 @@
 		}
 
 		/* Waveform */
-		.waveform-bar {
+		.waveform-wrap {
 			margin: 14px 20px;
-			height: 36px;
-			background: repeating-linear-gradient(
-				to right,
-				#3a3a3a 0px,
-				#3a3a3a 2px,
-				transparent 2px,
-				transparent 5px
-			);
-			border-radius: 4px;
-			position: relative;
-			overflow: hidden;
-		}
-
-		.waveform-bar::before {
-			content: '';
-			position: absolute;
-			left: 0; top: 0; bottom: 0;
-			width: 40%;
-			background: repeating-linear-gradient(
-				to right,
-				#e63946 0px,
-				#e63946 2px,
-				transparent 2px,
-				transparent 5px
-			);
+			cursor: pointer;
 		}
 
 		/* Social row */
@@ -324,7 +300,7 @@
 					<div class="cover-placeholder">&#127925;</div>
 				{% endif %}
 				<div class="play-overlay">
-					<button class="play-circle">▶</button>
+					<button class="play-circle" id="play-btn">▶</button>
 				</div>
 			</div>
 
@@ -339,7 +315,9 @@
 				{% endif %}
 			</div>
 
-			<div class="waveform-bar"></div>
+			<div class="waveform-wrap">
+					<div id="waveform"></div>
+				</div>
 
 			<div class="social-row">
 				<!-- Likes -->
@@ -432,5 +410,31 @@
 
 		</div>
 	</div>
+
+	<script type="module">
+		import WaveSurfer from 'https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.esm.js';
+
+		const btn = document.getElementById('play-btn');
+
+		const ws = WaveSurfer.create({
+			container: '#waveform',
+			url: '{{ asset('uploads/' ~ content.filePath) }}',
+			waveColor: '#3a3a3a',
+			progressColor: '#e63946',
+			height: 40,
+			barWidth: 2,
+			barGap: 2,
+			barRadius: 2,
+			cursorColor: '#e63946',
+			cursorWidth: 2,
+			interact: true,
+		});
+
+		btn.addEventListener('click', () => ws.playPause());
+
+		ws.on('play',   () => { btn.textContent = '⏸'; });
+		ws.on('pause',  () => { btn.textContent = '▶'; });
+		ws.on('finish', () => { btn.textContent = '▶'; });
+	</script>
 
 {% endblock %}

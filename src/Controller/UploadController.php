@@ -14,6 +14,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 use Psr\Log\LoggerInterface;
 use App\Entity\ContentTag;
 use App\Entity\Tag;
+use Symfony\Component\Form\FormError;
 
 
  
@@ -34,13 +35,25 @@ class UploadController extends AbstractController
         $form->handleRequest($request);
         
         if ($form->isSubmitted()) {
-            $logger->error('Form abgeschickt');
-            if (!$form->isValid()) {
-                // Gibt alle Validierungsfehler aus
-                foreach ($form->getErrors(true) as $error) {
-                    $logger->error('Form error: ' . $error->getMessage() . ' (field: ' . $error->getOrigin()->getName() . ')');
+            $audioFile = $form->get('audioFile')->getData();
+            $category  = $form->get('type')->getData();
+
+            if ($audioFile && $category) {
+                $name       = strtolower($category->getName());
+                $isSoundkit = str_contains($name, 'soundkit') || str_contains($name, 'sound kit');
+                $ext        = strtolower($audioFile->getClientOriginalExtension());
+
+                if ($isSoundkit && $ext !== 'zip') {
+                    $form->get('audioFile')->addError(
+                        new FormError('Für Sound Kits bitte nur eine ZIP-Datei hochladen.')
+                    );
+                } elseif (!$isSoundkit && $ext === 'zip') {
+                    $form->get('audioFile')->addError(
+                        new FormError('ZIP-Dateien sind nur für die Kategorie "Sound Kits" erlaubt.')
+                    );
                 }
             }
+
             if ($form->isValid()) {
                 $user = $security->getUser();
                 $userId = $user->getId();
@@ -68,7 +81,11 @@ class UploadController extends AbstractController
                 if ($audioFile) {
                     $originalFilename = pathinfo($audioFile->getClientOriginalName(), PATHINFO_FILENAME);
                     $safeFilename = $slugger->slug($originalFilename);
-                    $newFilename = $safeFilename . '_' . $userId . '.' . $audioFile->guessExtension();
+                    $ext = $audioFile->guessExtension();
+                    if (!$ext || $ext === 'bin') {
+                        $ext = $audioFile->getClientOriginalExtension();
+                    }
+                    $newFilename = $safeFilename . '_' . $userId . '.' . $ext;
 
                     $audioFile->move(
                         $uploadBase . '/' . $subfolder,  // → public/uploads/beats
