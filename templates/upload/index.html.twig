@@ -28,33 +28,26 @@
         width: 100% !important;
     }
 
-    /* Trigger / Selection box */
+    /* ── Single Select (Kategorie) ── */
     .ts-field .select2-container--default .select2-selection--single {
         background: #111;
         border: 1px solid #2a2a2a;
         border-radius: 8px;
-        height: 42px;
-        display: flex;
-        align-items: center;
-        padding: 0 2.4rem 0 1rem;
-        transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
-        cursor: pointer;
+        height: auto;
+        padding: 0.6rem 1rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
     }
 
-    .ts-field .select2-container--default .select2-selection--single:hover {
-        border-color: #3a3a3a;
-        background: #141414;
-    }
-
+    .ts-field .select2-container--default.select2-container--focus .select2-selection--single,
     .ts-field .select2-container--default.select2-container--open .select2-selection--single {
         border-color: #ff5a00;
-        box-shadow: 0 0 0 3px rgba(255, 90, 0, 0.12);
+        box-shadow: 0 0 0 3px rgba(255, 90, 0, 0.08);
     }
 
     .ts-field .select2-container--default .select2-selection--single .select2-selection__rendered {
         color: #fff;
         font-size: 0.88rem;
-        line-height: 42px;
+        line-height: 1.4;
         padding: 0;
         font-family: var(--font-body, sans-serif);
     }
@@ -66,58 +59,23 @@
     .ts-field .select2-container--default .select2-selection--single .select2-selection__arrow {
         height: 100%;
         top: 0;
-        right: 10px;
-        width: 18px;
+        right: 8px;
     }
 
     .ts-field .select2-container--default .select2-selection--single .select2-selection__arrow b {
-        border-color: #777 transparent transparent transparent;
-        border-width: 5px 4px 0 4px;
+        border-color: #888 transparent transparent transparent;
     }
 
-    .ts-field .select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b {
-        border-color: transparent transparent #ff5a00 transparent;
-        border-width: 0 4px 5px 4px;
-    }
-
-    /* Clear button (×) */
-    .ts-field .select2-container--default .select2-selection__clear {
-        color: #666;
-        font-size: 1.1rem;
-        font-weight: 400;
-        margin-right: 0.6rem;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        transition: color 0.18s;
-    }
-
-    .ts-field .select2-container--default .select2-selection__clear:hover {
-        color: #ff5a00;
-    }
-
-    /* Dropdown panel */
-    .select2-container--default .select2-dropdown {
-        background: #161616;
+    /* ── Dropdown panel ── */
+    .select2-dropdown {
+        background: #1a1a1a;
         border: 1px solid #2a2a2a;
         border-radius: 8px;
         overflow: hidden;
-        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
-        margin-top: 4px;
-    }
-
-    .select2-container--default .select2-dropdown--above {
-        margin-top: 0;
-        margin-bottom: 4px;
-    }
-
-    /* Search field inside dropdown */
-    .select2-container--default .select2-search--dropdown {
-        padding: 8px;
     }
 
     .select2-container--default .select2-search--dropdown .select2-search__field {
-        background: #0d0d0d;
+        background: #111;
         border: 1px solid #2a2a2a;
         border-radius: 6px;
         color: #fff;
@@ -125,55 +83,88 @@
         outline: none;
         font-family: var(--font-body, sans-serif);
         font-size: 0.85rem;
-        transition: border-color 0.18s;
-    }
-
-    .select2-container--default .select2-search--dropdown .select2-search__field::placeholder {
-        color: #444;
     }
 
     .select2-container--default .select2-search--dropdown .select2-search__field:focus {
         border-color: #ff5a00;
     }
 
-    /* Result list */
-    .select2-container--default .select2-results__options {
-        padding: 4px;
-        max-height: 240px;
-    }
-
     .select2-container--default .select2-results__option {
         color: #ccc;
-        padding: 0.55rem 0.75rem;
+        padding: 0.6rem 0.9rem;
         font-size: 0.85rem;
         font-family: var(--font-body, sans-serif);
-        border-radius: 6px;
-        transition: background 0.12s, color 0.12s;
     }
 
     .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
-        background: rgba(255, 90, 0, 0.12);
-        color: #ff5a00;
-    }
-
-    .select2-container--default .select2-results__option--selected,
-    .select2-container--default .select2-results__option[aria-selected=true] {
-        background: #1f1f1f;
+        background: #ff5a00;
         color: #fff;
     }
 
-    .select2-container--default .select2-results__option--selected.select2-results__option--highlighted {
-        background: rgba(255, 90, 0, 0.18);
-        color: #ff5a00;
+    .select2-container--default .select2-results__option--selected {
+        background: #2a2a2a;
+        color: #fff;
     }
 
     .select2-results__message {
-        color: #555 !important;
-        font-style: italic;
-        font-size: 0.82rem;
+        color: #666 !important;
     }
-</style>
-<style>
+
+    /* Das echte multiple-Select verstecken */
+    .ts-field select[multiple] {
+        display: none !important;
+    }
+
+
+
+    .ts-field select {
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        padding-right: 2.5rem !important;
+    }
+
+    /* Single-Select2 (fake picker) – gleich aussehen wie andere Felder */
+    #tag-picker-container .select2-container--default .select2-selection--single {
+        background: #111;
+        border: 1px solid #2a2a2a;
+        border-radius: 8px;
+        height: auto;
+        padding: 0.6rem 1rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    #tag-picker-container .select2-container--default.select2-container--focus .select2-selection--single,
+    #tag-picker-container .select2-container--default.select2-container--open .select2-selection--single {
+        border-color: #ff5a00;
+        box-shadow: 0 0 0 3px rgba(255, 90, 0, 0.08);
+    }
+
+    #tag-picker-container .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #fff;
+        font-size: 0.88rem;
+        line-height: 1.4;
+        padding: 0;
+        font-family: var(--font-body, sans-serif);
+    }
+
+    #tag-picker-container .select2-container--default .select2-selection--single .select2-selection__placeholder {
+        color: #555;
+    }
+
+    #tag-picker-container .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 100%;
+        top: 0;
+        right: 8px;
+    }
+
+    #tag-picker-container .select2-container--default .select2-selection--single .select2-selection__arrow b {
+        border-color: #888 transparent transparent transparent;
+    }
+
+    /* ── Layout ── */
     .ts-upload-wrapper {
         min-height: calc(100vh - 120px);
         padding: 2.5rem 3rem 5rem;
@@ -246,7 +237,6 @@
         gap: 1rem;
     }
 
-    /* Cover thumbnail (shown after selection) */
     .ts-cover-thumb-wrap {
         flex-shrink: 0;
         width: 140px;
@@ -281,7 +271,6 @@
         color: #444;
     }
 
-    /* Upload buttons */
     .ts-upload-cols {
         display: flex;
         gap: 0.75rem;
@@ -394,7 +383,7 @@
 
     .ts-field input::placeholder,
     .ts-field textarea::placeholder {
-        color: #3a3a3a;
+        color: #555;
     }
 
     .ts-field input:focus,
@@ -426,6 +415,7 @@
         flex-wrap: wrap;
         align-items: center;
         gap: 0.5rem;
+        margin-top: 0.75rem;
     }
 
     .ts-tag-chip {
@@ -580,24 +570,39 @@
         padding-left: 2.2rem !important;
     }
 
-    /* Hide number input spinners */
-    .ts-bpm-wrap input[type="number"]::-webkit-inner-spin-button,
-    .ts-bpm-wrap input[type="number"]::-webkit-outer-spin-button {
+    .ts-bpm-wrap input[type="number"]::-webkit-outer-spin-button,
+    .ts-bpm-wrap input[type="number"]::-webkit-inner-spin-button {
         -webkit-appearance: none;
         margin: 0;
     }
 
     .ts-bpm-wrap input[type="number"] {
-        -moz-appearance: textfield;
-        appearance: textfield;
+        -moz-appearance: textfield; /* Firefox */
     }
-
     @media (max-width: 768px) {
         .ts-two-col { grid-template-columns: 1fr; }
         .ts-section { padding: 1.5rem; }
         .ts-submit-wrap { padding: 1.5rem; }
         .ts-upload-wrapper { padding: 1.5rem 1rem 4rem; }
         .ts-cover-thumb-wrap { width: 90px; height: 90px; }
+    }
+
+    .ts-field select option[value=""] {
+        color: #555;
+    }
+
+    .ts-field select.placeholder-active {
+        color: #555;
+    }
+
+    .select2-container--open .select2-dropdown--above {
+        top: 100% !important;
+        bottom: auto !important;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .select2-container--open.select2-container--above .select2-selection--single {
+        border-radius: 8px !important;
     }
 </style>
 {% endblock %}
@@ -608,7 +613,7 @@
 
         <div class="ts-page-header">
             <h1>Neuen Track hochladen</h1>
-            <p>teile deinen sound mit der TrackStar community</p>
+            <p>Teile deinen sound mit der TrackStar Community!</p>
         </div>
 
         {% for message in app.flashes('success') %}
@@ -628,7 +633,6 @@
                 <p class="ts-section-subtitle">Lade dein Titelbild und deine Audiodatei für deinen Track hoch</p>
 
                 <div class="ts-file-row">
-                    {# Thumbnail preview #}
                     <div class="ts-cover-thumb-wrap" id="cover-thumb-wrap">
                         <div class="ts-cover-thumb-placeholder">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -641,7 +645,6 @@
                     </div>
 
                     <div class="ts-upload-cols">
-                        {# Cover upload #}
                         <div class="ts-upload-btn-wrap">
                             <label style="font-size:0.72rem;color:#888;font-weight:600;align-self:flex-start;">Cover/Titelbild</label>
                             <div class="ts-upload-btn" id="image-btn">
@@ -657,7 +660,6 @@
                             {{ form_errors(form.imageFile) }}
                         </div>
 
-                        {# Audio upload #}
                         <div class="ts-upload-btn-wrap">
                             <label style="font-size:0.72rem;color:#888;font-weight:600;align-self:flex-start;">Audio-Datei</label>
                             <div class="ts-upload-btn" id="audio-btn">
@@ -688,7 +690,7 @@
                 </div>
 
                 <div class="ts-field">
-                    {{ form_label(form.description) }}
+                    {{ form_label(form.description, 'Beschreibung ~ Optional') }}
                     {{ form_widget(form.description, {'attr': {'placeholder': 'Beschreibung deines Tracks'}}) }}
                     {{ form_errors(form.description) }}
                 </div>
@@ -700,14 +702,15 @@
                 <p class="ts-section-subtitle">füge die Details zu deinem Track hinzu</p>
 
                 <div class="ts-two-col">
-                    <div class="ts-field">
-                        <label>Tempo (BPM)</label>
+                   <div class="ts-field">
+                        <label>Tempo (BPM) ~ Optional</label>
                         <div class="ts-bpm-wrap">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
                             </svg>
-                            <input type="number" name="bpm" placeholder="100 BPM" min="40" max="300">
+                            {{ form_widget(form.bpm, {'attr': {'placeholder': '100 BPM', 'min': 40, 'max': 300}}) }}
                         </div>
+                        {{ form_errors(form.bpm) }}
                     </div>
                     <div class="ts-field">
                         {{ form_label(form.type, 'Kategorie') }}
@@ -720,21 +723,18 @@
             {# ── Section 4: Tags ── #}
             <div class="ts-section">
                 <p class="ts-section-title">Tags</p>
-                <p class="ts-section-subtitle">füge die Tags zu deinem Track hinzu</p>
+                <p class="ts-section-subtitle">füge die Tags zu deinem Track hinzu ~ Optional</p>
 
                 <div class="ts-field">
+                    {# Fake single-select für die Anzeige #}
+                    <div id="tag-picker-container" style="width:100%;"></div>
+                    {# Echtes multiple-Select (versteckt, wird per JS befüllt) #}
                     {{ form_widget(form.fk_tag) }}
                     {{ form_errors(form.fk_tag) }}
                 </div>
 
-                {# Visual tag chips (decorative / JS-powered addition) #}
                 <div class="ts-tags-row" id="tag-chips-row">
-                    <button type="button" class="ts-tag-add-btn" id="add-tag-btn">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-                        </svg>
-                        Tag hinzufügen
-                    </button>
+                    
                 </div>
             </div>
 
@@ -757,17 +757,57 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
-    /* ── Select2 für Tag-Dropdown ── */
-    const $tagSelect = jQuery(document.getElementById('tag-chips-row').closest('.ts-section').querySelector('select'));
-    $tagSelect.select2({
+    /* ── Tag-Picker: fake single-select aus den Optionen des echten multiple-Select ── */
+    const $realSelect = jQuery(document.querySelector('.ts-field select[multiple]'));
+
+    /* Fake-Select aufbauen */
+    const $fakeSelect = jQuery('<select><option value=""></option></select>');
+    $realSelect.find('option').each(function () {
+        $fakeSelect.append(jQuery('<option>').val(jQuery(this).val()).text(jQuery(this).text()));
+    });
+    jQuery('#tag-picker-container').append($fakeSelect);
+
+    $fakeSelect.select2({
         placeholder: 'Tag suchen...',
-        allowClear: true,
+        allowClear: false,
         width: '100%',
+        dropdownPosition: 'below', // immer nach unten
         language: {
             noResults: function () { return 'Keine Tags gefunden'; },
             searching: function () { return 'Suche...'; },
-            inputTooShort: function () { return 'Tippe zum Suchen'; }
         }
+    });
+
+    const chipsContainer = document.getElementById('tag-chips-row');
+    const addBtn = document.getElementById('add-tag-btn');
+
+    function addChip(id, text) {
+        if (chipsContainer.querySelector(`[data-tag-id="${id}"]`)) return;
+
+        const chip = document.createElement('span');
+        chip.className = 'ts-tag-chip';
+        chip.dataset.tagId = id;
+        chip.textContent = text;
+
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.setAttribute('aria-label', 'Entfernen');
+        removeBtn.innerHTML = '&times;';
+        removeBtn.addEventListener('click', () => {
+            $realSelect.find(`option[value="${id}"]`).prop('selected', false);
+            chip.remove();
+        });
+
+        chip.appendChild(removeBtn);
+        chipsContainer.insertBefore(chip, addBtn);
+    }
+
+    $fakeSelect.on('select2:select', function (e) {
+        const val  = e.params.data.id;
+        const text = e.params.data.text;
+        $realSelect.find(`option[value="${val}"]`).prop('selected', true);
+        addChip(val, text);
+        $fakeSelect.val(null).trigger('change');
     });
 
     /* ── Cover image preview ── */
@@ -787,6 +827,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     imageBtn.classList.add('has-file');
                 };
                 reader.readAsDataURL(this.files[0]);
+
+                // NEU: Dateiname anzeigen
+                const label = imageBtn.querySelector('.btn-label');
+                const name  = this.files[0].name;
+                if (label) label.textContent = name.length > 20 ? name.slice(0, 18) + '…' : name;
             }
         });
     }
@@ -805,37 +850,20 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
-
-    /* ── Tag chips aus Dropdown-Auswahl ── */
-    const tagsRow   = document.getElementById('tag-chips-row');
-    const addBtn    = document.getElementById('add-tag-btn');
-    const tagSelect = tagsRow.closest('.ts-section').querySelector('select');
-
-    function addTag(text, value) {
-        const chip = document.createElement('span');
-        chip.className = 'ts-tag-chip';
-        chip.dataset.tagId = value;
-        chip.textContent = text;
-
-        const closeBtn = document.createElement('button');
-        closeBtn.type = 'button';
-        closeBtn.setAttribute('aria-label', 'Entfernen');
-        closeBtn.innerHTML = '&times;';
-        closeBtn.addEventListener('click', () => chip.remove());
-
-        chip.appendChild(closeBtn);
-        tagsRow.insertBefore(chip, addBtn);
+    const categorySelect = document.querySelector('.ts-field select:not([multiple])');
+    if (categorySelect) {
+        const updateColor = () => {
+            if (!categorySelect.value) {
+                categorySelect.classList.add('placeholder-active');
+            } else {
+                categorySelect.classList.remove('placeholder-active');
+            }
+        };
+        updateColor(); // beim Laden
+        categorySelect.addEventListener('change', updateColor);
     }
-
-    addBtn.addEventListener('click', function () {
-        if (!tagSelect) return;
-        const opt = tagSelect.options[tagSelect.selectedIndex];
-        if (!opt || !opt.value) return;
-        if (!tagsRow.querySelector('.ts-tag-chip[data-tag-id="' + opt.value + '"]')) {
-            addTag(opt.textContent, opt.value);
-        }
-        jQuery(tagSelect).val(null).trigger('change');
-    });
 });
+
+
 </script>
 {% endblock %}

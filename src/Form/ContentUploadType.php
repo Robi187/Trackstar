@@ -14,7 +14,10 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\NotBlank;
- 
+use Doctrine\ORM\EntityRepository; 
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Validator\Constraints\Range;
+
 class ContentUploadType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -49,13 +52,32 @@ class ContentUploadType extends AbstractType
                     new NotBlank(message: 'Bitte wähle eine Kategorie.'),
                 ],
             ])
+            ->add('bpm', IntegerType::class, [
+                'label' => 'Tempo (BPM)',
+                'mapped' => false,
+                'required' => false,
+                'attr' => [
+                    'placeholder' => '100 BPM',
+                    'class' => 'ts-input',
+                    'min' => 1,
+                    'max' => 999,
+                ],
+                'constraints' => [
+                    new Range(
+                        min: 40,
+                        max: 300,
+                        notInRangeMessage: 'BPM muss zwischen {{ min }} und {{ max }} liegen.',
+                    ),
+                ],
+            ])
             ->add('fk_tag', EntityType::class, [
-                'label' => 'Tag',
                 'class' => Tag::class,
                 'choice_label' => 'name',
+                'multiple' => true,
+                'expanded' => false,
+                'mapped' => false,  // nicht direkt auf Content gemappt
                 'required' => false,
-                'placeholder' => 'Tag wählen (optional)...',
-                'attr' => ['class' => 'ts-input'],
+                'label' => 'Tags',
             ])
             ->add('audioFile', FileType::class, [
                 'label' => 'Audio-Datei',

@@ -12,6 +12,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Psr\Log\LoggerInterface;
+use App\Entity\ContentTag;
+use App\Entity\Tag;
+
 
  
 class UploadController extends AbstractController
@@ -90,7 +93,30 @@ class UploadController extends AbstractController
 
                     $content->setImageFile('images/' . $newFilename);
                 }
+                $selectedTags = $form->get('fk_tag')->getData();
+                foreach ($selectedTags as $tag) {
+                    $contentTag = new ContentTag();
+                    $contentTag->setFkContent($content);
+                    $contentTag->setFkTag($tag);
+                    $em->persist($contentTag);
+                }
 
+                $bpm = $form->get('bpm')->getData();
+                if ($bpm) {
+                    $tagName = $bpm . ' BPM';
+
+                    $bpmTag = $em->getRepository(Tag::class)->findOneBy(['name' => $tagName]);
+                    if (!$bpmTag) {
+                        $bpmTag = new Tag();
+                        $bpmTag->setName($tagName);
+                        $em->persist($bpmTag);
+                    }
+
+                    $bpmContentTag = new ContentTag();
+                    $bpmContentTag->setFkContent($content);
+                    $bpmContentTag->setFkTag($bpmTag);
+                    $em->persist($bpmContentTag);
+                }
                 $content->setCreatedAt(new \DateTime());
                 $content->setDownloadCount(0);
                 $content->setFkUser($user);
