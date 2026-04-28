@@ -9,7 +9,17 @@
       "Read(//home/stanku/Repos/Trackstar/templates/upload/**)",
       "Read(///wsl.localhost/Ubuntu/home/stanku/Repos/Trackstar/templates/upload/**)",
       "Read(//home/stanku/Repos/Trackstar/src/Form/**)",
-      "Read(///wsl.localhost/Ubuntu/home/stanku/Repos/Trackstar/src/Form/**)"
+      "Read(///wsl.localhost/Ubuntu/home/stanku/Repos/Trackstar/src/Form/**)",
+      "Read(//home/stanku/Repos/Trackstar/src/DataFixtures/**)",
+      "Read(///wsl.localhost/Ubuntu/home/stanku/Repos/Trackstar/src/DataFixtures/**)",
+      "Read(//home/stanku/Repos/Trackstar/templates/**)",
+      "Read(///wsl.localhost/Ubuntu/home/stanku/Repos/Trackstar/templates/**)",
+      "Read(//home/stanku/Repos/Trackstar/templates/favorites/**)",
+      "Read(///wsl.localhost/Ubuntu/home/stanku/Repos/Trackstar/templates/favorites/**)",
+      "Read(//home/stanku/Repos/Trackstar/templates/home/**)",
+      "Read(///wsl.localhost/Ubuntu/home/stanku/Repos/Trackstar/templates/home/**)",
+      "Read(//home/stanku/Repos/Trackstar/templates/userprofile/**)",
+      "Read(///wsl.localhost/Ubuntu/home/stanku/Repos/Trackstar/templates/userprofile/**)"
     ],
     "additionalDirectories": [
       "\\home\\stanku\\Repos\\Trackstar\\templates\\content",
@@ -17,7 +27,9 @@
       "\\home\\stanku\\Repos\\Trackstar\\templates\\upload",
       "\\\\wsl.localhost\\Ubuntu\\home\\stanku\\Repos\\Trackstar\\templates\\upload",
       "\\home\\stanku\\Repos\\Trackstar\\src\\Form",
-      "\\\\wsl.localhost\\Ubuntu\\home\\stanku\\Repos\\Trackstar\\src\\Form"
+      "\\\\wsl.localhost\\Ubuntu\\home\\stanku\\Repos\\Trackstar\\src\\Form",
+      "\\home\\stanku\\Repos\\Trackstar\\src\\DataFixtures",
+      "\\\\wsl.localhost\\Ubuntu\\home\\stanku\\Repos\\Trackstar\\src\\DataFixtures"
     ]
   }
 }

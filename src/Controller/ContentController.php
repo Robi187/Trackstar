@@ -26,11 +26,16 @@ final class ContentController extends AbstractController
         if (!$content) {
             throw $this->createNotFoundException('Content not found');
         }
+        $user = $this->getUser();
+        $isFavorited = $user && $em->getRepository(Favorite::class)
+            ->findOneBy(['fk_user' => $user, 'fk_content' => $content]) !== null;
+
         return $this->render('content/index.html.twig', [
             'content' => $content,
             'favoriteCount' => $em->getRepository(Favorite::class)->countByContent($content),
             'averageRating' => $em->getRepository(Rating::class)->averageByContent($content),
             'tags' => $em->getRepository(ContentTag::class)->findTagsByContent($content),
+            'isFavorited' => $isFavorited,
         ]);
     }
 

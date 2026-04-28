@@ -219,6 +219,12 @@
                     </span>
                     <span class="stat-label">Downloads</span>
                 </div>
+                {% if app.user and app.user.username == user_data.username %}
+                <a href="{{ path('app_favorites') }}" class="stat-item" style="text-decoration:none;color:inherit;">
+                    <span class="stat-value" style="color:#e63946;">♥</span>
+                    <span class="stat-label">Favoriten</span>
+                </a>
+                {% endif %}
             </div>
         </div>
 
