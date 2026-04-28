@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Content;
+use App\Repository\ContentRepository;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
@@ -60,7 +61,6 @@ final class ContentController extends AbstractController
                 'category' => $content->getType() ? $content->getType()->getName() : null, // Beispiel für die Kategorie
                 'created_at' => $content->getCreatedAt()->format('Y-m-d H:i:s'),
                 'user' => $content->getFkUser() ? $content->getFkUser()->getUsername() : null, // Beispiel für den User
-                'tag' => $content->getFkTag() ? $content->getFkTag()->getName() : null, // Beispiel für das Tag
                 'image_path' => $content->getImageFile(),
             ];
         }
@@ -90,5 +90,21 @@ final class ContentController extends AbstractController
         );
 
         return $response;
+    }
+
+    #[Route('/deine-inhalte', name: 'app_uploud')]
+    public function uploads(ContentRepository $contentRepository, EntityManagerInterface $em): Response
+    {   
+        $tagsByContent = [];
+        $user = $this->getUser();
+        $contents = $contentRepository->findBy(['fk_user' => $user]);
+        foreach ($contents as $content) {
+            $tagsByContent[$content->getId()] = $em->getRepository(ContentTag::class)->findTagsByContent($content);
+        }
+        return $this->render('uploud/index.html.twig', [
+            'user_data' => $user,
+            'contents' => $contents,
+            'tagsByContent' => $tagsByContent,
+        ]);
     }
 }

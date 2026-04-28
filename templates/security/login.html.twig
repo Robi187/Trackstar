@@ -252,6 +252,8 @@
 {% endblock %}
 
 {% block body %}
+    {% block navbar %}{% endblock %}
+
     {% for msg in app.flashes('success') %}
       <div class="flash-success">
         <svg class="flash-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">

@@ -26,6 +26,7 @@
 		}
 	}
 
+	request_body max_size 100MB    # <-- diese Zeile hinzufügen
 	root /app/public
 	encode zstd br gzip
 

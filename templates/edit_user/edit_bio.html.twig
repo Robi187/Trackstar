@@ -1,0 +1,47 @@
+{% extends 'user_management/index.html.twig' %}
+
+{% block title %}Bio ändern{% endblock %}
+
+{% block ku_content %}
+  <a href="{{ path('app_user_management') }}" class="ku-back">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><polyline points="15 18 9 12 15 6"/></svg>
+    zurück zur Übersicht
+  </a>
+
+  <h1 class="ku-title" style="margin-top:12px;">Bio bearbeiten</h1>
+
+  {% for msg in app.flashes('warning') %}
+    <div class="ku-flash warning">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      {{ msg }}
+    </div>
+  {% endfor %}
+
+  <div class="ku-card">
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #2a2a2a;">
+      <div style="font-size:13px; color:#aaa; margin-bottom:8px; font-weight:600;">Aktuelle Bio</div>
+      <div style="background:#2a2a2a; border:1px solid #3a3a3a; border-radius:8px; padding:10px 14px; font-size:14px; color:#ccc;">
+        {{ current_bio ?? 'Keine Bio vorhanden' }}
+      </div>
+    </div>
+
+    <div style="font-size:13px; color:#aaa; margin-bottom:8px; font-weight:600;">Neue Bio</div>
+    {{ form_start(form) }}
+      {% set f = form.biography %}
+      <div class="ku-field-wrap{{ f.vars.errors|length ? ' has-error' : '' }}">
+        {{ form_widget(f, { attr: { placeholder: 'Schreib etwas über dich...' } }) }}
+        {% if f.vars.errors|length %}
+          <ul class="ku-field-errors">
+            {% for error in f.vars.errors %}<li>{{ error.message }}</li>{% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px;">
+        <a href="{{ path('app_user_management') }}" class="ku-nav-btn" style="width:auto;">abbrechen</a>
+        <button type="submit" class="ku-nav-btn active" style="width:auto;">Speichern</button>
+      </div>
+    {{ form_end(form) }}
+  </div>
+{% endblock %}
