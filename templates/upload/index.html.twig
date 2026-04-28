@@ -1,0 +1,869 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Upload – TrackStar{% endblock %}
+
+{% form_theme form _self %}
+
+{% block form_errors %}
+{% if errors|length > 0 %}
+<ul class="ts-form-errors">
+    {% for error in errors %}
+    <li class="ts-form-error-item">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        {{ error.message }}
+    </li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    /* ── Select2 Dark Theme Override ── */
+    .ts-field .select2-container {
+        width: 100% !important;
+    }
+
+    /* ── Single Select (Kategorie) ── */
+    .ts-field .select2-container--default .select2-selection--single {
+        background: #111;
+        border: 1px solid #2a2a2a;
+        border-radius: 8px;
+        height: auto;
+        padding: 0.6rem 1rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .ts-field .select2-container--default.select2-container--focus .select2-selection--single,
+    .ts-field .select2-container--default.select2-container--open .select2-selection--single {
+        border-color: #ff5a00;
+        box-shadow: 0 0 0 3px rgba(255, 90, 0, 0.08);
+    }
+
+    .ts-field .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #fff;
+        font-size: 0.88rem;
+        line-height: 1.4;
+        padding: 0;
+        font-family: var(--font-body, sans-serif);
+    }
+
+    .ts-field .select2-container--default .select2-selection--single .select2-selection__placeholder {
+        color: #555;
+    }
+
+    .ts-field .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 100%;
+        top: 0;
+        right: 8px;
+    }
+
+    .ts-field .select2-container--default .select2-selection--single .select2-selection__arrow b {
+        border-color: #888 transparent transparent transparent;
+    }
+
+    /* ── Dropdown panel ── */
+    .select2-dropdown {
+        background: #1a1a1a;
+        border: 1px solid #2a2a2a;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .select2-container--default .select2-search--dropdown .select2-search__field {
+        background: #111;
+        border: 1px solid #2a2a2a;
+        border-radius: 6px;
+        color: #fff;
+        padding: 0.5rem 0.75rem;
+        outline: none;
+        font-family: var(--font-body, sans-serif);
+        font-size: 0.85rem;
+    }
+
+    .select2-container--default .select2-search--dropdown .select2-search__field:focus {
+        border-color: #ff5a00;
+    }
+
+    .select2-container--default .select2-results__option {
+        color: #ccc;
+        padding: 0.6rem 0.9rem;
+        font-size: 0.85rem;
+        font-family: var(--font-body, sans-serif);
+    }
+
+    .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
+        background: #ff5a00;
+        color: #fff;
+    }
+
+    .select2-container--default .select2-results__option--selected {
+        background: #2a2a2a;
+        color: #fff;
+    }
+
+    .select2-results__message {
+        color: #666 !important;
+    }
+
+    /* Das echte multiple-Select verstecken */
+    .ts-field select[multiple] {
+        display: none !important;
+    }
+
+
+
+    .ts-field select {
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        padding-right: 2.5rem !important;
+    }
+
+    /* Single-Select2 (fake picker) – gleich aussehen wie andere Felder */
+    #tag-picker-container .select2-container--default .select2-selection--single {
+        background: #111;
+        border: 1px solid #2a2a2a;
+        border-radius: 8px;
+        height: auto;
+        padding: 0.6rem 1rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    #tag-picker-container .select2-container--default.select2-container--focus .select2-selection--single,
+    #tag-picker-container .select2-container--default.select2-container--open .select2-selection--single {
+        border-color: #ff5a00;
+        box-shadow: 0 0 0 3px rgba(255, 90, 0, 0.08);
+    }
+
+    #tag-picker-container .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #fff;
+        font-size: 0.88rem;
+        line-height: 1.4;
+        padding: 0;
+        font-family: var(--font-body, sans-serif);
+    }
+
+    #tag-picker-container .select2-container--default .select2-selection--single .select2-selection__placeholder {
+        color: #555;
+    }
+
+    #tag-picker-container .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 100%;
+        top: 0;
+        right: 8px;
+    }
+
+    #tag-picker-container .select2-container--default .select2-selection--single .select2-selection__arrow b {
+        border-color: #888 transparent transparent transparent;
+    }
+
+    /* ── Layout ── */
+    .ts-upload-wrapper {
+        min-height: calc(100vh - 120px);
+        padding: 2.5rem 3rem 5rem;
+        background: #111111;
+    }
+
+    .ts-upload-inner {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    /* ── Page Header ── */
+    .ts-page-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .ts-page-header h1 {
+        font-family: var(--font-heading, 'futura-pt', sans-serif);
+        font-size: 1.3rem;
+        font-weight: 700;
+        font-style: italic;
+        color: #ff5a00;
+        margin: 0 0 0.25rem;
+        letter-spacing: -0.01em;
+    }
+
+    .ts-page-header p {
+        color: var(--muted, #8a8a8e);
+        font-size: 0.85rem;
+        margin: 0;
+        font-family: var(--font-body, sans-serif);
+    }
+
+    /* ── Main Card ── */
+    .ts-card {
+        background: #1a1a1a;
+        border: 1px solid #2a2a2a;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    /* ── Section inside card ── */
+    .ts-section {
+        padding: 2rem 2.5rem;
+        border-bottom: 1px solid #2a2a2a;
+    }
+
+    .ts-section:last-of-type {
+        border-bottom: none;
+    }
+
+    .ts-section-title {
+        font-family: var(--font-subheading, 'sofia-pro', sans-serif);
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #ff5a00;
+        margin: 0 0 0.25rem;
+    }
+
+    .ts-section-subtitle {
+        font-size: 0.85rem;
+        color: #666;
+        margin: 0 0 1.5rem;
+    }
+
+    /* ── File Upload Row ── */
+    .ts-file-row {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .ts-cover-thumb-wrap {
+        flex-shrink: 0;
+        width: 140px;
+        height: 140px;
+        border-radius: 10px;
+        background: #2a2a2a;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #444;
+        position: relative;
+    }
+
+    .ts-cover-thumb-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: none;
+    }
+
+    .ts-cover-thumb-wrap img.visible {
+        display: block;
+    }
+
+    .ts-cover-thumb-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        color: #444;
+    }
+
+    .ts-upload-cols {
+        display: flex;
+        gap: 0.75rem;
+        flex: 1;
+    }
+
+    .ts-upload-btn-wrap {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .ts-upload-btn {
+        width: 100%;
+        background: #1e1e1e;
+        border: 1px solid #333;
+        border-radius: 10px;
+        color: #fff;
+        padding: 2rem 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.6rem;
+        cursor: pointer;
+        position: relative;
+        transition: border-color 0.2s, background 0.2s;
+        text-align: center;
+        min-height: 140px;
+        justify-content: center;
+    }
+
+    .ts-upload-btn:hover {
+        border-color: #ff5a00;
+        background: #222;
+    }
+
+    .ts-upload-btn input[type="file"] {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+        width: 100%;
+        height: 100%;
+    }
+
+    .ts-upload-btn svg {
+        color: #888;
+        width: 32px;
+        height: 32px;
+    }
+
+    .ts-upload-btn .btn-label {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #ddd;
+        font-family: var(--font-body, sans-serif);
+    }
+
+    .ts-upload-btn .btn-sub {
+        font-size: 0.78rem;
+        color: #555;
+        line-height: 1.4;
+        font-family: var(--font-body, sans-serif);
+    }
+
+    .ts-upload-btn.has-file {
+        border-color: #ff5a00;
+    }
+
+    .ts-upload-btn.has-file svg {
+        color: #ff5a00;
+    }
+
+    /* ── Fields ── */
+    .ts-field {
+        margin-bottom: 1rem;
+    }
+
+    .ts-field:last-child {
+        margin-bottom: 0;
+    }
+
+    .ts-field label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #888;
+        margin-bottom: 0.4rem;
+        font-family: var(--font-body, sans-serif);
+    }
+
+    .ts-field input[type="text"],
+    .ts-field input[type="number"],
+    .ts-field textarea,
+    .ts-field select {
+        width: 100%;
+        background: #111;
+        border: 1px solid #2a2a2a;
+        border-radius: 8px;
+        color: #fff;
+        font-size: 0.88rem;
+        padding: 0.75rem 1rem;
+        outline: none;
+        box-sizing: border-box;
+        font-family: var(--font-body, sans-serif);
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .ts-field input::placeholder,
+    .ts-field textarea::placeholder {
+        color: #555;
+    }
+
+    .ts-field input:focus,
+    .ts-field textarea:focus,
+    .ts-field select:focus {
+        border-color: #ff5a00;
+        box-shadow: 0 0 0 3px rgba(255, 90, 0, 0.08);
+    }
+
+    .ts-field textarea {
+        resize: vertical;
+        min-height: 80px;
+    }
+
+    .ts-field select option {
+        background: #111;
+        color: #fff;
+    }
+
+    .ts-two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    /* ── Tags ── */
+    .ts-tags-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+    }
+
+    .ts-tag-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: #222;
+        border: 1px solid #333;
+        border-radius: 6px;
+        color: #ccc;
+        font-size: 0.78rem;
+        font-weight: 500;
+        padding: 5px 10px;
+        font-family: var(--font-body, sans-serif);
+    }
+
+    .ts-tag-chip button {
+        background: none;
+        border: none;
+        color: #666;
+        cursor: pointer;
+        font-size: 0.8rem;
+        padding: 0;
+        line-height: 1;
+        display: flex;
+        align-items: center;
+        transition: color 0.2s;
+    }
+
+    .ts-tag-chip button:hover {
+        color: #ff5a00;
+    }
+
+    .ts-tag-add-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: transparent;
+        border: 1px dashed #333;
+        border-radius: 6px;
+        color: #666;
+        font-size: 0.78rem;
+        font-weight: 500;
+        padding: 5px 12px;
+        cursor: pointer;
+        font-family: var(--font-body, sans-serif);
+        transition: border-color 0.2s, color 0.2s;
+    }
+
+    .ts-tag-add-btn:hover {
+        border-color: #ff5a00;
+        color: #ff5a00;
+    }
+
+    /* ── Submit ── */
+    .ts-submit-wrap {
+        padding: 2rem 2.5rem;
+        display: flex;
+        justify-content: center;
+    }
+
+    .ts-submit-btn {
+        padding: 0.85rem 3rem;
+        background: #ff5a00;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: var(--font-subheading, 'sofia-pro', sans-serif);
+        letter-spacing: 0.03em;
+        transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+        box-shadow: 0 4px 18px rgba(255, 90, 0, 0.25);
+    }
+
+    .ts-submit-btn:hover {
+        background: #e85000;
+        box-shadow: 0 6px 24px rgba(255, 90, 0, 0.35);
+        transform: translateY(-1px);
+    }
+
+    .ts-submit-btn:active {
+        transform: scale(0.98);
+    }
+
+    /* ── Flash & Errors ── */
+    .ts-flash {
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .ts-flash.success {
+        background: rgba(34, 197, 94, 0.1);
+        color: #22c55e;
+        border: 1px solid rgba(34, 197, 94, 0.15);
+    }
+
+    .ts-flash.error {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+        border: 1px solid rgba(239, 68, 68, 0.15);
+    }
+
+    /* ── Form Errors (Symfony custom theme) ── */
+    .ts-form-errors {
+        list-style: none;
+        margin: 0.6rem 0 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+    }
+
+    .ts-form-error-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(224, 36, 52, 0.1);
+        border: 1px solid rgba(224, 36, 52, 0.35);
+        border-radius: 8px;
+        color: #e02434;
+        font-size: 0.82rem;
+        font-weight: 500;
+        padding: 0.55rem 0.9rem;
+        font-family: var(--font-body, sans-serif);
+    }
+
+    .ts-form-error-item svg {
+        flex-shrink: 0;
+        color: #e02434;
+    }
+
+    /* ── BPM field with icon ── */
+    .ts-bpm-wrap {
+        position: relative;
+    }
+
+    .ts-bpm-wrap svg {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #555;
+        pointer-events: none;
+    }
+
+    .ts-bpm-wrap input {
+        padding-left: 2.2rem !important;
+    }
+
+    .ts-bpm-wrap input[type="number"]::-webkit-outer-spin-button,
+    .ts-bpm-wrap input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .ts-bpm-wrap input[type="number"] {
+        -moz-appearance: textfield; /* Firefox */
+    }
+    @media (max-width: 768px) {
+        .ts-two-col { grid-template-columns: 1fr; }
+        .ts-section { padding: 1.5rem; }
+        .ts-submit-wrap { padding: 1.5rem; }
+        .ts-upload-wrapper { padding: 1.5rem 1rem 4rem; }
+        .ts-cover-thumb-wrap { width: 90px; height: 90px; }
+    }
+
+    .ts-field select option[value=""] {
+        color: #555;
+    }
+
+    .ts-field select.placeholder-active {
+        color: #555;
+    }
+
+    .select2-container--open .select2-dropdown--above {
+        top: 100% !important;
+        bottom: auto !important;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .select2-container--open.select2-container--above .select2-selection--single {
+        border-radius: 8px !important;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="ts-upload-wrapper">
+    <div class="ts-upload-inner">
+
+        <div class="ts-page-header">
+            <h1>Neuen Track hochladen</h1>
+            <p>Teile deinen sound mit der TrackStar Community!</p>
+        </div>
+
+        {% for message in app.flashes('success') %}
+            <div class="ts-flash success">{{ message }}</div>
+        {% endfor %}
+        {% for message in app.flashes('error') %}
+            <div class="ts-flash error">{{ message }}</div>
+        {% endfor %}
+
+        {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'enctype': 'multipart/form-data', 'id': 'upload-form'}}) }}
+
+        <div class="ts-card">
+
+            {# ── Section 1: Files ── #}
+            <div class="ts-section">
+                <p class="ts-section-title">Titelbild/Audiodatei</p>
+                <p class="ts-section-subtitle">Lade dein Titelbild und deine Audiodatei für deinen Track hoch</p>
+
+                <div class="ts-file-row">
+                    <div class="ts-cover-thumb-wrap" id="cover-thumb-wrap">
+                        <div class="ts-cover-thumb-placeholder">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                <circle cx="8.5" cy="8.5" r="1.5"/>
+                                <polyline points="21 15 16 10 5 21"/>
+                            </svg>
+                        </div>
+                        <img id="cover-thumb-img" src="" alt="Cover">
+                    </div>
+
+                    <div class="ts-upload-cols">
+                        <div class="ts-upload-btn-wrap">
+                            <label style="font-size:0.72rem;color:#888;font-weight:600;align-self:flex-start;">Cover/Titelbild</label>
+                            <div class="ts-upload-btn" id="image-btn">
+                                {{ form_widget(form.imageFile) }}
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="16 16 12 12 8 16"/>
+                                    <line x1="12" y1="12" x2="12" y2="21"/>
+                                    <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+                                </svg>
+                                <span class="btn-label">Datei auswählen</span>
+                                <span class="btn-sub">jpg oder png datei<br>hochladen</span>
+                            </div>
+                            {{ form_errors(form.imageFile) }}
+                        </div>
+
+                        <div class="ts-upload-btn-wrap">
+                            <label style="font-size:0.72rem;color:#888;font-weight:600;align-self:flex-start;">Audio-Datei</label>
+                            <div class="ts-upload-btn" id="audio-btn">
+                                {{ form_widget(form.audioFile) }}
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="16 16 12 12 8 16"/>
+                                    <line x1="12" y1="12" x2="12" y2="21"/>
+                                    <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+                                </svg>
+                                <span class="btn-label">Datei auswählen</span>
+                                <span class="btn-sub"><br>Audiodatei hochladen</span>
+                            </div>
+                            {{ form_errors(form.audioFile) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# ── Section 2: Info ── #}
+            <div class="ts-section">
+                <p class="ts-section-title">Informationen</p>
+                <p class="ts-section-subtitle">gib die Informationen zu deinem Track an</p>
+
+                <div class="ts-field">
+                    {{ form_label(form.title) }}
+                    {{ form_widget(form.title, {'attr': {'placeholder': 'Titel deines Tracks'}}) }}
+                    {{ form_errors(form.title) }}
+                </div>
+
+                <div class="ts-field">
+                    {{ form_label(form.description, 'Beschreibung ~ Optional') }}
+                    {{ form_widget(form.description, {'attr': {'placeholder': 'Beschreibung deines Tracks'}}) }}
+                    {{ form_errors(form.description) }}
+                </div>
+            </div>
+
+            {# ── Section 3: Details ── #}
+            <div class="ts-section">
+                <p class="ts-section-title">Details</p>
+                <p class="ts-section-subtitle">füge die Details zu deinem Track hinzu</p>
+
+                <div class="ts-two-col">
+                   <div class="ts-field">
+                        <label>Tempo (BPM) ~ Optional</label>
+                        <div class="ts-bpm-wrap">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
+                            </svg>
+                            {{ form_widget(form.bpm, {'attr': {'placeholder': '100 BPM', 'min': 40, 'max': 300}}) }}
+                        </div>
+                        {{ form_errors(form.bpm) }}
+                    </div>
+                    <div class="ts-field">
+                        {{ form_label(form.type, 'Kategorie') }}
+                        {{ form_widget(form.type) }}
+                        {{ form_errors(form.type) }}
+                    </div>
+                </div>
+            </div>
+
+            {# ── Section 4: Tags ── #}
+            <div class="ts-section">
+                <p class="ts-section-title">Tags</p>
+                <p class="ts-section-subtitle">füge die Tags zu deinem Track hinzu ~ Optional</p>
+
+                <div class="ts-field">
+                    {# Fake single-select für die Anzeige #}
+                    <div id="tag-picker-container" style="width:100%;"></div>
+                    {# Echtes multiple-Select (versteckt, wird per JS befüllt) #}
+                    {{ form_widget(form.fk_tag) }}
+                    {{ form_errors(form.fk_tag) }}
+                </div>
+
+                <div class="ts-tags-row" id="tag-chips-row">
+                    
+                </div>
+            </div>
+
+            {# ── Submit ── #}
+            <div class="ts-submit-wrap">
+                <button type="submit" class="ts-submit-btn">Veröffentlichen</button>
+            </div>
+
+        </div>
+
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    /* ── Tag-Picker: fake single-select aus den Optionen des echten multiple-Select ── */
+    const $realSelect = jQuery(document.querySelector('.ts-field select[multiple]'));
+
+    /* Fake-Select aufbauen */
+    const $fakeSelect = jQuery('<select><option value=""></option></select>');
+    $realSelect.find('option').each(function () {
+        $fakeSelect.append(jQuery('<option>').val(jQuery(this).val()).text(jQuery(this).text()));
+    });
+    jQuery('#tag-picker-container').append($fakeSelect);
+
+    $fakeSelect.select2({
+        placeholder: 'Tag suchen...',
+        allowClear: false,
+        width: '100%',
+        dropdownPosition: 'below', // immer nach unten
+        language: {
+            noResults: function () { return 'Keine Tags gefunden'; },
+            searching: function () { return 'Suche...'; },
+        }
+    });
+
+    const chipsContainer = document.getElementById('tag-chips-row');
+    const addBtn = document.getElementById('add-tag-btn');
+
+    function addChip(id, text) {
+        if (chipsContainer.querySelector(`[data-tag-id="${id}"]`)) return;
+
+        const chip = document.createElement('span');
+        chip.className = 'ts-tag-chip';
+        chip.dataset.tagId = id;
+        chip.textContent = text;
+
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.setAttribute('aria-label', 'Entfernen');
+        removeBtn.innerHTML = '&times;';
+        removeBtn.addEventListener('click', () => {
+            $realSelect.find(`option[value="${id}"]`).prop('selected', false);
+            chip.remove();
+        });
+
+        chip.appendChild(removeBtn);
+        chipsContainer.insertBefore(chip, addBtn);
+    }
+
+    $fakeSelect.on('select2:select', function (e) {
+        const val  = e.params.data.id;
+        const text = e.params.data.text;
+        $realSelect.find(`option[value="${val}"]`).prop('selected', true);
+        addChip(val, text);
+        $fakeSelect.val(null).trigger('change');
+    });
+
+    /* ── Cover image preview ── */
+    const imageInput = document.querySelector('#image-btn input[type="file"]');
+    const thumbImg   = document.getElementById('cover-thumb-img');
+    const thumbPlaceholder = document.querySelector('.ts-cover-thumb-placeholder');
+    const imageBtn   = document.getElementById('image-btn');
+
+    if (imageInput) {
+        imageInput.addEventListener('change', function () {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    thumbImg.src = e.target.result;
+                    thumbImg.classList.add('visible');
+                    thumbPlaceholder.style.display = 'none';
+                    imageBtn.classList.add('has-file');
+                };
+                reader.readAsDataURL(this.files[0]);
+
+                // NEU: Dateiname anzeigen
+                const label = imageBtn.querySelector('.btn-label');
+                const name  = this.files[0].name;
+                if (label) label.textContent = name.length > 20 ? name.slice(0, 18) + '…' : name;
+            }
+        });
+    }
+
+    /* ── Audio file feedback ── */
+    const audioInput = document.querySelector('#audio-btn input[type="file"]');
+    const audioBtn   = document.getElementById('audio-btn');
+
+    if (audioInput) {
+        audioInput.addEventListener('change', function () {
+            if (this.files && this.files[0]) {
+                audioBtn.classList.add('has-file');
+                const label = audioBtn.querySelector('.btn-label');
+                const name  = this.files[0].name;
+                if (label) label.textContent = name.length > 20 ? name.slice(0, 18) + '…' : name;
+            }
+        });
+    }
+    const categorySelect = document.querySelector('.ts-field select:not([multiple])');
+    if (categorySelect) {
+        const updateColor = () => {
+            if (!categorySelect.value) {
+                categorySelect.classList.add('placeholder-active');
+            } else {
+                categorySelect.classList.remove('placeholder-active');
+            }
+        };
+        updateColor(); // beim Laden
+        categorySelect.addEventListener('change', updateColor);
+    }
+});
+
+
+</script>
+{% endblock %}

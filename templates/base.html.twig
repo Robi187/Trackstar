@@ -3,8 +3,7 @@
 	<head>
 		<meta charset="UTF-8">
 		<title>
-			{% block title %}Trackstar
-			{% endblock %}
+			{% block title %}Trackstar{% endblock %}
 		</title>
 		<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
 		{% block stylesheets %}
@@ -78,9 +77,7 @@
 					color: #ffffff;
 				}
 
-				.navbar-logo span {
-					color: var(--orange);
-				}
+				.navbar-logo span { color: var(--orange); }
 
 				.navbar-search {
 					flex: 1;
@@ -101,13 +98,8 @@
 					transition: border-color 0.2s;
 				}
 
-				.navbar-search input::placeholder {
-					color: #666;
-				}
-
-				.navbar-search input:focus {
-					border-color: var(--orange);
-				}
+				.navbar-search input::placeholder { color: #666; }
+				.navbar-search input:focus { border-color: var(--orange); }
 
 				.navbar-search .search-icon {
 					position: absolute;
@@ -132,9 +124,7 @@
 					transition: color 0.2s;
 				}
 
-				.navbar-shop:hover {
-					color: var(--orange);
-				}
+				.navbar-shop:hover { color: var(--orange); }
 
 				.navbar-avatar {
 					width: 34px;
@@ -431,13 +421,8 @@
 					transition: color 0.2s;
 				}
 
-				.subnav a:hover {
-					color: var(--orange-h);
-				}
-
-				.subnav a.active {
-					color: #ffffff;
-				}
+				.subnav a:hover { color: var(--orange-h); }
+				.subnav a.active { color: #ffffff; }
 
 				.subnav a svg {
 					width: 15px;
@@ -500,9 +485,7 @@
 					font-size: 2.5rem;
 				}
 
-				.card-body {
-					padding: 12px 12px 14px;
-				}
+				.card-body { padding: 12px 12px 14px; }
 
 				.card-title {
 					text-align: center;
@@ -559,7 +542,6 @@
 					padding: 3px 7px;
 				}
 
-				/* ── EMPTY STATE ── */
 				.empty-state {
 					text-align: center;
 					color: #555;
@@ -577,8 +559,25 @@
 					margin: 2px;
 				}
 
-				.subnav a.active {
-					color: var(--orange);
+				.navbar-upload-btn {
+					width: 34px;
+					height: 34px;
+					background-color: #ff5a00;
+					border-radius: 50%;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					color: #fff;
+					font-size: 1.3rem;
+					font-weight: 300;
+					text-decoration: none;
+					line-height: 1;
+					transition: background 0.2s, transform 0.1s;
+				}
+
+				.navbar-upload-btn:hover {
+					background-color: #e85000;
+					transform: scale(1.08);
 				}
 			</style>
 		{% endblock %}
@@ -598,7 +597,8 @@
 				</div>
 
 				<div class="navbar-right">
-					<a href="/shop" class="navbar-shop">Deine Inhalte</a>
+          <a href="/upload" class="navbar-upload-btn">+</a>
+					<a href="/deine-inhalte" class="navbar-shop">Deine Inhalte</a>
 					
 
 					{# ── MENU TOGGLE BUTTON ── #}
@@ -756,5 +756,8 @@
 			</script>
 
 		{% endblock %}
+		{# ── PAGE CONTENT ── #}
+		{% block body %}{% endblock %}
+
 	</body>
 </html>
