@@ -10,5 +10,5 @@ class UserEmailDto
 {
     #[NotBlank(message: 'Bitte gib eine E-Mail-Adresse ein.')]
     #[Email(message: 'Bitte gib eine gültige E-Mail-Adresse ein.')]
-    public string $email = '';
+    public ?string $email = null;
 }

@@ -6,6 +6,8 @@
 {{ parent() }}
 
 <style>
+  .ku-back { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #888; text-decoration: none; margin-bottom: 4px; }
+  .ku-back:hover { color: #fff; }
   .ku-page { display: flex; justify-content: center; align-items: flex-start; padding: 40px 20px; }
   .ku-wrap { display: flex; gap: 40px; align-items: flex-start; max-width: 900px; width: 100%; }
   .ku-sidebar { width: 210px; min-width: 210px; background: #1a1a1a; border: 1.5px solid #3a3a3a; border-radius: 20px; padding: 28px 16px 20px; display: flex; flex-direction: column; gap: 6px; }
@@ -30,28 +32,41 @@
   .ku-row-value { flex: 1; font-size: 14px; color: #fff; }
   .ku-row-action { font-size: 13px; color: #777; cursor: pointer; text-decoration: none; }
   .ku-row-action:hover { color: #e85d04; }
+  .ku-flash { display: flex; align-items: center; gap: 10px; border-radius: 10px; padding: 13px 16px; margin-bottom: 16px; font-size: .88rem; font-weight: 500; }
+  .ku-flash svg { flex-shrink: 0; width: 18px; height: 18px; }
+  .ku-flash.success { background: rgba(0,200,80,.10); border: 1px solid rgba(0,200,80,.3); color: #00d966; }
+  .ku-flash.error { background: rgba(224,36,52,.12); border: 1px solid rgba(224,36,52,.4); color: #ff6070; }
+  .ku-flash.warning { background: rgba(255,90,0,.12); border: 1px solid rgba(255,90,0,.4); color: #ff7a30; }
+  .ku-field-wrap { margin-bottom: 14px; }
+  .ku-field-wrap label { font-size: 13px; color: #aaa; display: block; margin-bottom: 6px; }
+  .ku-field-wrap input { width: 100%; background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px; color: #fff; font-size: 14px; padding: 10px 14px; outline: none; box-sizing: border-box; }
+  .ku-field-wrap input:focus { border-color: #e85d04; }
+  .ku-field-wrap.has-error input { border-color: #e02434; }
+  .ku-field-errors { list-style: none; margin-top: 5px; padding: 0; }
+  .ku-field-errors li { font-size: 12px; color: #ff6070; }
 </style>
 
 <div class="ku-page">
   <div class="ku-wrap">
+
     <div class="ku-sidebar">
       <div class="ku-avatar">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
       </div>
       <div class="ku-username">{{ user_data.getUsername() }}</div>
 
-      <a href="{{ path('app_user_management') }}" class="ku-nav-btn active">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-        Übersicht
-      </a>
-      <a href="{{ path('app_uploud') }}" class="ku-nav-btn">
+      <a href="{{ path('app_user_management') }}" class="ku-nav-btn {{ app.request.attributes.get('_route') == 'app_user_management' ? 'active' : '' }}">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    Übersicht
+    </a>
+    <a href="{{ path('app_uploud') }}" class="ku-nav-btn {{ app.request.attributes.get('_route') == 'app_uploud' ? 'active' : '' }}">
         <svg viewBox="0 0 24 24"><path d="M12 16V4m0 0l-4 4m4-4l4 4"/><path d="M4 20h16"/></svg>
         Meine Uploads
-      </a>
-      <a href="{{ path('app_favorites') }}" class="ku-nav-btn">
+    </a>
+    <a href="{{ path('app_favorites') }}" class="ku-nav-btn {{ app.request.attributes.get('_route') == 'app_favorites' ? 'active' : '' }}">
         <svg viewBox="0 0 24 24"><path d="M12 21C12 21 3 14 3 8a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 6-9 13-9 13z"/></svg>
         Meine Favoriten
-      </a>
+    </a>
 
       <hr class="ku-divider">
 
@@ -66,31 +81,54 @@
     </div>
 
     <div class="ku-main">
-      <h1 class="ku-title">Kontoübersicht</h1>
-      <p class="ku-subtitle">Hier findest du deine Kontoinformationen und eine Übersicht deiner Aktivitäten</p>
+      {% block ku_content %}
+        <h1 class="ku-title">Kontoübersicht</h1>
+        <p class="ku-subtitle">Hier findest du deine Kontoinformationen und eine Übersicht deiner Aktivitäten</p>
 
-      <div class="ku-card">
-        <div class="ku-card-title">Persönliche Informationen</div>
+        {% for msg in app.flashes('success') %}
+          <div class="ku-flash success">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/>
+            </svg>
+            {{ msg }}
+          </div>
+        {% endfor %}
 
-        <div class="ku-row">
-          <span class="ku-row-label">Benutzername:</span>
-          <span class="ku-row-value">{{ user_data.getUsername() }}</span>
-          <a href="{{ path('app_edit_username') }}" class="ku-row-action">ändern</a>
+        {% for msg in app.flashes('error') %}
+          <div class="ku-flash error">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            {{ msg }}
+          </div>
+        {% endfor %}
+
+        <div class="ku-card">
+          <div class="ku-card-title">Persönliche Informationen</div>
+          <div class="ku-row">
+            <span class="ku-row-label">Benutzername:</span>
+            <span class="ku-row-value">{{ user_data.getUsername() }}</span>
+            <a href="{{ path('app_edit_username') }}" class="ku-row-action">ändern</a>
+          </div>
+          <div class="ku-row">
+            <span class="ku-row-label">E-Mail-Adresse:</span>
+            <span class="ku-row-value">{{ user_data.getEmail() }}</span>
+            <a href="{{ path('app_edit_email') }}" class="ku-row-action">ändern</a>
+          </div>
+          <div class="ku-row">
+            <span class="ku-row-label">Passwort:</span>
+            <span class="ku-row-value">••••••••••••••••</span>
+            <a href="{{ path('app_edit_password') }}" class="ku-row-action">ändern</a>
+          </div>
+          <div class="ku-row">
+            <span class="ku-row-label">Bio:</span>
+            <span class="ku-row-value">{{ user_data.getBiography() }}</span>
+            <a href="{{ path('app_edit_bio') }}" class="ku-row-action">ändern</a>
+          </div>
         </div>
-
-        <div class="ku-row">
-          <span class="ku-row-label">E-Mail-Adresse:</span>
-          <span class="ku-row-value">{{ user_data.getEmail() }}</span>
-          <a href="{{ path('app_edit_email') }}" class="ku-row-action">ändern</a>
-        </div>
-
-        <div class="ku-row">
-          <span class="ku-row-label">Passwort:</span>
-          <span class="ku-row-value">••••••••••••••••</span>
-          <a href="{{ path('app_edit_username') }}" class="ku-row-action">ändern</a>
-        </div>
-      </div>
+      {% endblock %}
     </div>
+
   </div>
 </div>
 {% endblock %}

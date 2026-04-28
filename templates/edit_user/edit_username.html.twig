@@ -1,34 +1,45 @@
-{% extends 'base.html.twig' %}
+{% extends 'user_management/index.html.twig' %}
 
-{% block title %}Benutzer bearbeiten{% endblock %}
+{% block title %}Benutzername ändern{% endblock %}
 
-{% block body %}
-{{parent()}}
-<style>
-    .form-wrapper { margin: 2em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .form-wrapper label { font-weight: bold; margin-bottom: 5px; display: block; }
-    .form-wrapper input { width: 100%; padding: 10px; margin-bottom: 1em; border-radius: 5px; border: 1px solid #ccc; }
-    .form-wrapper button { padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
-    .form-wrapper button:hover { background-color: #0056b3; }
-    .error { color: red; font-size: 14px; }
-</style>
+{% block ku_content %}
+  <a href="{{ path('app_user_management') }}" class="ku-back">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><polyline points="15 18 9 12 15 6"/></svg>
+    zurück zur Übersicht
+  </a>
 
-<div class="form-wrapper">
-    <h1>Benutzer bearbeiten</h1>
+  <h1 class="ku-title" style="margin-top:12px;">Benutzername bearbeiten</h1>
 
-    {# Wenn Fehler vorhanden sind, zeige sie an #}
-    {% for error in form.vars.errors %}
-        <div class="error">{{ error.message }}</div>
-    {% endfor %}
+  {% for msg in app.flashes('warning') %}
+    <div class="alert-warning">{{ msg }}</div>
+  {% endfor %}
 
-    {# Das Formular anzeigen #}
+  <div class="form-wrapper">
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #2a2a2a;">
+      <div style="font-size:13px; color:#aaa; margin-bottom:8px; font-weight:600;">Aktueller Benutzername</div>
+      <div style="background:#2a2a2a; border:1px solid #3a3a3a; border-radius:8px; padding:10px 14px; font-size:14px; color:#ccc;">
+        {{ current_username }}
+      </div>
+    </div>
+
+    <div style="font-size:13px; color:#aaa; margin-bottom:8px; font-weight:600;">Neuer Benutzername</div>
     {{ form_start(form) }}
-        <div>
-            {{ form_row(form.username) }}
-        </div>
-        <div>
-            <button type="submit">Speichern</button>
-        </div>
+      {% set f = form.username %}
+      <div class="ku-field-wrap{{ f.vars.errors|length ? ' has-error' : '' }}">
+        {{ form_widget(f, { attr: { placeholder: 'Neuer Benutzername' } }) }}
+        {% if f.vars.errors|length %}
+          <ul class="ku-field-errors">
+            {% for error in f.vars.errors %}
+              <li>{{ error.message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px;">
+        <a href="{{ path('app_user_management') }}" class="ku-nav-btn" style="width:auto;">abbrechen</a>
+        <button type="submit" class="ku-nav-btn active" style="width:auto;">Speichern</button>
+      </div>
     {{ form_end(form) }}
-</div>
+  </div>
 {% endblock %}
