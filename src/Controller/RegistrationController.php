@@ -32,6 +32,7 @@ final class RegistrationController extends AbstractController
 
             $user->setPassword($hashedPassword);
             $user->setRoles(['ROLE_USER']);
+            $user->setCreatedAt(new \DateTimeImmutable());
 
             $entityManager->persist($user);
             $entityManager->flush();
