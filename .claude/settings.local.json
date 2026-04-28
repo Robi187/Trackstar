@@ -1,7 +1,23 @@
 {
   "permissions": {
     "allow": [
-      "Bash(sudo chmod *)"
+      "Bash(sudo chmod *)",
+      "Read(//home/stanku/Repos/Trackstar/**)",
+      "Read(///wsl.localhost/Ubuntu/home/stanku/Repos/Trackstar/**)",
+      "Read(//home/stanku/Repos/Trackstar/src/Entity/**)",
+      "Read(///wsl.localhost/Ubuntu/home/stanku/Repos/Trackstar/src/Entity/**)",
+      "Read(//home/stanku/Repos/Trackstar/templates/upload/**)",
+      "Read(///wsl.localhost/Ubuntu/home/stanku/Repos/Trackstar/templates/upload/**)",
+      "Read(//home/stanku/Repos/Trackstar/src/Form/**)",
+      "Read(///wsl.localhost/Ubuntu/home/stanku/Repos/Trackstar/src/Form/**)"
+    ],
+    "additionalDirectories": [
+      "\\home\\stanku\\Repos\\Trackstar\\templates\\content",
+      "\\\\wsl.localhost\\Ubuntu\\home\\stanku\\Repos\\Trackstar\\templates\\content",
+      "\\home\\stanku\\Repos\\Trackstar\\templates\\upload",
+      "\\\\wsl.localhost\\Ubuntu\\home\\stanku\\Repos\\Trackstar\\templates\\upload",
+      "\\home\\stanku\\Repos\\Trackstar\\src\\Form",
+      "\\\\wsl.localhost\\Ubuntu\\home\\stanku\\Repos\\Trackstar\\src\\Form"
     ]
   }
 }

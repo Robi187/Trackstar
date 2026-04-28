@@ -661,7 +661,7 @@
                         </div>
 
                         <div class="ts-upload-btn-wrap">
-                            <label style="font-size:0.72rem;color:#888;font-weight:600;align-self:flex-start;">Audio-Datei</label>
+                            <label id="audio-file-label" style="font-size:0.72rem;color:#888;font-weight:600;align-self:flex-start;">Audio-Datei</label>
                             <div class="ts-upload-btn" id="audio-btn">
                                 {{ form_widget(form.audioFile) }}
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -670,7 +670,7 @@
                                     <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
                                 </svg>
                                 <span class="btn-label">Datei auswählen</span>
-                                <span class="btn-sub"><br>Audiodatei hochladen</span>
+                                <span class="btn-sub" id="audio-btn-sub">Audiodatei hochladen<br>Achtung: bei Soundkits ZIP Dateien</span>
                             </div>
                             {{ form_errors(form.audioFile) }}
                         </div>
@@ -850,17 +850,50 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
-    const categorySelect = document.querySelector('.ts-field select:not([multiple])');
+    const categorySelect  = document.querySelector('.ts-field select:not([multiple])');
+    const audioFileLabel  = document.getElementById('audio-file-label');
+    const audioBtnSub     = document.getElementById('audio-btn-sub');
+
+    function updateAudioField() {
+        const text = categorySelect?.options[categorySelect.selectedIndex]?.text?.toLowerCase() ?? '';
+        const isSoundkit = text.includes('sound kit');
+        if (audioInput) {
+            audioInput.accept = isSoundkit
+                ? '.zip,application/zip,application/x-zip-compressed'
+                : 'audio/*,.mp3,.wav,.flac,.aiff';
+        }
+        if (audioFileLabel) {
+            audioFileLabel.textContent = isSoundkit ? 'ZIP-Datei' : 'Audio-Datei';
+        }
+        if (audioBtnSub) {
+            audioBtnSub.innerHTML = isSoundkit ? '<br>ZIP-Datei hochladen' : 'Audiodatei <br> hochladen';
+        }
+    }
+
     if (categorySelect) {
         const updateColor = () => {
-            if (!categorySelect.value) {
-                categorySelect.classList.add('placeholder-active');
-            } else {
-                categorySelect.classList.remove('placeholder-active');
-            }
+            categorySelect.classList.toggle('placeholder-active', !categorySelect.value);
         };
-        updateColor(); // beim Laden
-        categorySelect.addEventListener('change', updateColor);
+        updateColor();
+        categorySelect.addEventListener('change', () => {
+            updateColor();
+            updateAudioField();
+        });
+        updateAudioField(); // beim Laden prüfen
+    }
+
+    /* ── Submit-Validierung: Kategorie ↔ Dateityp ── */
+    const uploadForm = document.getElementById('upload-form');
+    if (uploadForm) {
+        uploadForm.addEventListener('submit', function (e) {
+            if (!audioInput || !audioInput.files[0] || !categorySelect) return;
+
+            const categoryText = categorySelect.options[categorySelect.selectedIndex]?.text?.toLowerCase() ?? '';
+            const isSoundkit   = categoryText.includes('soundkit');
+            const ext          = audioInput.files[0].name.split('.').pop().toLowerCase();
+            const isZip        = ext === 'zip';
+            
+        });
     }
 });
 
