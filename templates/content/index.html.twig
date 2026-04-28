@@ -299,9 +299,11 @@
 				{% else %}
 					<div class="cover-placeholder">&#127925;</div>
 				{% endif %}
+				{% if 'soundkit' not in content.type.name|lower and 'sound kit' not in content.type.name|lower %}
 				<div class="play-overlay">
 					<button class="play-circle" id="play-btn">▶</button>
 				</div>
+				{% endif %}
 			</div>
 
 			<div class="track-meta">
@@ -315,9 +317,11 @@
 				{% endif %}
 			</div>
 
+			{% if 'soundkit' not in content.type.name|lower and 'sound kit' not in content.type.name|lower %}
 			<div class="waveform-wrap">
-					<div id="waveform"></div>
-				</div>
+				<div id="waveform"></div>
+			</div>
+			{% endif %}
 
 			<div class="social-row">
 				<!-- Likes -->
@@ -411,6 +415,7 @@
 		</div>
 	</div>
 
+	{% if 'soundkit' not in content.type.name|lower and 'sound kit' not in content.type.name|lower %}
 	<script type="module">
 		import WaveSurfer from 'https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.esm.js';
 
@@ -436,5 +441,6 @@
 		ws.on('pause',  () => { btn.textContent = '▶'; });
 		ws.on('finish', () => { btn.textContent = '▶'; });
 	</script>
+	{% endif %}
 
 {% endblock %}
