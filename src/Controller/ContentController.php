@@ -92,7 +92,7 @@ final class ContentController extends AbstractController
         return $response;
     }
 
-    #[Route('/deine-inhalte', name: 'app_uploud')]
+    #[Route('/deine-inhalte', name: 'app_deine_inhalte')]
     public function uploads(ContentRepository $contentRepository, EntityManagerInterface $em): Response
     {   
         $tagsByContent = [];
@@ -101,7 +101,7 @@ final class ContentController extends AbstractController
         foreach ($contents as $content) {
             $tagsByContent[$content->getId()] = $em->getRepository(ContentTag::class)->findTagsByContent($content);
         }
-        return $this->render('uploud/index.html.twig', [
+        return $this->render('deine_inhalte/index.html.twig', [
             'user_data' => $user,
             'contents' => $contents,
             'tagsByContent' => $tagsByContent,
