@@ -4,12 +4,19 @@ namespace App\Controller;
 use App\Entity\Content;
 use App\Entity\ContentTag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class HomeController extends AbstractController
 {
+    #[Route('/', name: 'app_root')]
+    public function root(): RedirectResponse
+    {
+        return $this->redirectToRoute('app_home');
+    }
+
     #[Route('/home', name: 'app_home')]
     public function index(EntityManagerInterface $em): Response
     {
