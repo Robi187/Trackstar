@@ -14,7 +14,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Content;
 use App\Repository\ContentRepository;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use App\Repository\RatingRepository;
 
 
 final class ContentController extends AbstractController
@@ -30,12 +32,20 @@ final class ContentController extends AbstractController
         $isFavorited = $user && $em->getRepository(Favorite::class)
             ->findOneBy(['fk_user' => $user, 'fk_content' => $content]) !== null;
 
+        $userRatingEntity = $user
+            ? $em->getRepository(Rating::class)->findOneBy(['fk_user' => $user, 'fk_content' => $content])
+            : null;
+
+        $isOwner = $user && $content->getFkUser() && $content->getFkUser()->getId() === $user->getId();
+
         return $this->render('content/index.html.twig', [
             'content' => $content,
             'favoriteCount' => $em->getRepository(Favorite::class)->countByContent($content),
             'averageRating' => $em->getRepository(Rating::class)->averageByContent($content),
             'tags' => $em->getRepository(ContentTag::class)->findTagsByContent($content),
             'isFavorited' => $isFavorited,
+            'userRating' => $userRatingEntity ? $userRatingEntity->getValue() : 0,
+            'isOwner' => $isOwner,
         ]);
     }
 
@@ -95,6 +105,57 @@ final class ContentController extends AbstractController
         );
 
         return $response;
+    }
+
+    #[Route('/content/{id}/rate', name: 'content_rate', methods: ['POST'])]
+    public function rate(int $id, Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
+        $content = $em->getRepository(Content::class)->find($id);
+        if (!$content) {
+            return new JsonResponse(['error' => 'Not found'], 404);
+        }
+
+        $user = $this->getUser();
+
+        if ($content->getFkUser() && $content->getFkUser()->getId() === $user->getId()) {
+            return new JsonResponse(['error' => 'You cannot rate your own content'], 403);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        $value = (int)($data['value'] ?? 0);
+
+        $existing = $em->getRepository(Rating::class)->findOneBy([
+            'fk_user' => $user,
+            'fk_content' => $content,
+        ]);
+
+        if ($value < 1 || $value > 5 || ($existing && $existing->getValue() === $value)) {
+            if ($existing) {
+                $em->remove($existing);
+            }
+            $userRating = 0;
+        } elseif ($existing) {
+            $existing->setValue($value);
+            $userRating = $value;
+        } else {
+            $rating = new Rating();
+            $rating->setFkUser($user);
+            $rating->setFkContent($content);
+            $rating->setValue($value);
+            $em->persist($rating);
+            $userRating = $value;
+        }
+
+        $em->flush();
+
+        $avg = $em->getRepository(Rating::class)->averageByContent($content);
+
+        return new JsonResponse([
+            'userRating' => $userRating,
+            'averageRating' => round($avg, 1),
+        ]);
     }
 
     #[Route('/deine-inhalte', name: 'app_deine_inhalte')]

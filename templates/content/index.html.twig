@@ -286,6 +286,64 @@
 			font-size: 14px;
 			color: #666;
 		}
+
+		.user-rating-section {
+			margin-top: 18px;
+			padding-top: 16px;
+			border-top: 1px solid #2a2a2a;
+		}
+
+		.user-rating-label {
+			font-size: 13px;
+			color: #888;
+			margin: 0 0 10px;
+		}
+
+		.interactive-stars {
+			cursor: pointer;
+		}
+
+		.interactive-stars svg {
+			width: 30px;
+			height: 30px;
+			transition: transform 0.1s;
+		}
+
+		.interactive-stars svg:hover {
+			transform: scale(1.15);
+		}
+
+		.interactive-stars .star-active { fill: #f5a623; }
+		.interactive-stars .star-inactive { fill: none; stroke: #555; stroke-width: 1.5; }
+		.interactive-stars .star-hover { fill: #f5a623; opacity: 0.7; }
+
+		.delete-rating-btn {
+			margin-top: 10px;
+			background: none;
+			border: none;
+			color: #666;
+			font-size: 12px;
+			cursor: pointer;
+			padding: 0;
+			font-family: inherit;
+			text-decoration: underline;
+			transition: color 0.15s;
+		}
+
+		.delete-rating-btn:hover { color: #e63946; }
+
+		.login-to-rate {
+			margin-top: 14px;
+			font-size: 13px;
+			color: #666;
+		}
+
+		.login-to-rate a {
+			color: #e63946;
+			text-decoration: none;
+		}
+
+		.login-to-rate a:hover { text-decoration: underline; }
 	</style>
 
 	<div class="page-wrapper">
@@ -384,8 +442,8 @@
 			<!-- Rating -->
 			<div class="panel-box">
 				<h3>Bewertung</h3>
-				<div class="rating-box">
-					<div class="stars">
+				<div class="rating-box" id="avg-rating-box">
+					<div class="stars" id="avg-stars">
 						{% for i in 1..5 %}
 							{% if averageRating >= i %}
 								<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -408,9 +466,38 @@
 							{% endif %}
 						{% endfor %}
 					</div>
-					<span class="rating-score">{{ averageRating|number_format(1) }}</span>
+					<span class="rating-score" id="avg-score">{{ averageRating|number_format(1) }}</span>
 					<span class="rating-max">/ 5.0</span>
 				</div>
+
+				{% if app.user %}
+					{% if isOwner %}
+					<p class="login-to-rate" style="margin-top:14px;">Du kannst deinen eigenen Inhalt nicht bewerten.</p>
+					{% else %}
+					<div class="user-rating-section">
+						<p class="user-rating-label">Deine Bewertung:</p>
+						<div class="interactive-stars" id="user-stars"
+							data-content-id="{{ content.id }}"
+							data-user-rating="{{ userRating }}">
+							{% for i in 1..5 %}
+								<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" data-value="{{ i }}">
+									<polygon class="{{ userRating >= i ? 'star-active' : 'star-inactive' }}"
+										points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+								</svg>
+							{% endfor %}
+						</div>
+						<button class="delete-rating-btn" id="delete-rating-btn"
+							data-content-id="{{ content.id }}"
+							style="{{ userRating > 0 ? '' : 'display:none' }}">
+							Bewertung löschen
+						</button>
+					</div>
+					{% endif %}
+				{% else %}
+				<p class="login-to-rate">
+					<a href="{{ path('app_login') }}">Anmelden</a>, um zu bewerten
+				</p>
+				{% endif %}
 			</div>
 
 		</div>
@@ -447,6 +534,99 @@
 					path.setAttribute('stroke', '#aaa');
 					path.setAttribute('stroke-width', '2');
 				}
+			});
+		})();
+	</script>
+
+	<script>
+		(function () {
+			const starsContainer = document.getElementById('user-stars');
+			if (!starsContainer) return;
+
+			const deleteBtn = document.getElementById('delete-rating-btn');
+			const avgScore  = document.getElementById('avg-score');
+			const avgStars  = document.getElementById('avg-stars');
+			const contentId = starsContainer.dataset.contentId;
+			let userRating  = parseInt(starsContainer.dataset.userRating, 10);
+
+			const starEls = starsContainer.querySelectorAll('svg');
+
+			function renderUserStars(active) {
+				starEls.forEach(svg => {
+					const v = parseInt(svg.dataset.value, 10);
+					svg.querySelector('polygon').className.baseVal = v <= active ? 'star-active' : 'star-inactive';
+				});
+			}
+
+			function renderAvgStars(avg) {
+				avgScore.textContent = avg.toFixed(1);
+				const polygons = avgStars.querySelectorAll('polygon, [fill]');
+				polygons.forEach((el, idx) => {
+					const i = idx + 1;
+					if (avg >= i) {
+						el.setAttribute('class', 'star-filled');
+						el.removeAttribute('stroke');
+						el.removeAttribute('stroke-width');
+					} else {
+						el.setAttribute('class', 'star-empty');
+					}
+				});
+			}
+
+			starsContainer.addEventListener('mouseover', function (e) {
+				const svg = e.target.closest('svg');
+				if (!svg) return;
+				const hovered = parseInt(svg.dataset.value, 10);
+				starEls.forEach(s => {
+					const v = parseInt(s.dataset.value, 10);
+					s.querySelector('polygon').className.baseVal = v <= hovered ? 'star-hover' : 'star-inactive';
+				});
+			});
+
+			starsContainer.addEventListener('mouseleave', function () {
+				renderUserStars(userRating);
+			});
+
+			starsContainer.addEventListener('click', async function (e) {
+				const svg = e.target.closest('svg');
+				if (!svg) return;
+				const clicked = parseInt(svg.dataset.value, 10);
+
+				const res = await fetch('/content/' + contentId + '/rate', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'X-Requested-With': 'XMLHttpRequest',
+					},
+					body: JSON.stringify({ value: clicked }),
+				});
+				if (!res.ok) return;
+				const data = await res.json();
+
+				userRating = data.userRating;
+				starsContainer.dataset.userRating = userRating;
+				renderUserStars(userRating);
+				deleteBtn.style.display = userRating > 0 ? '' : 'none';
+				renderAvgStars(data.averageRating);
+			});
+
+			deleteBtn && deleteBtn.addEventListener('click', async function () {
+				const res = await fetch('/content/' + contentId + '/rate', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'X-Requested-With': 'XMLHttpRequest',
+					},
+					body: JSON.stringify({ value: 0 }),
+				});
+				if (!res.ok) return;
+				const data = await res.json();
+
+				userRating = 0;
+				starsContainer.dataset.userRating = 0;
+				renderUserStars(0);
+				deleteBtn.style.display = 'none';
+				renderAvgStars(data.averageRating);
 			});
 		})();
 	</script>
