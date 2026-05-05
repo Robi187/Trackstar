@@ -15,6 +15,7 @@ use App\Entity\Content;
 use App\Repository\ContentRepository;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpFoundation\Request;
 
 
 final class ContentController extends AbstractController
@@ -30,12 +31,17 @@ final class ContentController extends AbstractController
         $isFavorited = $user && $em->getRepository(Favorite::class)
             ->findOneBy(['fk_user' => $user, 'fk_content' => $content]) !== null;
 
+        $userRatingEntity = $user
+            ? $em->getRepository(Rating::class)->findOneBy(['fk_content' => $content, 'fk_user' => $user])
+            : null;
+
         return $this->render('content/index.html.twig', [
             'content' => $content,
             'favoriteCount' => $em->getRepository(Favorite::class)->countByContent($content),
             'averageRating' => $em->getRepository(Rating::class)->averageByContent($content),
             'tags' => $em->getRepository(ContentTag::class)->findTagsByContent($content),
             'isFavorited' => $isFavorited,
+            'userRating' => $userRatingEntity ? $userRatingEntity->getValue() : null,
         ]);
     }
 
@@ -95,6 +101,67 @@ final class ContentController extends AbstractController
         );
 
         return $response;
+    }
+
+    #[Route('/content/{id}/rate', name: 'content_rate', methods: ['POST'], requirements: ['id' => '\d+'])]
+    public function rate(int $id, Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse(['error' => 'Not authenticated'], 401);
+        }
+
+        $content = $em->getRepository(Content::class)->find($id);
+        if (!$content) {
+            return new JsonResponse(['error' => 'Not found'], 404);
+        }
+
+        if ($content->getFkUser() === $user) {
+            return new JsonResponse(['error' => 'Cannot rate own content'], 403);
+        }
+
+        $value = (int) $request->request->get('value');
+        if ($value < 1 || $value > 5) {
+            return new JsonResponse(['error' => 'Invalid value'], 400);
+        }
+
+        $rating = $em->getRepository(Rating::class)->findOneBy(['fk_content' => $content, 'fk_user' => $user]);
+        if (!$rating) {
+            $rating = new Rating();
+            $rating->setFkUser($user);
+            $rating->setFkContent($content);
+            $em->persist($rating);
+        }
+        $rating->setValue($value);
+        $em->flush();
+
+        $average = $em->getRepository(Rating::class)->averageByContent($content);
+
+        return new JsonResponse(['average' => round($average, 2)]);
+    }
+
+    #[Route('/content/{id}/rate', name: 'content_unrate', methods: ['DELETE'], requirements: ['id' => '\d+'])]
+    public function unrate(int $id, EntityManagerInterface $em): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse(['error' => 'Not authenticated'], 401);
+        }
+
+        $content = $em->getRepository(Content::class)->find($id);
+        if (!$content) {
+            return new JsonResponse(['error' => 'Not found'], 404);
+        }
+
+        $rating = $em->getRepository(Rating::class)->findOneBy(['fk_content' => $content, 'fk_user' => $user]);
+        if ($rating) {
+            $em->remove($rating);
+            $em->flush();
+        }
+
+        $average = $em->getRepository(Rating::class)->averageByContent($content);
+
+        return new JsonResponse(['average' => round($average, 2)]);
     }
 
     #[Route('/deine-inhalte', name: 'app_deine_inhalte')]
