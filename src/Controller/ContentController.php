@@ -15,6 +15,7 @@ use App\Entity\Content;
 use App\Repository\ContentRepository;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpFoundation\Request;
 
 
 final class ContentController extends AbstractController
@@ -95,6 +96,24 @@ final class ContentController extends AbstractController
         );
 
         return $response;
+    }
+
+    #[Route('/suche', name: 'app_search')]
+    public function search(Request $request, ContentRepository $contentRepository, EntityManagerInterface $em): Response
+    {
+        $query = trim($request->query->get('q', ''));
+        $results = $query !== '' ? $contentRepository->search($query) : [];
+
+        $tagsByContent = [];
+        foreach ($results as $content) {
+            $tagsByContent[$content->getId()] = $em->getRepository(ContentTag::class)->findTagsByContent($content);
+        }
+
+        return $this->render('search/index.html.twig', [
+            'query' => $query,
+            'results' => $results,
+            'tagsByContent' => $tagsByContent,
+        ]);
     }
 
     #[Route('/deine-inhalte', name: 'app_deine_inhalte')]
