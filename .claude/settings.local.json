@@ -19,7 +19,10 @@
       "Read(//home/stanku/Repos/Trackstar/templates/home/**)",
       "Read(///wsl.localhost/Ubuntu/home/stanku/Repos/Trackstar/templates/home/**)",
       "Read(//home/stanku/Repos/Trackstar/templates/userprofile/**)",
-      "Read(///wsl.localhost/Ubuntu/home/stanku/Repos/Trackstar/templates/userprofile/**)"
+      "Read(///wsl.localhost/Ubuntu/home/stanku/Repos/Trackstar/templates/userprofile/**)",
+      "Read(///wsl.localhost/Ubuntu/home/stanku/Repos/**)",
+      "Read(//mnt/wsl/Ubuntu/home/stanku/Repos/**)",
+      "Bash(wsl ls *)"
     ],
     "additionalDirectories": [
       "\\home\\stanku\\Repos\\Trackstar\\templates\\content",

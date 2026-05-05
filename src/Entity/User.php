@@ -43,6 +43,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $biography = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $profilePicture = null;
+
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
@@ -141,6 +144,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setBiography(?string $biography): static
     {
         $this->biography = $biography;
+
+        return $this;
+    }
+
+    public function getProfilePicture(): ?string
+    {
+        return $this->profilePicture;
+    }
+
+    public function setProfilePicture(?string $profilePicture): static
+    {
+        $this->profilePicture = $profilePicture;
 
         return $this;
     }
