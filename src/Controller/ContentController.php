@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use App\Repository\RatingRepository;
+use Symfony\Component\HttpFoundation\Request;
 
 
 final class ContentController extends AbstractController
@@ -155,6 +156,21 @@ final class ContentController extends AbstractController
         return new JsonResponse([
             'userRating' => $userRating,
             'averageRating' => round($avg, 1),
+    #[Route('/suche', name: 'app_search')]
+    public function search(Request $request, ContentRepository $contentRepository, EntityManagerInterface $em): Response
+    {
+        $query = trim($request->query->get('q', ''));
+        $results = $query !== '' ? $contentRepository->search($query) : [];
+
+        $tagsByContent = [];
+        foreach ($results as $content) {
+            $tagsByContent[$content->getId()] = $em->getRepository(ContentTag::class)->findTagsByContent($content);
+        }
+
+        return $this->render('search/index.html.twig', [
+            'query' => $query,
+            'results' => $results,
+            'tagsByContent' => $tagsByContent,
         ]);
     }
 
