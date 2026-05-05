@@ -99,6 +99,7 @@ final class EditUserController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($user);
             $entityManager->flush();
+            $this->addFlash('success', 'Bio erfolgreich geändert.');
             return $this->redirectToRoute('app_user_management');
         }
 
@@ -180,5 +181,27 @@ final class EditUserController extends AbstractController
             'form' => $form->createView(),
             'user_data' => $user,
         ]);
+    }
+
+    #[Route('/edit/profilbild/entfernen', name: 'app_remove_profilbild', methods: ['POST'])]
+    public function removeProfilbild(
+        EntityManagerInterface $entityManager,
+        #[Autowire('%profile_pictures_directory%')] string $profilePicturesDir,
+    ): Response {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $current = $user->getProfilePicture();
+        if ($current) {
+            $fullPath = $profilePicturesDir . '/' . basename($current);
+            if (file_exists($fullPath)) {
+                unlink($fullPath);
+            }
+            $user->setProfilePicture(null);
+            $entityManager->flush();
+            $this->addFlash('success', 'Profilbild erfolgreich entfernt.');
+        }
+
+        return $this->redirectToRoute('app_user_management');
     }
 }
