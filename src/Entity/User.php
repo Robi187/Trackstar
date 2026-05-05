@@ -39,7 +39,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
-    #[NoSpaces(message: 'Der Benutzername darf keine Leerzeichen enthalten.')]
+    #[NoSpaces()]
     private ?string $username = null;
 
     #[ORM\Column(length: 255, nullable: true)]
