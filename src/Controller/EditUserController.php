@@ -15,8 +15,6 @@ use App\Dto\UserEmailDto;
 use App\Dto\UsernameDto;
 use App\Dto\UserPasswordDto;
 use App\Form\PasswordType;
-use App\Form\ProfilePictureType;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 final class EditUserController extends AbstractController
@@ -141,44 +139,6 @@ final class EditUserController extends AbstractController
         return $this->render('edit_user/edit_password.html.twig', [
             'form' => $form->createView(),
             'user_data' => $this->getUser(),
-        ]);
-    }
-
-    #[Route('/edit/profilbild', name: 'app_edit_profilbild')]
-    public function editProfilbild(
-        Request $request,
-        EntityManagerInterface $entityManager,
-        #[Autowire('%profile_pictures_directory%')] string $profilePicturesDir,
-    ): Response {
-        /** @var User $user */
-        $user = $this->getUser();
-
-        $form = $this->createForm(ProfilePictureType::class);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $file = $form->get('profilePicture')->getData();
-
-            $extension = $file->guessExtension() ?? 'jpg';
-            $filename = uniqid() . '_' . $user->getId() . '.' . $extension;
-            $file->move($profilePicturesDir, $filename);
-
-            // Delete old profile picture if it exists
-            $old = $user->getProfilePicture();
-            if ($old && file_exists($profilePicturesDir . '/' . basename($old))) {
-                unlink($profilePicturesDir . '/' . basename($old));
-            }
-
-            $user->setProfilePicture('profile_pictures/' . $filename);
-            $entityManager->flush();
-
-            $this->addFlash('success', 'Profilbild erfolgreich geändert.');
-            return $this->redirectToRoute('app_user_management');
-        }
-
-        return $this->render('edit_user/edit_profilbild.html.twig', [
-            'form' => $form->createView(),
-            'user_data' => $user,
         ]);
     }
 }

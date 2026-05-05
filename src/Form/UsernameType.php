@@ -8,8 +8,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use App\Dto\UsernameDto;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Validator\Constraints\Regex;
-use Symfony\Component\Validator\Constraints\Length;
 
 class UsernameType extends AbstractType
 {
@@ -18,7 +16,7 @@ class UsernameType extends AbstractType
         $builder
             ->add('username', TextType::class, [
                 'label' => 'Benutzername',
-                'required' => false,        
+                'required' => false,              
             ]);
     }
 

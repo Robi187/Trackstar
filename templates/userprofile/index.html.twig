@@ -46,13 +46,6 @@
         font-family: var(--font-heading);
         font-style: italic;
         flex-shrink: 0;
-        overflow: hidden;
-    }
-
-    .profile-avatar img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
     }
 
     .profile-username {
@@ -200,11 +193,7 @@
         {# Left: Profile Card #}
         <div class="profile-card">
             <div class="profile-avatar">
-                {% if user_data.profilePicture %}
-                    <img src="{{ asset(user_data.profilePicture) }}" alt="{{ user_data.username }}" />
-                {% else %}
-                    {{ user_data.username|first|upper }}
-                {% endif %}
+                {{ user_data.username|first|upper }}
             </div>
 
             <h1 class="profile-username">{{ user_data.username }}</h1>

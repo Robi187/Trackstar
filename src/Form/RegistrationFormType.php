@@ -13,8 +13,6 @@ use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\Email;
-use App\Validator\Constraints\NoSpaces;
-use Symfony\Component\Validator\Constraints\Regex;
 
 
 
@@ -27,11 +25,6 @@ class RegistrationFormType extends AbstractType
                 'label' => 'Username',
                 'constraints' => [
                     new NotBlank(message: 'Bitte gib einen Benutzernamen ein.'),
-                    new NoSpaces(),
-                    new Regex(
-                        pattern: '/^[a-zA-Z0-9_.-]+$/',
-                        message: 'Der Benutzername darf nur Buchstaben, Zahlen, _, . und - enthalten.'
-                    ),
                     new Length(
                         min: 3,
                         minMessage: 'Der Benutzername muss mindestens {{ limit }} Zeichen lang sein.',
@@ -67,21 +60,6 @@ class RegistrationFormType extends AbstractType
                         minMessage: 'Das Passwort muss mindestens {{ limit }} Zeichen lang sein.',
                         max: 4096,
                     ),
-                    new Regex(
-                        pattern: '/[A-Z]/',
-                        message: 'Das Passwort muss mindestens einen Großbuchstaben enthalten.'
-                    ),
-                    new Regex(
-                        pattern: '/[0-9]/',
-                        message: 'Das Passwort muss mindestens eine Zahl enthalten.'
-                    ),
-                    new Regex(
-                        pattern: '/[\W_]/',
-                        message: 'Das Passwort muss mindestens ein Sonderzeichen enthalten.'
-                    ),
-                    new NoSpaces(),
-                    
-
                 ],
             ]);
     }

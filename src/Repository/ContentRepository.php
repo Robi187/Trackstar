@@ -27,22 +27,6 @@ class ContentRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
-
-    public function search(string $query): array
-    {
-        $q = '%' . mb_strtolower($query) . '%';
-
-        return $this->createQueryBuilder('c')
-            ->join('c.fk_user', 'u')
-            ->where('LOWER(c.title) LIKE :q')
-            ->orWhere('LOWER(c.description) LIKE :q')
-            ->orWhere('LOWER(u.username) LIKE :q')
-            ->setParameter('q', $q)
-            ->orderBy('c.created_at', 'DESC')
-            ->getQuery()
-            ->getResult()
-        ;
-    }
 //    /**
 //     * @return Content[] Returns an array of Content objects
 //     */
