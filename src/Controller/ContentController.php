@@ -163,6 +163,24 @@ final class ContentController extends AbstractController
 
         return new JsonResponse(['average' => round($average, 2)]);
     }
+  
+    #[Route('/suche', name: 'app_search')]
+    public function search(Request $request, ContentRepository $contentRepository, EntityManagerInterface $em): Response
+    {
+        $query = trim($request->query->get('q', ''));
+        $results = $query !== '' ? $contentRepository->search($query) : [];
+
+        $tagsByContent = [];
+        foreach ($results as $content) {
+            $tagsByContent[$content->getId()] = $em->getRepository(ContentTag::class)->findTagsByContent($content);
+        }
+
+        return $this->render('search/index.html.twig', [
+            'query' => $query,
+            'results' => $results,
+            'tagsByContent' => $tagsByContent,
+        ]);
+    }
 
     #[Route('/deine-inhalte', name: 'app_deine_inhalte')]
     public function uploads(ContentRepository $contentRepository, EntityManagerInterface $em): Response
