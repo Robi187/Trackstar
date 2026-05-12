@@ -16,28 +16,19 @@ class CommentRepository extends ServiceEntityRepository
         parent::__construct($registry, Comment::class);
     }
 
-//    /**
-//     * @return Comment[] Returns an array of Comment objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('c')
-//            ->andWhere('c.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('c.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Comment
-//    {
-//        return $this->createQueryBuilder('c')
-//            ->andWhere('c.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    /** @return Comment[] Top-level comments (no parent), ordered by like count desc, then newest first. */
+    public function findTopLevelByContent(\App\Entity\Content $content): array
+    {
+        return $this->createQueryBuilder('c')
+            ->select('c', 'COUNT(cl.fk_user) AS HIDDEN likeCount')
+            ->leftJoin('App\Entity\CommentLike', 'cl', 'WITH', 'cl.fk_comment = c')
+            ->andWhere('c.fk_content = :content')
+            ->andWhere('c.fk_parent_comment IS NULL')
+            ->setParameter('content', $content)
+            ->groupBy('c.id')
+            ->orderBy('likeCount', 'DESC')
+            ->addOrderBy('c.created_at', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }

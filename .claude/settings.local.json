@@ -22,7 +22,9 @@
       "Read(///wsl.localhost/Ubuntu/home/stanku/Repos/Trackstar/templates/userprofile/**)",
       "Read(///wsl.localhost/Ubuntu/home/stanku/Repos/**)",
       "Read(//mnt/wsl/Ubuntu/home/stanku/Repos/**)",
-      "Bash(wsl ls *)"
+      "Bash(wsl ls *)",
+      "Bash(php /home/stanku/Repos/Trackstar/bin/console doctrine:migrations:status --no-interaction)",
+      "Bash(xargs ls -la)"
     ],
     "additionalDirectories": [
       "\\home\\stanku\\Repos\\Trackstar\\templates\\content",
