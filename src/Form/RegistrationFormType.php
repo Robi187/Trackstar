@@ -80,6 +80,7 @@ class RegistrationFormType extends AbstractType
                         message: 'Das Passwort muss mindestens ein Sonderzeichen enthalten.'
                     ),
                     new NoSpaces(),
+                    
 
                 ],
             ]);
