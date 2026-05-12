@@ -139,10 +139,10 @@
 
   /* Fehlermeldung – Rot hervorheben */
   .alert-danger {
-    background: rgba(224,36,52,.15);
-    border: 1px solid rgba(224,36,52,.45);
+    background: rgba(255,90,0,.12);
+    border: 1px solid rgba(255,90,0,.4);
     border-radius: 10px;
-    color: var(--red);
+    color: var(--orange);
     padding: 12px 16px;
     margin-bottom: 20px;
     font-family: var(--font-body);
@@ -214,11 +214,15 @@
   .register a:hover { color: var(--orange-h); text-decoration: underline; }
 
 
+  @keyframes flashDown {
+    from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+
   .flash-success {
     position: fixed;
     top: 20px;
-    left: 37%;
-    transform: translateX(-50%);
+    left: 50%;
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -232,9 +236,8 @@
     font-weight: 500;
     z-index: 999;
     white-space: nowrap;
-    animation: fadeUp .4s ease both;
+    animation: flashDown .4s ease both;
     transition: opacity .5s ease, transform .5s ease;
-    margin-left: 
   }
 
   .flash-success.hide {
@@ -329,8 +332,8 @@
 
   const flash = document.querySelector('.flash-success');
   if (flash) {
-    setTimeout(() => flash.classList.add('hide'), 3000);
-    setTimeout(() => flash.remove(), 3500);
+    setTimeout(() => flash.classList.add('hide'), 6000);
+    setTimeout(() => flash.remove(), 6600);
   }
 </script>
 {% endblock %}

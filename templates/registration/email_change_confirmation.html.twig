@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neue E-Mail-Adresse bestätigen – TrackStar</title>
+</head>
+<body style="margin:0;padding:0;background:#000000;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#000000;padding:40px 0;">
+    <tr>
+      <td align="center">
+        <table width="560" cellpadding="0" cellspacing="0" style="background:#111113;border:1px solid #2a2a2d;border-radius:16px;overflow:hidden;max-width:560px;width:100%;">
+
+          <!-- Header -->
+          <tr>
+            <td style="padding:36px 40px 24px;border-bottom:1px solid #2a2a2d;">
+              <span style="font-size:2rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#ffffff;">TrackStar</span>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td style="padding:36px 40px 28px;">
+              <h1 style="margin:0 0 16px;font-size:1.4rem;font-weight:700;color:#ffffff;">Neue E-Mail-Adresse bestätigen</h1>
+              <p style="margin:0 0 24px;font-size:.95rem;color:#8a8a8e;line-height:1.65;">
+                Du hast eine Änderung deiner E-Mail-Adresse angefordert. Klicke auf den Button unten, um deine neue E-Mail-Adresse zu bestätigen.
+              </p>
+
+              <!-- Button -->
+              <table cellpadding="0" cellspacing="0" style="margin:0 0 28px;">
+                <tr>
+                  <td style="background:#ff5a00;border-radius:10px;">
+                    <a href="{{ signedUrl }}" target="_blank"
+                       style="display:inline-block;padding:16px 32px;font-size:1rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#ffffff;text-decoration:none;">
+                      Jetzt bestätigen
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin:0 0 8px;font-size:.85rem;color:#8a8a8e;line-height:1.6;">
+                Oder kopiere diesen Link in deinen Browser:
+              </p>
+              <p style="margin:0 0 24px;font-size:.78rem;color:#ff5a00;word-break:break-all;">
+                {{ signedUrl }}
+              </p>
+
+              <p style="margin:0;font-size:.82rem;color:#555558;line-height:1.6;">
+                Dieser Link ist <strong style="color:#8a8a8e;">5 Minuten</strong> gültig. Wenn du keine E-Mail-Änderung angefordert hast, kannst du diese E-Mail ignorieren – deine aktuelle E-Mail-Adresse bleibt unverändert.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding:20px 40px;border-top:1px solid #2a2a2d;">
+              <p style="margin:0;font-size:.78rem;color:#555558;text-align:center;">
+                &copy; {{ "now"|date("Y") }} TrackStar · Diese E-Mail wurde automatisch generiert.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

@@ -4,25 +4,19 @@ namespace App\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\PasswordType as SymfonyPasswordType;
-use App\Dto\UserPasswordDto;
 use App\Validator\Constraints\NoSpaces;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Regex;
 
-class PasswordType extends AbstractType
+class ResetPasswordFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('currentPassword', SymfonyPasswordType::class, [
-                'label' => 'Aktuelles Passwort',
-                'always_empty' => true,
-                'required' => false,
-            ])
-            ->add('newPassword', SymfonyPasswordType::class, [
+            ->add('newPassword', PasswordType::class, [
                 'label' => 'Neues Passwort',
                 'always_empty' => true,
                 'required' => false,
@@ -35,17 +29,18 @@ class PasswordType extends AbstractType
                     new NoSpaces(),
                 ],
             ])
-            ->add('confirmPassword', SymfonyPasswordType::class, [
+            ->add('confirmPassword', PasswordType::class, [
                 'label' => 'Passwort bestätigen',
                 'always_empty' => true,
                 'required' => false,
+                'constraints' => [
+                    new NotBlank(message: 'Bitte bestätige dein neues Passwort.'),
+                ],
             ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
-            'data_class' => UserPasswordDto::class,
-        ]);
+        $resolver->setDefaults([]);
     }
 }
