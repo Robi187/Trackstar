@@ -51,6 +51,8 @@
 					color: #ffffff;
 					font-family: 'Arial', sans-serif;
 					min-height: 100vh;
+					display: flex;
+					flex-direction: column;
 				}
 
 				/* ── NAVBAR ── */
@@ -459,9 +461,11 @@
 
 				/* ── MAIN ── */
 				.main {
+					flex: 1;
 					padding: 48px 32px 64px;
 					max-width: 1200px;
 					margin: 0 auto;
+					width: 100%;
 				}
 
 				.section-title {
@@ -535,9 +539,15 @@
 
 				.card-footer {
 					display: flex;
+					flex-wrap: wrap;
 					justify-content: center;
 					align-items: center;
 					gap: 6px;
+				}
+
+				.card-tag-more {
+					color: var(--muted);
+					background-color: #2a2a2a;
 				}
 
 				.card-price {
@@ -584,6 +594,26 @@
 					padding: 3px 10px;
 					font-size: 0.8rem;
 					margin: 2px;
+				}
+
+				/* ── FOOTER ── */
+				footer {
+					background-color: var(--surface);
+					border-top: 1px solid var(--border);
+					color: var(--muted);
+					font-family: var(--font-body);
+					font-size: 0.8rem;
+					text-align: center;
+					padding: 24px 32px;
+				}
+
+				footer a {
+					color: var(--muted);
+					text-decoration: none;
+				}
+
+				footer a:hover {
+					color: var(--text);
 				}
 			</style>
 		{% endblock %}
@@ -679,17 +709,6 @@
 
 				<div class="sidebar-divider"></div>
 
-				<a href="/impressum" class="sidebar-nav-item">
-					<span class="sidebar-nav-icon">
-						<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-							<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
-						</svg>
-					</span>
-					Impressum &amp; Datenschutz
-				</a>
-
-				<div class="sidebar-divider"></div>
-
 				<a href="/logout" class="sidebar-nav-item logout">
 					<span class="sidebar-nav-icon">
 						<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -772,6 +791,40 @@
 
 		{# ── PAGE CONTENT ── Kind-Templates füllen diesen Block #}
 		{% block body %}{% endblock %}
+
+		<script>
+			document.addEventListener('DOMContentLoaded', function () {
+				document.querySelectorAll('.card-footer').forEach(function (footer) {
+					var tags = Array.from(footer.querySelectorAll('.card-tag'));
+					if (tags.length === 0) return;
+
+					var baseTop = tags[0].offsetTop;
+					var overflowStart = tags.findIndex(function (t) { return t.offsetTop > baseTop; });
+					if (overflowStart === -1) return;
+
+					var hiddenCount = tags.length - overflowStart;
+					tags.slice(overflowStart).forEach(function (t) { t.style.display = 'none'; });
+
+					var badge = document.createElement('span');
+					badge.className = 'card-tag card-tag-more';
+					badge.textContent = '+' + hiddenCount;
+					footer.appendChild(badge);
+
+					// if the badge itself wraps, pull one more tag into the hidden count
+					if (badge.offsetTop > baseTop && overflowStart > 0) {
+						tags[overflowStart - 1].style.display = 'none';
+						hiddenCount++;
+						badge.textContent = '+' + hiddenCount;
+					}
+				});
+			});
+		</script>
+
+		<footer>
+			<span>© {{ "now"|date("Y") }} Trackstar. Alle Rechte vorbehalten.</span>
+			&nbsp;·&nbsp;
+			<a href="/impressum">Impressum &amp; Datenschutz</a>
+		</footer>
 
 	</body>
 </html>
