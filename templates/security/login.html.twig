@@ -39,12 +39,37 @@
     min-height: 100vh;
     background: var(--bg);
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
     font-family: var(--font-body);
     font-weight: 500;
     color: var(--text);
-    overflow: hidden;
+  }
+
+  .page-center {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+  }
+
+  footer {
+    background-color: var(--surface);
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    text-align: center;
+    padding: 24px 32px;
+  }
+
+  footer a {
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  footer a:hover {
+    color: var(--text);
   }
 
   body::before {
@@ -265,6 +290,7 @@
         {{ msg }}
       </div>
     {% endfor %}
+<div class="page-center">
 <div class="card">
   <div class="logo">TrackStar</div>
   <p class="subtitle">Willkommen bei TrackStar!</p>
@@ -314,6 +340,7 @@
   <p class="register">
     Noch kein Konto? <a href="/register">Jetzt registrieren</a>
   </p>
+</div>
 </div>
 
 <script>

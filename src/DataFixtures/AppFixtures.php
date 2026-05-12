@@ -73,6 +73,7 @@ class AppFixtures extends Fixture
             $user->setBiography($bio);
             $user->setPassword($this->passwordHasher->hashPassword($user, $plainPassword));
             $user->setCreatedAt(new \DateTimeImmutable(sprintf('-%d days', random_int(1, 30))));
+            $user->setIsVerified(true);
             $manager->persist($user);
             $users[] = $user;
         }
