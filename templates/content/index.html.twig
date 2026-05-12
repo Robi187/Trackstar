@@ -273,7 +273,7 @@
 			height: 26px;
 		}
 
-		.star-filled { fill: #f5a623; }
+		.star-filled { fill: #f5a623; stroke: #f5a623; stroke-width: 1.5; }
 		.star-empty { fill: none; stroke: #f5a623; stroke-width: 1.5; }
 
 		.rating-score {
@@ -285,6 +285,101 @@
 		.rating-max {
 			font-size: 14px;
 			color: #666;
+		}
+
+		/* ── INTERACTIVE RATING ── */
+		.rate-section {
+			margin-top: 16px;
+			padding-top: 16px;
+			border-top: 1px solid #2a2a2a;
+		}
+
+		.rate-label {
+			font-size: 13px;
+			color: #888;
+			margin-bottom: 10px;
+		}
+
+		.rate-stars {
+			display: flex;
+			gap: 6px;
+		}
+
+		.rate-star {
+			width: 28px;
+			height: 28px;
+			cursor: pointer;
+			flex-shrink: 0;
+			transition: transform 0.1s;
+		}
+
+		.rate-star:hover {
+			transform: scale(1.2);
+		}
+
+		.rate-star polygon {
+			fill: none;
+			stroke: #f5a623;
+			stroke-width: 1.5;
+			transition: fill 0.1s;
+		}
+
+		.rate-star.active polygon,
+		.rate-star.hovered polygon {
+			fill: #f5a623;
+		}
+
+		.rate-feedback {
+			font-size: 12px;
+			color: #666;
+			margin-top: 8px;
+			min-height: 16px;
+		}
+
+		.rate-delete-btn {
+			display: none;
+			align-items: center;
+			gap: 6px;
+			background: transparent;
+			border: 1px solid #3a3a3a;
+			color: #888;
+			font-size: 12px;
+			cursor: pointer;
+			padding: 5px 10px;
+			border-radius: 6px;
+			font-family: inherit;
+			transition: all 0.15s;
+		}
+
+		.rate-delete-btn svg {
+			width: 14px;
+			height: 14px;
+			flex-shrink: 0;
+		}
+
+		.rate-delete-btn:hover {
+			color: #e63946;
+			border-color: #e63946;
+			background: rgba(230, 57, 70, 0.08);
+		}
+
+		.rate-delete-btn.visible { display: flex; }
+
+		.rate-delete-success {
+			display: none;
+			font-size: 12px;
+			color: #4caf50;
+		}
+
+		.rate-delete-success.visible { display: inline; }
+
+		.rate-own-notice {
+			font-size: 13px;
+			color: #555;
+			font-style: italic;
+			margin-top: 16px;
+			padding-top: 16px;
+			border-top: 1px solid #2a2a2a;
 		}
 	</style>
 
@@ -385,7 +480,7 @@
 			<div class="panel-box">
 				<h3>Bewertung</h3>
 				<div class="rating-box">
-					<div class="stars">
+					<div class="stars" id="avg-stars">
 						{% for i in 1..5 %}
 							{% if averageRating >= i %}
 								<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -408,9 +503,43 @@
 							{% endif %}
 						{% endfor %}
 					</div>
-					<span class="rating-score">{{ averageRating|number_format(1) }}</span>
+					<span class="rating-score" id="avg-score">{{ averageRating|number_format(1) }}</span>
 					<span class="rating-max">/ 5.0</span>
 				</div>
+
+				{% if app.user %}
+					{% if app.user.id == content.fkUser.id %}
+						<p class="rate-own-notice">Du kannst deinen eigenen Inhalt nicht bewerten.</p>
+					{% else %}
+						<div class="rate-section">
+							<p class="rate-label">Deine Bewertung:</p>
+							<div class="rate-stars" id="rate-stars"
+								 data-content-id="{{ content.id }}"
+								 data-user-rating="{{ userRating ?? 0 }}">
+								{% for i in 1..5 %}
+									<svg class="rate-star {{ userRating and userRating >= i ? 'active' : '' }}"
+										 data-value="{{ i }}"
+										 viewBox="0 0 24 24"
+										 xmlns="http://www.w3.org/2000/svg">
+										<polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+									</svg>
+								{% endfor %}
+							</div>
+							<p class="rate-feedback" id="rate-feedback">
+								{% if userRating %}Deine Bewertung: {{ userRating }}/5{% endif %}
+							</p>
+							<div style="display:flex;align-items:center;gap:10px;margin-top:4px;">
+								<button class="rate-delete-btn {{ userRating ? 'visible' : '' }}" id="rate-delete-btn">
+									<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+										<path d="M6 2h4 M2 4h12 M5 4v9a1 1 0 001 1h4a1 1 0 001-1V4"/>
+									</svg>
+									Bewertung löschen
+								</button>
+								<span class="rate-delete-success" id="rate-delete-success">Gelöscht ✓</span>
+							</div>
+						</div>
+					{% endif %}
+				{% endif %}
 			</div>
 
 		</div>
@@ -448,6 +577,133 @@
 					path.setAttribute('stroke-width', '2');
 				}
 			});
+		})();
+	</script>
+
+	<script>
+		(function () {
+			const container = document.getElementById('rate-stars');
+			if (!container) return;
+
+			const stars     = Array.from(container.querySelectorAll('.rate-star'));
+			const feedback  = document.getElementById('rate-feedback');
+			const avgScore  = document.getElementById('avg-score');
+			const avgStars  = document.getElementById('avg-stars');
+			const contentId = container.dataset.contentId;
+			let current     = parseInt(container.dataset.userRating) || 0;
+
+			const POINTS = '12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26';
+
+			function setHover(upTo) {
+				stars.forEach((s, i) => s.classList.toggle('hovered', i < upTo));
+			}
+
+			function setActive(upTo) {
+				stars.forEach((s, i) => s.classList.toggle('active', i < upTo));
+			}
+
+			function renderAvg(avg) {
+				avgScore.textContent = avg.toFixed(1);
+				avgStars.innerHTML = '';
+				for (let i = 1; i <= 5; i++) {
+					const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+					svg.setAttribute('viewBox', '0 0 24 24');
+					svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+					svg.style.cssText = 'width:26px;height:26px';
+					const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+					poly.setAttribute('points', POINTS);
+
+					if (avg >= i) {
+						poly.setAttribute('fill', '#f5a623');
+						poly.setAttribute('stroke', '#f5a623');
+						poly.setAttribute('stroke-width', '1.5');
+						svg.appendChild(poly);
+					} else if (avg >= i - 0.5) {
+						const gradId = 'half-js-' + i;
+						const defs   = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+						const grad   = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+						grad.setAttribute('id', gradId);
+						const s1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+						s1.setAttribute('offset', '50%');
+						s1.setAttribute('stop-color', '#f5a623');
+						const s2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+						s2.setAttribute('offset', '50%');
+						s2.setAttribute('stop-color', 'transparent');
+						grad.appendChild(s1);
+						grad.appendChild(s2);
+						defs.appendChild(grad);
+						svg.appendChild(defs);
+						poly.setAttribute('fill', 'url(#' + gradId + ')');
+						poly.setAttribute('stroke', '#f5a623');
+						poly.setAttribute('stroke-width', '1.5');
+						svg.appendChild(poly);
+					} else {
+						poly.setAttribute('fill', 'none');
+						poly.setAttribute('stroke', '#f5a623');
+						poly.setAttribute('stroke-width', '1.5');
+						svg.appendChild(poly);
+					}
+
+					avgStars.appendChild(svg);
+				}
+			}
+
+			container.addEventListener('mouseover', e => {
+				const s = e.target.closest('.rate-star');
+				if (s) setHover(parseInt(s.dataset.value));
+			});
+
+			container.addEventListener('mouseleave', () => setHover(0));
+
+			container.addEventListener('click', async e => {
+				const s = e.target.closest('.rate-star');
+				if (!s) return;
+				const value = parseInt(s.dataset.value);
+
+				const res = await fetch('/content/' + contentId + '/rate', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded',
+						'X-Requested-With': 'XMLHttpRequest',
+					},
+					body: 'value=' + value,
+				});
+
+				if (res.status === 401) { feedback.textContent = 'Du musst eingeloggt sein, um zu bewerten.'; return; }
+				if (!res.ok) return;
+
+				const data = await res.json();
+				current = value;
+				setActive(current);
+				renderAvg(data.average);
+				feedback.textContent = 'Deine Bewertung: ' + value + '/5';
+				deleteBtn.classList.add('visible');
+			});
+
+			const deleteBtn    = document.getElementById('rate-delete-btn');
+			const deleteSuccess = document.getElementById('rate-delete-success');
+			if (deleteBtn) {
+				deleteBtn.addEventListener('click', async () => {
+					const res = await fetch('/content/' + contentId + '/rate', {
+						method: 'DELETE',
+						headers: { 'X-Requested-With': 'XMLHttpRequest' },
+					});
+					if (!res.ok) return;
+
+					const data = await res.json();
+					current = 0;
+					setActive(0);
+					setHover(0);
+					renderAvg(data.average);
+					if (feedback) feedback.textContent = '';
+
+					deleteBtn.classList.remove('visible');
+					if (deleteSuccess) {
+						deleteSuccess.classList.add('visible');
+						setTimeout(() => deleteSuccess.classList.remove('visible'), 2000);
+					}
+				});
+			}
 		})();
 	</script>
 
