@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Category;
+use App\Entity\Comment;
+use App\Entity\CommentLike;
 use App\Entity\Favorite;
 use App\Entity\Rating;
 use App\Entity\ContentTag;
@@ -13,6 +15,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Content;
 use App\Repository\ContentRepository;
+use App\Repository\CommentRepository;
+use App\Repository\CommentLikeRepository;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,7 +25,7 @@ use Symfony\Component\HttpFoundation\Request;
 final class ContentController extends AbstractController
 {
     #[Route('/content/{id}', name: 'app_content_detail', requirements: ['id' => '\d+'])]
-    public function index(int $id, EntityManagerInterface $em): Response
+    public function index(int $id, EntityManagerInterface $em, CommentRepository $commentRepository, CommentLikeRepository $likeRepository): Response
     {
         $content = $em->getRepository(Content::class)->find($id);
         if (!$content) {
@@ -35,14 +39,134 @@ final class ContentController extends AbstractController
             ? $em->getRepository(Rating::class)->findOneBy(['fk_content' => $content, 'fk_user' => $user])
             : null;
 
+        $topLevelComments = $commentRepository->findTopLevelByContent($content);
+
+        // Collect all comment IDs (top-level + replies) for like queries
+        $allCommentIds = [];
+        foreach ($topLevelComments as $c) {
+            $allCommentIds[] = $c->getId();
+            foreach ($c->getReplies() as $r) {
+                $allCommentIds[] = $r->getId();
+            }
+        }
+
+        $likeCounts  = $likeRepository->countByComments($allCommentIds);
+        $likedByUser = $user ? $likeRepository->likedByUser($user, $allCommentIds) : [];
+
         return $this->render('content/index.html.twig', [
-            'content' => $content,
+            'content'      => $content,
             'favoriteCount' => $em->getRepository(Favorite::class)->countByContent($content),
             'averageRating' => $em->getRepository(Rating::class)->averageByContent($content),
-            'tags' => $em->getRepository(ContentTag::class)->findTagsByContent($content),
-            'isFavorited' => $isFavorited,
-            'userRating' => $userRatingEntity ? $userRatingEntity->getValue() : null,
+            'tags'         => $em->getRepository(ContentTag::class)->findTagsByContent($content),
+            'isFavorited'  => $isFavorited,
+            'userRating'   => $userRatingEntity ? $userRatingEntity->getValue() : null,
+            'comments'     => $topLevelComments,
+            'likeCounts'   => $likeCounts,
+            'likedByUser'  => $likedByUser,
         ]);
+    }
+
+    #[Route('/content/{id}/comment', name: 'content_comment', methods: ['POST'], requirements: ['id' => '\d+'])]
+    public function comment(int $id, Request $request, EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $content = $em->getRepository(Content::class)->find($id);
+        if (!$content) {
+            throw $this->createNotFoundException('Content not found');
+        }
+
+        $text = trim($request->request->get('text', ''));
+        if ($text !== '') {
+            $comment = new Comment();
+            $comment->setText($text);
+            $comment->setCreatedAt(new \DateTime());
+            $comment->setFkUser($user);
+            $comment->setFkContent($content);
+
+            $parentId = (int) $request->request->get('parent_id', 0);
+            if ($parentId > 0) {
+                $parent = $em->getRepository(Comment::class)->find($parentId);
+                if ($parent && $parent->getFkContent() === $content && $parent->getFkParentComment() === null) {
+                    $comment->setFkParentComment($parent);
+                }
+            }
+
+            $em->persist($comment);
+            $em->flush();
+
+            if ($request->isXmlHttpRequest()) {
+                return new JsonResponse([
+                    'id'             => $comment->getId(),
+                    'text'           => $comment->getText(),
+                    'username'       => $comment->getFkUser()->getUsername(),
+                    'profilePicture' => $comment->getFkUser()->getProfilePicture(),
+                    'createdAt'      => $comment->getCreatedAt()->format('d.m.Y H:i'),
+                    'parentId'       => $comment->getFkParentComment()?->getId(),
+                    'userId'         => $comment->getFkUser()->getId(),
+                ]);
+            }
+        }
+
+        return $this->redirectToRoute('app_content_detail', ['id' => $id]);
+    }
+
+    #[Route('/comment/{id}/delete', name: 'comment_delete', methods: ['POST'], requirements: ['id' => '\d+'])]
+    public function deleteComment(int $id, Request $request, EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $comment = $em->getRepository(Comment::class)->find($id);
+        if (!$comment || $comment->getFkUser() !== $user) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $contentId = $comment->getFkContent()->getId();
+        $em->remove($comment);
+        $em->flush();
+
+        if ($request->isXmlHttpRequest()) {
+            return new JsonResponse(['deleted' => true]);
+        }
+
+        return $this->redirectToRoute('app_content_detail', ['id' => $contentId]);
+    }
+
+    #[Route('/comment/{id}/like', name: 'comment_like', methods: ['POST'], requirements: ['id' => '\d+'])]
+    public function toggleCommentLike(int $id, EntityManagerInterface $em): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse(['error' => 'Not authenticated'], 401);
+        }
+
+        $comment = $em->getRepository(Comment::class)->find($id);
+        if (!$comment) {
+            return new JsonResponse(['error' => 'Not found'], 404);
+        }
+
+        $like = $em->getRepository(CommentLike::class)->findOneBy(['fk_user' => $user, 'fk_comment' => $comment]);
+        if ($like) {
+            $em->remove($like);
+            $liked = false;
+        } else {
+            $like = new CommentLike();
+            $like->setFkUser($user);
+            $like->setFkComment($comment);
+            $em->persist($like);
+            $liked = true;
+        }
+        $em->flush();
+
+        $count = $em->getRepository(CommentLike::class)->count(['fk_comment' => $comment]);
+
+        return new JsonResponse(['liked' => $liked, 'count' => $count]);
     }
 
     #[Route('/content/{category_name}', name: 'app_content_category', requirements: ['category_name' => '[a-zA-Z]+'])]

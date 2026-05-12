@@ -12,12 +12,18 @@
 			font-family: 'DM Sans', sans-serif;
 		}
 
+		.content-outer {
+			max-width: 764px;
+			margin: 0 auto;
+			padding: 60px 20px 0;
+			box-sizing: border-box;
+		}
+
 		.page-wrapper {
 			display: flex;
-			justify-content: center;
 			align-items: flex-start;
-			padding: 60px 20px;
 			gap: 24px;
+			margin-bottom: 32px;
 		}
 
 		/* ── LEFT PANEL ── */
@@ -383,6 +389,7 @@
 		}
 	</style>
 
+	<div class="content-outer">
 	<div class="page-wrapper">
 
 		<!-- LEFT PANEL -->
@@ -543,7 +550,543 @@
 			</div>
 
 		</div>
+
 	</div>
+
+	<!-- COMMENT SECTION -->
+	<style>
+		.comment-section {
+			margin-bottom: 60px;
+		}
+
+		.comment-section > h3 {
+			font-size: 17px;
+			font-weight: 700;
+			color: #fff;
+			margin-bottom: 20px;
+		}
+
+		/* ── forms ── */
+		.comment-form {
+			background: #161616;
+			border: 1px solid #2a2a2a;
+			border-radius: 16px;
+			padding: 20px;
+			margin-bottom: 28px;
+		}
+
+		.comment-form textarea {
+			width: 100%;
+			background: #0e0e0e;
+			border: 1px solid #2a2a2a;
+			border-radius: 10px;
+			color: #fff;
+			font-family: 'DM Sans', sans-serif;
+			font-size: 14px;
+			padding: 12px 14px;
+			resize: vertical;
+			min-height: 90px;
+			outline: none;
+			transition: border-color 0.15s;
+			box-sizing: border-box;
+		}
+
+		.comment-form textarea:focus { border-color: #e63946; }
+
+		.comment-form button {
+			margin-top: 10px;
+			background: #e63946;
+			color: #fff;
+			border: none;
+			border-radius: 8px;
+			padding: 9px 22px;
+			font-size: 13px;
+			font-weight: 600;
+			font-family: 'DM Sans', sans-serif;
+			cursor: pointer;
+			transition: background 0.15s;
+		}
+
+		.comment-form button:hover { background: #c1121f; }
+
+		.comment-form .cancel-reply {
+			margin-top: 10px;
+			margin-left: 8px;
+			background: transparent;
+			color: #666;
+			border: 1px solid #333;
+			border-radius: 8px;
+			padding: 9px 16px;
+			font-size: 13px;
+			font-family: 'DM Sans', sans-serif;
+			cursor: pointer;
+			transition: color 0.15s, border-color 0.15s;
+		}
+
+		.comment-form .cancel-reply:hover { color: #aaa; border-color: #555; }
+
+		.comment-login-hint {
+			background: #161616;
+			border: 1px solid #2a2a2a;
+			border-radius: 16px;
+			padding: 18px 20px;
+			margin-bottom: 28px;
+			font-size: 14px;
+			color: #666;
+		}
+
+		.comment-login-hint a { color: #e63946; text-decoration: none; }
+
+		/* ── list ── */
+		.comment-list { display: flex; flex-direction: column; gap: 14px; }
+
+		.comment-item {
+			background: #161616;
+			border: 1px solid #2a2a2a;
+			border-radius: 12px;
+			padding: 16px 18px;
+		}
+
+		/* ── header ── */
+		.comment-header {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			margin-bottom: 8px;
+		}
+
+		.comment-avatar {
+			width: 32px;
+			height: 32px;
+			border-radius: 50%;
+			background: #2a2a2a;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 13px;
+			font-weight: 700;
+			color: #e63946;
+			flex-shrink: 0;
+			overflow: hidden;
+		}
+
+		.comment-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+		.comment-username { font-size: 13px; font-weight: 600; color: #ddd; }
+
+		.comment-date { font-size: 12px; color: #555; margin-left: auto; }
+
+		/* ── body ── */
+		.comment-text {
+			font-size: 14px;
+			color: #bbb;
+			line-height: 1.6;
+			white-space: pre-wrap;
+			word-break: break-word;
+			margin-bottom: 10px;
+		}
+
+		/* ── actions row ── */
+		.comment-actions {
+			display: flex;
+			align-items: center;
+			gap: 14px;
+			margin-top: 4px;
+		}
+
+		.comment-like-btn, .comment-reply-btn {
+			display: flex;
+			align-items: center;
+			gap: 5px;
+			background: none;
+			border: none;
+			color: #555;
+			font-size: 12px;
+			font-family: 'DM Sans', sans-serif;
+			cursor: pointer;
+			padding: 0;
+			transition: color 0.15s;
+		}
+
+		.comment-like-btn svg, .comment-reply-btn svg {
+			width: 14px;
+			height: 14px;
+			fill: currentColor;
+			transition: fill 0.15s;
+		}
+
+		.comment-like-btn:hover, .comment-reply-btn:hover { color: #e63946; }
+
+		.comment-like-btn.liked { color: #e63946; }
+
+		.comment-delete-btn {
+			display: flex;
+			align-items: center;
+			gap: 5px;
+			background: transparent;
+			border: 1px solid #3a3a3a;
+			border-radius: 6px;
+			color: #888;
+			font-size: 12px;
+			font-family: 'DM Sans', sans-serif;
+			cursor: pointer;
+			padding: 4px 10px;
+			margin-left: auto;
+			transition: color 0.15s, border-color 0.15s, background 0.15s;
+		}
+
+		.comment-delete-btn svg {
+			width: 13px;
+			height: 13px;
+			fill: currentColor;
+			flex-shrink: 0;
+		}
+
+		.comment-delete-btn:hover {
+			color: #e63946;
+			border-color: #e63946;
+			background: rgba(230, 57, 70, 0.08);
+		}
+
+		/* ── reply thread ── */
+		.reply-thread {
+			margin-top: 12px;
+			padding-left: 16px;
+			border-left: 2px solid #2a2a2a;
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+		}
+
+		.reply-item {
+			background: #111;
+			border: 1px solid #222;
+			border-radius: 10px;
+			padding: 12px 14px;
+		}
+
+		/* inline reply form */
+		.inline-reply-form {
+			display: none;
+			margin-top: 12px;
+			padding: 14px;
+			background: #111;
+			border: 1px solid #2a2a2a;
+			border-radius: 10px;
+		}
+
+		.inline-reply-form.open { display: block; }
+
+		.inline-reply-form textarea {
+			width: 100%;
+			background: #0e0e0e;
+			border: 1px solid #2a2a2a;
+			border-radius: 8px;
+			color: #fff;
+			font-family: 'DM Sans', sans-serif;
+			font-size: 13px;
+			padding: 10px 12px;
+			resize: vertical;
+			min-height: 70px;
+			outline: none;
+			transition: border-color 0.15s;
+			box-sizing: border-box;
+		}
+
+		.inline-reply-form textarea:focus { border-color: #e63946; }
+
+		.comment-empty {
+			font-size: 14px;
+			color: #555;
+			text-align: center;
+			padding: 24px 0;
+		}
+	</style>
+
+	{# ── Macro: render one comment card (used for top-level and replies) ── #}
+	{% macro commentCard(comment, likeCounts, likedByUser, contentId, isReply, currentUserId) %}
+		{% set cid = comment.id %}
+		{% set liked = likedByUser[cid] is defined %}
+		{% set likeCount = likeCounts[cid] ?? 0 %}
+		<div class="comment-header">
+			<div class="comment-avatar">
+				{% if comment.fkUser.profilePicture %}
+					<img src="{{ asset(comment.fkUser.profilePicture) }}" alt="{{ comment.fkUser.username }}"/>
+				{% else %}
+					{{ comment.fkUser.username|slice(0,1)|upper }}
+				{% endif %}
+			</div>
+			<span class="comment-username">{{ comment.fkUser.username }}</span>
+			<span class="comment-date">{{ comment.createdAt|date('d.m.Y H:i') }}</span>
+		</div>
+		<p class="comment-text">{{ comment.text }}</p>
+		<div class="comment-actions">
+			<button class="comment-like-btn {{ liked ? 'liked' : '' }}"
+					data-comment-id="{{ cid }}">
+				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+					<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+				</svg>
+				<span class="like-count">{{ likeCount }}</span>
+			</button>
+			{% if not isReply %}
+				<button class="comment-reply-btn" data-target="reply-form-{{ cid }}">
+					<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+						<path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/>
+					</svg>
+					Antworten
+				</button>
+			{% endif %}
+			{% if currentUserId == comment.fkUser.id %}
+				<form method="POST" action="/comment/{{ cid }}/delete" style="margin-left:auto;">
+					<button type="submit" class="comment-delete-btn">
+						<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+							<path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+						</svg>
+						Löschen
+					</button>
+				</form>
+			{% endif %}
+		</div>
+	{% endmacro %}
+
+	{% import _self as macros %}
+	{% set currentUserId = app.user ? app.user.id : null %}
+
+	<div class="comment-section">
+		<h3>Kommentare ({{ comments|length }})</h3>
+
+		{% if app.user %}
+			<div class="comment-form">
+				<form method="POST" action="{{ path('content_comment', { id: content.id }) }}">
+					<textarea name="text" placeholder="Schreib einen Kommentar…" maxlength="2000" required></textarea>
+					<button type="submit">Kommentar abschicken</button>
+				</form>
+			</div>
+		{% else %}
+			<div class="comment-login-hint">
+				<a href="{{ path('app_login') }}">Melde dich an</a>, um einen Kommentar zu hinterlassen.
+			</div>
+		{% endif %}
+
+		<div class="comment-list">
+			{% if comments|length > 0 %}
+				{% for comment in comments %}
+					<div class="comment-item">
+						{{ macros.commentCard(comment, likeCounts, likedByUser, content.id, false, currentUserId) }}
+
+						{# ── inline reply form ── #}
+						{% if app.user %}
+							<div class="inline-reply-form" id="reply-form-{{ comment.id }}">
+								<form method="POST" action="{{ path('content_comment', { id: content.id }) }}">
+									<input type="hidden" name="parent_id" value="{{ comment.id }}"/>
+									<textarea name="text" placeholder="Antwort schreiben…" maxlength="1000" required></textarea>
+									<button type="submit">Antworten</button>
+									<button type="button" class="cancel-reply" data-target="reply-form-{{ comment.id }}">Abbrechen</button>
+								</form>
+							</div>
+						{% endif %}
+
+						{# ── replies ── #}
+						<div class="reply-thread" id="replies-{{ comment.id }}"{% if comment.replies|length == 0 %} style="display:none"{% endif %}>
+							{% for reply in comment.replies %}
+								<div class="reply-item">
+									{{ macros.commentCard(reply, likeCounts, likedByUser, content.id, true, currentUserId) }}
+								</div>
+							{% endfor %}
+						</div>
+					</div>
+				{% endfor %}
+			{% else %}
+				<p class="comment-empty">Noch keine Kommentare. Sei der Erste!</p>
+			{% endif %}
+		</div>
+	</div>
+
+	</div>{# end .content-outer #}
+
+	<script>
+		const CONTENT_ID      = {{ content.id }};
+		const CURRENT_USER_ID = {{ app.user ? app.user.id : 'null' }};
+	</script>
+
+	<script>
+		(function () {
+			function escHtml(str) {
+				return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+			}
+
+			function buildAvatar(pic, username) {
+				if (pic) return '<img src="/' + escHtml(pic) + '" alt="' + escHtml(username) + '"/>';
+				return escHtml(username.charAt(0).toUpperCase());
+			}
+
+			function buildCommentCard(data, isReply) {
+				const isOwn  = CURRENT_USER_ID && data.userId == CURRENT_USER_ID;
+				const replyBtn = !isReply
+					? `<button class="comment-reply-btn" data-target="reply-form-${data.id}">
+						<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>
+						Antworten
+					</button>` : '';
+				const deleteBtn = isOwn
+					? `<form method="POST" action="/comment/${data.id}/delete" style="margin-left:auto;">
+						<button type="submit" class="comment-delete-btn">
+							<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+							Löschen
+						</button>
+					</form>` : '';
+				const replyForm = (!isReply && CURRENT_USER_ID)
+					? `<div class="inline-reply-form" id="reply-form-${data.id}">
+						<form>
+							<input type="hidden" name="parent_id" value="${data.id}"/>
+							<textarea name="text" placeholder="Antwort schreiben…" maxlength="1000" required></textarea>
+							<button type="submit">Antworten</button>
+							<button type="button" class="cancel-reply" data-target="reply-form-${data.id}">Abbrechen</button>
+						</form>
+					</div>
+					<div class="reply-thread" id="replies-${data.id}" style="display:none"></div>` : '';
+
+				const wrap = document.createElement('div');
+				wrap.className = isReply ? 'reply-item' : 'comment-item';
+				wrap.innerHTML = `
+					<div class="comment-header">
+						<div class="comment-avatar">${buildAvatar(data.profilePicture, data.username)}</div>
+						<span class="comment-username">${escHtml(data.username)}</span>
+						<span class="comment-date">${escHtml(data.createdAt)}</span>
+					</div>
+					<p class="comment-text"></p>
+					<div class="comment-actions">
+						<button class="comment-like-btn" data-comment-id="${data.id}">
+							<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+							<span class="like-count">0</span>
+						</button>
+						${replyBtn}
+						${deleteBtn}
+					</div>
+					${replyForm}`;
+				wrap.querySelector('.comment-text').textContent = data.text;
+				return wrap;
+			}
+
+			// ── Enter to submit (Shift+Enter = new line) ──
+			document.addEventListener('keydown', function (e) {
+				if (e.key !== 'Enter' || e.shiftKey) return;
+				var ta = e.target;
+				if (!ta.matches('.comment-form textarea, .inline-reply-form textarea')) return;
+				e.preventDefault();
+				ta.closest('form').requestSubmit();
+			});
+
+			// ── AJAX comment submit ──
+			document.addEventListener('submit', async function (e) {
+				const form = e.target;
+				if (!form.closest('.comment-form, .inline-reply-form')) return;
+				e.preventDefault();
+
+				const ta       = form.querySelector('textarea');
+				const text     = ta.value.trim();
+				if (!text) return;
+
+				const parentInput = form.querySelector('[name="parent_id"]');
+				const parentId    = parentInput ? parseInt(parentInput.value) : null;
+
+				const body = new URLSearchParams({ text });
+				if (parentId) body.append('parent_id', parentId);
+
+				const res = await fetch('/content/' + CONTENT_ID + '/comment', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded',
+						'X-Requested-With': 'XMLHttpRequest',
+					},
+					body,
+				});
+				if (!res.ok) return;
+				const data = await res.json();
+
+				const card = buildCommentCard(data, !!parentId);
+				ta.value = '';
+
+				if (parentId) {
+					// append reply under parent
+					const thread = document.getElementById('replies-' + parentId);
+					if (thread) {
+						thread.appendChild(card);
+						thread.style.display = '';
+					}
+					// close reply form
+					const replyForm = document.getElementById('reply-form-' + parentId);
+					if (replyForm) replyForm.classList.remove('open');
+				} else {
+					// prepend top-level comment
+					const list  = document.querySelector('.comment-list');
+					const empty = list.querySelector('.comment-empty');
+					if (empty) empty.remove();
+					list.prepend(card);
+					// update counter
+					const h3 = document.querySelector('.comment-section > h3');
+					if (h3) h3.textContent = 'Kommentare (' + list.querySelectorAll(':scope > .comment-item').length + ')';
+				}
+			});
+
+			// ── Event delegation: comment delete ──
+			document.addEventListener('submit', async function (e) {
+				const form = e.target;
+				if (!form.closest('.comment-actions')) return;
+				if (!form.action.includes('/delete')) return;
+				e.preventDefault();
+
+				if (!confirm('Kommentar wirklich löschen?')) return;
+
+				const card = form.closest('.comment-item, .reply-item');
+				const res  = await fetch(form.action, {
+					method: 'POST',
+					headers: { 'X-Requested-With': 'XMLHttpRequest' },
+				});
+				if (!res.ok) return;
+
+				// update counter before removing
+				if (card && card.classList.contains('comment-item')) {
+					const h3   = document.querySelector('.comment-section > h3');
+					const list = document.querySelector('.comment-list');
+					if (h3 && list) {
+						const count = list.querySelectorAll(':scope > .comment-item').length - 1;
+						h3.textContent = 'Kommentare (' + count + ')';
+					}
+				}
+				if (card) card.remove();
+			});
+
+			// ── Event delegation: reply toggle ──
+			document.addEventListener('click', function (e) {
+				const replyBtn = e.target.closest('.comment-reply-btn');
+				if (replyBtn) {
+					const form = document.getElementById(replyBtn.dataset.target);
+					if (form) form.classList.toggle('open');
+					return;
+				}
+				const cancelBtn = e.target.closest('.cancel-reply');
+				if (cancelBtn) {
+					const form = document.getElementById(cancelBtn.dataset.target);
+					if (form) form.classList.remove('open');
+				}
+			});
+
+			// ── Event delegation: comment like ──
+			document.addEventListener('click', async function (e) {
+				const btn = e.target.closest('.comment-like-btn');
+				if (!btn) return;
+				const commentId = btn.dataset.commentId;
+				const res = await fetch('/comment/' + commentId + '/like', {
+					method: 'POST',
+					headers: { 'X-Requested-With': 'XMLHttpRequest' },
+				});
+				if (res.status === 401 || !res.ok) return;
+				const data = await res.json();
+				btn.classList.toggle('liked', data.liked);
+				btn.querySelector('.like-count').textContent = data.count;
+			});
+		})();
+	</script>
 
 	<script>
 		(function () {
