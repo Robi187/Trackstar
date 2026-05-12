@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Kontoübersicht{% endblock %}
+{% block title %}Kontodetails{% endblock %}
 
 {% block body %}
 {{ parent() }}
@@ -62,7 +62,7 @@
 
       <a href="{{ path('app_user_management') }}" class="ku-nav-btn {{ app.request.attributes.get('_route') == 'app_user_management' ? 'active' : '' }}">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-    Übersicht
+    Kontodetails
     </a>
     <a href="{{ path('app_deine_inhalte') }}" class="ku-nav-btn {{ app.request.attributes.get('_route') == 'app_deine_inhalte' ? 'active' : '' }}">
         <svg viewBox="0 0 24 24"><path d="M12 16V4m0 0l-4 4m4-4l4 4"/><path d="M4 20h16"/></svg>
@@ -87,8 +87,8 @@
 
     <div class="ku-main">
       {% block ku_content %}
-        <h1 class="ku-title">Kontoübersicht</h1>
-        <p class="ku-subtitle">Hier findest du deine Kontoinformationen und eine Übersicht deiner Aktivitäten</p>
+        <h1 class="ku-title">Kontodetails</h1>
+        <p class="ku-subtitle">Hier findest du Details zu deinem Konto</p>
 
         {% for msg in app.flashes('success') %}
           <div class="ku-flash success">
