@@ -200,6 +200,40 @@
 		.info-row .label { color: #666; }
 		.info-row .value { color: #ddd; font-weight: 500; }
 
+		/* ── CC License badges ── */
+		.cc-badge-inline {
+			display: inline-flex;
+			align-items: center;
+			gap: 3px;
+		}
+
+		.cc-icon {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 20px;
+			height: 20px;
+			border-radius: 50%;
+			background: #222;
+			border: 1.5px solid #888;
+			color: #ddd;
+			font-size: 0.5rem;
+			font-weight: 900;
+			font-family: 'Arial', 'Helvetica Neue', sans-serif;
+			letter-spacing: -0.3px;
+			flex-shrink: 0;
+		}
+
+		.license-details-link {
+			color: #555;
+			font-size: 12px;
+			text-decoration: underline;
+			margin-left: 4px;
+			transition: color 0.15s;
+		}
+
+		.license-details-link:hover { color: #e63946; }
+
 		/* ── RIGHT PANEL ── */
 		.right-panel {
 			width: 420px;
@@ -352,6 +386,45 @@
 					<span class="label">Kategorie</span>
 					<span class="value">{{ content.type.name }}</span>
 				</div>
+				{% if content.license %}
+				<div class="info-row">
+					<span class="label">Lizenz</span>
+					<span class="value">
+						{% set licenseUrls = {
+							'CC BY':       'https://creativecommons.org/licenses/by/4.0/deed.de',
+							'CC BY-SA':    'https://creativecommons.org/licenses/by-sa/4.0/deed.de',
+							'CC BY-ND':    'https://creativecommons.org/licenses/by-nd/4.0/deed.de',
+							'CC BY-NC':    'https://creativecommons.org/licenses/by-nc/4.0/deed.de',
+							'CC BY-NC-SA': 'https://creativecommons.org/licenses/by-nc-sa/4.0/deed.de',
+							'CC BY-NC-ND': 'https://creativecommons.org/licenses/by-nc-nd/4.0/deed.de'
+						} %}
+						{% set licenseNames = {
+							'CC BY':       'Namensnennung 4.0',
+							'CC BY-SA':    'Namensnennung-Share Alike 4.0',
+							'CC BY-ND':    'Namensnennung-Keine Bearb. 4.0',
+							'CC BY-NC':    'Namensnennung-Nicht kommerziell 4.0',
+							'CC BY-NC-SA': 'Nicht kommerziell-Share Alike 4.0',
+							'CC BY-NC-ND': 'Nicht kommerziell-Keine Bearb. 4.0'
+						} %}
+						{% set licenseBadges = {
+							'CC BY':       ['CC','BY'],
+							'CC BY-SA':    ['CC','BY','SA'],
+							'CC BY-ND':    ['CC','BY','ND'],
+							'CC BY-NC':    ['CC','BY','€'],
+							'CC BY-NC-SA': ['CC','BY','€','SA'],
+							'CC BY-NC-ND': ['CC','BY','€','ND']
+						} %}
+						<span class="cc-badge-inline">
+							{% for badge in licenseBadges[content.license] %}
+								<span class="cc-icon">{{ badge }}</span>
+							{% endfor %}
+						</span>
+						{% if licenseUrls[content.license] is defined %}
+							<a class="license-details-link" href="{{ licenseUrls[content.license] }}" target="_blank" rel="noopener noreferrer">(Details)</a>
+						{% endif %}
+					</span>
+				</div>
+				{% endif %}
 			</div>
 
 		</div>

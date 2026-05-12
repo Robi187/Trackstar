@@ -15,6 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Doctrine\ORM\EntityRepository; 
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Validator\Constraints\Range;
 
@@ -107,6 +108,20 @@ class ContentUploadType extends AbstractType
                         mimeTypesMessage: 'Bitte lade eine gültige Audio-Datei (MP3, WAV, FLAC, AIFF) oder ZIP-Datei hoch.',
                     ),
                 ],
+            ])
+            ->add('license', ChoiceType::class, [
+                'label' => 'Lizenz',
+                'required' => false,
+                'placeholder' => 'Lizenz wählen...',
+                'choices' => [
+                    'CC BY – Namensnennung 4.0 International' => 'CC BY',
+                    'CC BY-SA – Namensnennung-Share Alike 4.0 International' => 'CC BY-SA',
+                    'CC BY-ND – Namensnennung-Keine Bearbeitungen 4.0 International' => 'CC BY-ND',
+                    'CC BY-NC – Namensnennung-Nicht kommerziell 4.0 International' => 'CC BY-NC',
+                    'CC BY-NC-SA – Namensnennung-Nicht kommerziell-Share Alike 4.0 International' => 'CC BY-NC-SA',
+                    'CC BY-NC-ND – Namensnennung-Nicht kommerziell-Keine Bearbeitungen 4.0 International' => 'CC BY-NC-ND',
+                ],
+                'attr' => ['class' => 'ts-input', 'id' => 'license-select'],
             ])
             ->add('imageFile', FileType::class, [
                 'label' => 'Titelbild',

@@ -134,6 +134,9 @@ class UploadController extends AbstractController
                     $bpmContentTag->setFkTag($bpmTag);
                     $em->persist($bpmContentTag);
                 }
+                $license = $form->get('license')->getData();
+                $content->setLicense($license);
+
                 $content->setCreatedAt(new \DateTime());
                 $content->setDownloadCount(0);
                 $content->setFkUser($user);
