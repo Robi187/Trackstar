@@ -593,7 +593,8 @@
 
 		.comment-form textarea:focus { border-color: #e63946; }
 
-		.comment-form button {
+		.comment-form button,
+		.inline-reply-form button[type="submit"] {
 			margin-top: 10px;
 			background: #e63946;
 			color: #fff;
@@ -607,9 +608,11 @@
 			transition: background 0.15s;
 		}
 
-		.comment-form button:hover { background: #c1121f; }
+		.comment-form button:hover,
+		.inline-reply-form button[type="submit"]:hover { background: #c1121f; }
 
-		.comment-form .cancel-reply {
+		.comment-form .cancel-reply,
+		.inline-reply-form .cancel-reply {
 			margin-top: 10px;
 			margin-left: 8px;
 			background: transparent;
@@ -623,7 +626,8 @@
 			transition: color 0.15s, border-color 0.15s;
 		}
 
-		.comment-form .cancel-reply:hover { color: #aaa; border-color: #555; }
+		.comment-form .cancel-reply:hover,
+		.inline-reply-form .cancel-reply:hover { color: #aaa; border-color: #555; }
 
 		.comment-login-hint {
 			background: #161616;
