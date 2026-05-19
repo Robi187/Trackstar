@@ -42,6 +42,13 @@ class Content
     #[ORM\Column]
     private ?int $downloadCount = null;
 
+<<<<<<< HEAD
+=======
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?License $license = null;
+
+>>>>>>> e0d82df (lizenzen in DB)
     public function getId(): ?int
     {
         return $this->id;
@@ -148,4 +155,19 @@ class Content
     {
         $this->downloadCount++;
     }
+<<<<<<< HEAD
+=======
+
+    public function getLicense(): ?License
+    {
+        return $this->license;
+    }
+
+    public function setLicense(?License $license): static
+    {
+        $this->license = $license;
+
+        return $this;
+    }
+>>>>>>> e0d82df (lizenzen in DB)
 }
