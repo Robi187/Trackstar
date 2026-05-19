@@ -51,6 +51,8 @@
 					color: #ffffff;
 					font-family: 'Arial', sans-serif;
 					min-height: 100vh;
+					display: flex;
+					flex-direction: column;
 				}
 
 				/* ── NAVBAR ── */
@@ -77,12 +79,19 @@
 
 				.navbar-search {
 					flex: 1;
-					max-width: 360px;
+					max-width: 440px;
 					margin: 0 40px;
-					position: relative;
+					display: flex;
+					align-items: center;
+					gap: 8px;
 				}
 
-				.navbar-search input {
+				.navbar-search-inner {
+					position: relative;
+					flex: 1;
+				}
+
+				.navbar-search-inner input {
 					width: 100%;
 					background-color: #2a2a2a;
 					border: 1px solid #3a3a3a;
@@ -94,17 +103,44 @@
 					transition: border-color 0.2s;
 				}
 
-				.navbar-search input::placeholder { color: #666; }
-				.navbar-search input:focus { border-color: var(--orange); }
+				.navbar-search-inner input::placeholder { color: #666; }
+				.navbar-search-inner input:focus { border-color: var(--orange); }
 
-				.navbar-search .search-icon {
+				.navbar-search-inner .search-icon {
 					position: absolute;
-					left: 11px;
+					left: 10px;
 					top: 50%;
 					transform: translateY(-50%);
 					color: #666;
-					font-size: 0.85rem;
+					width: 16px;
+					height: 16px;
+					pointer-events: none;
 				}
+
+				.navbar-search-inner .search-icon svg {
+					width: 16px;
+					height: 16px;
+					stroke: currentColor;
+					fill: none;
+					stroke-width: 2;
+					stroke-linecap: round;
+				}
+
+				.navbar-search-btn {
+					background: var(--orange);
+					color: #fff;
+					border: none;
+					border-radius: 6px;
+					padding: 8px 16px;
+					font-size: 0.85rem;
+					font-weight: 600;
+					cursor: pointer;
+					white-space: nowrap;
+					transition: background 0.2s;
+					flex-shrink: 0;
+				}
+
+				.navbar-search-btn:hover { background: var(--orange-h); }
 
 				.navbar-right {
 					display: flex;
@@ -415,7 +451,7 @@
 				}
 
 				.subnav a:hover { color: var(--orange-h); }
-				.subnav a.active { color: #ffffff; }
+				.subnav a.active { color: var(--orange-h); }
 
 				.subnav a svg {
 					width: 15px;
@@ -425,9 +461,11 @@
 
 				/* ── MAIN ── */
 				.main {
+					flex: 1;
 					padding: 48px 32px 64px;
 					max-width: 1200px;
 					margin: 0 auto;
+					width: 100%;
 				}
 
 				.section-title {
@@ -501,9 +539,15 @@
 
 				.card-footer {
 					display: flex;
+					flex-wrap: wrap;
 					justify-content: center;
 					align-items: center;
 					gap: 6px;
+				}
+
+				.card-tag-more {
+					color: var(--muted);
+					background-color: #2a2a2a;
 				}
 
 				.card-price {
@@ -551,6 +595,26 @@
 					font-size: 0.8rem;
 					margin: 2px;
 				}
+
+				/* ── FOOTER ── */
+				footer {
+					background-color: var(--surface);
+					border-top: 1px solid var(--border);
+					color: var(--muted);
+					font-family: var(--font-body);
+					font-size: 0.8rem;
+					text-align: center;
+					padding: 24px 32px;
+				}
+
+				footer a {
+					color: var(--muted);
+					text-decoration: none;
+				}
+
+				footer a:hover {
+					color: var(--text);
+				}
 			</style>
 		{% endblock %}
 
@@ -563,10 +627,18 @@
 		<nav class="navbar">
 			<a href="/home" class="navbar-logo">Track<span>Star</span></a>
 
-			<div class="navbar-search">
-				<span class="search-icon">&#128269;</span>
-				<input type="text" placeholder="Suche"/>
-			</div>
+			<form class="navbar-search" action="{{ path('app_search') }}" method="GET">
+				<div class="navbar-search-inner">
+					<span class="search-icon">
+						<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+							<circle cx="11" cy="11" r="7"/>
+							<line x1="21" y1="21" x2="16.65" y2="16.65"/>
+						</svg>
+					</span>
+					<input type="text" name="q" placeholder="Titel, Beschreibung oder Autor …" value="{{ app.request.query.get('q') }}"/>
+				</div>
+				<button type="submit" class="navbar-search-btn">Suchen</button>
+			</form>
 
 			<div class="navbar-right">
 				<a href="/upload" class="navbar-upload-btn">+</a>
@@ -633,17 +705,6 @@
 						</svg>
 					</span>
 					Favorisierte Inhalte
-				</a>
-
-				<div class="sidebar-divider"></div>
-
-				<a href="/impressum" class="sidebar-nav-item">
-					<span class="sidebar-nav-icon">
-						<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-							<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
-						</svg>
-					</span>
-					Impressum &amp; Datenschutz
 				</a>
 
 				<div class="sidebar-divider"></div>
@@ -730,6 +791,40 @@
 
 		{# ── PAGE CONTENT ── Kind-Templates füllen diesen Block #}
 		{% block body %}{% endblock %}
+
+		<script>
+			document.addEventListener('DOMContentLoaded', function () {
+				document.querySelectorAll('.card-footer').forEach(function (footer) {
+					var tags = Array.from(footer.querySelectorAll('.card-tag'));
+					if (tags.length === 0) return;
+
+					var baseTop = tags[0].offsetTop;
+					var overflowStart = tags.findIndex(function (t) { return t.offsetTop > baseTop; });
+					if (overflowStart === -1) return;
+
+					var hiddenCount = tags.length - overflowStart;
+					tags.slice(overflowStart).forEach(function (t) { t.style.display = 'none'; });
+
+					var badge = document.createElement('span');
+					badge.className = 'card-tag card-tag-more';
+					badge.textContent = '+' + hiddenCount;
+					footer.appendChild(badge);
+
+					// if the badge itself wraps, pull one more tag into the hidden count
+					if (badge.offsetTop > baseTop && overflowStart > 0) {
+						tags[overflowStart - 1].style.display = 'none';
+						hiddenCount++;
+						badge.textContent = '+' + hiddenCount;
+					}
+				});
+			});
+		</script>
+
+		<footer>
+			<span>© {{ "now"|date("Y") }} Trackstar. Alle Rechte vorbehalten.</span>
+			&nbsp;·&nbsp;
+			<a href="/impressum">Impressum &amp; Datenschutz</a>
+		</footer>
 
 	</body>
 </html>
