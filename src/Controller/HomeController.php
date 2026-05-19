@@ -61,6 +61,7 @@ final class HomeController extends AbstractController
         return $this->render('home/index.html.twig', [
             'contents'      => $contents,
             'tagsByContent' => $tagsByContent,
+            'title' => 'Entdecke neue Musik',
         ]);
     }
 
@@ -71,6 +72,7 @@ final class HomeController extends AbstractController
         return $this->render('home/tracks.html.twig', [
             'contents'      => $contents,
             'tagsByContent' => $tagsByContent,
+            'title' => 'Entdecke Tracks',
         ]);
     }
 
@@ -81,6 +83,7 @@ final class HomeController extends AbstractController
         return $this->render('home/beats.html.twig', [
             'contents'      => $contents,
             'tagsByContent' => $tagsByContent,
+            'title' => 'Entdecke Beats',
         ]);
     }
 
@@ -91,6 +94,7 @@ final class HomeController extends AbstractController
         return $this->render('home/soundkits.html.twig', [
             'contents'      => $contents,
             'tagsByContent' => $tagsByContent,
+            'title' => 'Entdecke Sound Kits',
         ]);
     }
 
@@ -101,6 +105,7 @@ final class HomeController extends AbstractController
         return $this->render('home/samples.html.twig', [
             'contents'      => $contents,
             'tagsByContent' => $tagsByContent,
+            'title' => 'Entdecke Loops & Samples',
         ]);
     }
 }

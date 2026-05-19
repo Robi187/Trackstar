@@ -2,12 +2,15 @@
 
 namespace App\Controller;
 
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\User;
 use App\Form\BioType;
 use App\Form\UsernameType;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Form\UserEmailType;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,6 +21,8 @@ use App\Form\PasswordType;
 use App\Form\ProfilePictureType;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
+use SymfonyCasts\Bundle\VerifyEmail\VerifyEmailHelperInterface;
 
 final class EditUserController extends AbstractController
 {   
@@ -55,13 +60,16 @@ final class EditUserController extends AbstractController
         }
 
     #[Route('/edit/email', name: 'app_edit_email')]
-    public function editEmail(Request $request, EntityManagerInterface $entityManager): Response
-    {
-
+    public function editEmail(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        VerifyEmailHelperInterface $verifyEmailHelper,
+        MailerInterface $mailer,
+    ): Response {
+        /** @var User $user */
         $user = $this->getUser();
         $currentEmail = $user->getEmail();
 
-        // DTO mit aktueller Email befüllen
         $dto = new UserEmailDto();
         $dto->email = $currentEmail;
 
@@ -69,14 +77,41 @@ final class EditUserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
             if ($dto->email === $currentEmail) {
                 $this->addFlash('warning', 'Das ist bereits deine aktuelle E-Mail-Adresse.');
             } else {
-                $user->setEmail($dto->email);
-                $entityManager->persist($user);
+                $user->setPendingEmail($dto->email);
                 $entityManager->flush();
-                $this->addFlash('success', 'E-Mail erfolgreich geändert.');
+
+                $signatureComponents = $verifyEmailHelper->generateSignature(
+                    'app_verify_email_change',
+                    (string) $user->getId(),
+                    $dto->email,
+                    ['id' => $user->getId()]
+                );
+
+                $email = (new TemplatedEmail())
+                    ->from((string) $_SERVER['MAILER_SENDER_EMAIL'])
+                    ->to($dto->email)
+                    ->subject('TrackStar – Neue E-Mail-Adresse bestätigen')
+                    ->htmlTemplate('registration/email_change_confirmation.html.twig')
+                    ->context([
+                        'signedUrl' => $signatureComponents->getSignedUrl(),
+                        'expiresAt' => $signatureComponents->getExpiresAt(),
+                    ]);
+
+                $mailer->send($email);
+
+                $notification = (new TemplatedEmail())
+                    ->from((string) $_SERVER['MAILER_SENDER_EMAIL'])
+                    ->to($currentEmail)
+                    ->subject('TrackStar – Änderung deiner E-Mail-Adresse')
+                    ->htmlTemplate('registration/email_change_notification.html.twig')
+                    ->context(['newEmail' => $dto->email]);
+
+                $mailer->send($notification);
+
+                $this->addFlash('success', 'Wir haben eine Bestätigungs-E-Mail an ' . $dto->email . ' gesendet. Bitte bestätige deine neue E-Mail-Adresse.');
                 return $this->redirectToRoute('app_user_management');
             }
         }
@@ -87,6 +122,46 @@ final class EditUserController extends AbstractController
             'user_data' => $this->getUser(),
             'current_email' => $currentEmail,
         ]);
+    }
+
+    #[Route('/verify/email-change', name: 'app_verify_email_change')]
+    public function verifyEmailChange(
+        Request $request,
+        VerifyEmailHelperInterface $verifyEmailHelper,
+        UserRepository $userRepository,
+        EntityManagerInterface $entityManager,
+    ): Response {
+        $id = $request->query->get('id');
+
+        if (!$id) {
+            $this->addFlash('error', 'Ungültiger Bestätigungslink.');
+            return $this->redirectToRoute('app_user_management');
+        }
+
+        $user = $userRepository->find($id);
+
+        if (!$user || !$user->getPendingEmail()) {
+            $this->addFlash('error', 'Benutzer nicht gefunden oder kein Änderungsantrag vorhanden.');
+            return $this->redirectToRoute('app_user_management');
+        }
+
+        try {
+            $verifyEmailHelper->validateEmailConfirmationFromRequest(
+                $request,
+                (string) $user->getId(),
+                $user->getPendingEmail()
+            );
+        } catch (VerifyEmailExceptionInterface $e) {
+            $this->addFlash('error', 'Der Bestätigungslink ist ungültig oder abgelaufen.');
+            return $this->redirectToRoute('app_edit_email');
+        }
+
+        $user->setEmail($user->getPendingEmail());
+        $user->setPendingEmail(null);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'E-Mail-Adresse erfolgreich geändert.');
+        return $this->redirectToRoute('app_user_management');
     }
 
     #[Route('/edit/bio', name: 'app_edit_bio')]

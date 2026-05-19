@@ -47,6 +47,10 @@ class Content
     #[ORM\Column(options: ['default' => false])]
     private bool $isSuspended = false;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?License $license = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -153,6 +157,18 @@ class Content
     public function setIsSuspended(bool $isSuspended): static
     {
         $this->isSuspended = $isSuspended;
+        return $this;
+    }
+
+    public function getLicense(): ?License
+    {
+        return $this->license;
+    }
+
+    public function setLicense(?License $license): static
+    {
+        $this->license = $license;
+
         return $this;
     }
 }

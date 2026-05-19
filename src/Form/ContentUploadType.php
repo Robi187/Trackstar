@@ -4,6 +4,7 @@ namespace App\Form;
  
 use App\Entity\Category;
 use App\Entity\Content;
+use App\Entity\License;
 use App\Entity\Tag;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -107,6 +108,14 @@ class ContentUploadType extends AbstractType
                         mimeTypesMessage: 'Bitte lade eine gültige Audio-Datei (MP3, WAV, FLAC, AIFF) oder ZIP-Datei hoch.',
                     ),
                 ],
+            ])
+            ->add('license', EntityType::class, [
+                'label' => 'Lizenz',
+                'class' => License::class,
+                'choice_label' => 'fullName',
+                'required' => false,
+                'placeholder' => 'Lizenz wählen...',
+                'attr' => ['class' => 'ts-input', 'id' => 'license-select'],
             ])
             ->add('imageFile', FileType::class, [
                 'label' => 'Titelbild',

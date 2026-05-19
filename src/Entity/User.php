@@ -39,6 +39,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
+    #[NoSpaces()]
     private ?string $username = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -50,6 +51,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[ORM\Column]
+    private bool $isVerified = false;
+
+    #[ORM\Column(length: 180, nullable: true)]
+    private ?string $pendingEmail = null;
+  
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     private ?\DateTimeImmutable $bannedUntil = null;
 
@@ -176,6 +183,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function isVerified(): bool
+    {
+        return $this->isVerified;
+    }
+
+    public function setIsVerified(bool $isVerified): static
+    {
+        $this->isVerified = $isVerified;
+
+        return $this;
+    }
+
+    public function getPendingEmail(): ?string
+    {
+        return $this->pendingEmail;
+    }
+
+    public function setPendingEmail(?string $pendingEmail): static
+    {
+        $this->pendingEmail = $pendingEmail;
+
+        return $this;
+    }
+  
     public function getBannedUntil(): ?\DateTimeImmutable
     {
         return $this->bannedUntil;
