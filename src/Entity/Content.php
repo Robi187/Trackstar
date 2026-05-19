@@ -42,9 +42,6 @@ class Content
     #[ORM\Column]
     private ?int $downloadCount = null;
 
-    #[ORM\Column(length: 20, nullable: true)]
-    private ?string $license = null;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -150,17 +147,5 @@ class Content
     public function incrementDownloadCount(): void
     {
         $this->downloadCount++;
-    }
-
-    public function getLicense(): ?string
-    {
-        return $this->license;
-    }
-
-    public function setLicense(?string $license): static
-    {
-        $this->license = $license;
-
-        return $this;
     }
 }

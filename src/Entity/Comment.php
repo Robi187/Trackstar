@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\CommentRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -27,6 +29,19 @@ class Comment
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Content $fk_content = null;
+
+    #[ORM\ManyToOne(targetEntity: self::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
+    private ?Comment $fk_parent_comment = null;
+
+    #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'fk_parent_comment', cascade: ['remove'])]
+    #[ORM\OrderBy(['created_at' => 'ASC'])]
+    private Collection $replies;
+
+    public function __construct()
+    {
+        $this->replies = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -79,5 +94,22 @@ class Comment
         $this->fk_content = $fk_content;
 
         return $this;
+    }
+
+    public function getFkParentComment(): ?Comment
+    {
+        return $this->fk_parent_comment;
+    }
+
+    public function setFkParentComment(?Comment $fk_parent_comment): static
+    {
+        $this->fk_parent_comment = $fk_parent_comment;
+
+        return $this;
+    }
+
+    public function getReplies(): Collection
+    {
+        return $this->replies;
     }
 }
