@@ -30,6 +30,9 @@ class Comment
     #[ORM\JoinColumn(nullable: false)]
     private ?Content $fk_content = null;
 
+    #[ORM\Column(options: ['default' => false])]
+    private bool $isSuspended = false;
+  
     #[ORM\ManyToOne(targetEntity: self::class)]
     #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
     private ?Comment $fk_parent_comment = null;
@@ -96,6 +99,16 @@ class Comment
         return $this;
     }
 
+    public function isSuspended(): bool
+    {
+        return $this->isSuspended;
+    }
+    
+    public function setIsSuspended(bool $isSuspended): static
+    {
+        $this->isSuspended = $isSuspended;
+        return $this;
+    }
     public function getFkParentComment(): ?Comment
     {
         return $this->fk_parent_comment;

@@ -34,21 +34,23 @@ class Content
     #[ORM\JoinColumn(nullable: false)]
     private ?User $fk_user = null;
 
-   
-
     #[ORM\Column(length: 255)]
     private ?string $image_file = null;
 
     #[ORM\Column]
     private ?int $downloadCount = null;
 
-<<<<<<< HEAD
-=======
+    /**
+     * Wird auf true gesetzt wenn der Benutzer temporär gesperrt wird.
+     * Wird beim Entsperren wieder auf false gesetzt.
+     */
+    #[ORM\Column(options: ['default' => false])]
+    private bool $isSuspended = false;
+
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?License $license = null;
 
->>>>>>> e0d82df (lizenzen in DB)
     public function getId(): ?int
     {
         return $this->id;
@@ -62,7 +64,6 @@ class Content
     public function setTitle(string $title): static
     {
         $this->title = $title;
-
         return $this;
     }
 
@@ -74,7 +75,6 @@ class Content
     public function setDescription(?string $description): static
     {
         $this->description = $description;
-
         return $this;
     }
 
@@ -86,7 +86,6 @@ class Content
     public function setFilePath(string $file_path): static
     {
         $this->file_path = $file_path;
-
         return $this;
     }
 
@@ -98,7 +97,6 @@ class Content
     public function setType(?Category $type): static
     {
         $this->type = $type;
-
         return $this;
     }
 
@@ -110,7 +108,6 @@ class Content
     public function setCreatedAt(\DateTime $created_at): static
     {
         $this->created_at = $created_at;
-
         return $this;
     }
 
@@ -122,11 +119,8 @@ class Content
     public function setFkUser(?User $fk_user): static
     {
         $this->fk_user = $fk_user;
-
         return $this;
     }
-
-    
 
     public function getImageFile(): ?string
     {
@@ -136,7 +130,6 @@ class Content
     public function setImageFile(string $image_file): static
     {
         $this->image_file = $image_file;
-
         return $this;
     }
 
@@ -148,15 +141,24 @@ class Content
     public function setDownloadCount(int $downloadCount): static
     {
         $this->downloadCount = $downloadCount;
-
         return $this;
     }
+
     public function incrementDownloadCount(): void
     {
         $this->downloadCount++;
     }
-<<<<<<< HEAD
-=======
+
+    public function isSuspended(): bool
+    {
+        return $this->isSuspended;
+    }
+
+    public function setIsSuspended(bool $isSuspended): static
+    {
+        $this->isSuspended = $isSuspended;
+        return $this;
+    }
 
     public function getLicense(): ?License
     {
@@ -169,5 +171,4 @@ class Content
 
         return $this;
     }
->>>>>>> e0d82df (lizenzen in DB)
 }

@@ -1,0 +1,204 @@
+{% extends 'admin_base.html.twig' %}
+
+{% block title %}Admin – Meldungen{% endblock %}
+
+{% block admin_body %}
+
+<style>
+  .ku-flash { display: flex; align-items: center; gap: 10px; border-radius: 10px; padding: 13px 16px; margin-bottom: 16px; font-size: .88rem; font-weight: 500; }
+  .ku-flash svg { flex-shrink: 0; width: 18px; height: 18px; }
+  .ku-flash.success { background: rgba(0,200,80,.10); border: 1px solid rgba(0,200,80,.3); color: #00d966; }
+  .ku-flash.error   { background: rgba(224,36,52,.12); border: 1px solid rgba(224,36,52,.4); color: #ff6070; }
+
+  .stat-row { display: flex; gap: 20px; margin-bottom: 20px; }
+  .stat-box { background: #1e1e1e; border: 1px solid #2a2a2a; border-radius: 12px; padding: 16px 20px; flex: 1; }
+  .stat-box .stat-val { font-size: 28px; font-weight: 700; color: #fff; }
+  .stat-box .stat-lbl { font-size: 12px; color: #666; margin-top: 2px; }
+
+  .admin-card { background: #1e1e1e; border-radius: 14px; overflow: hidden; border: 1px solid #2a2a2a; }
+  .admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .admin-table thead { background: #161616; }
+  .admin-table th { padding: 13px 16px; text-align: left; font-size: 12px; font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid #2a2a2a; }
+  .admin-table td { padding: 13px 16px; border-bottom: 1px solid #222; color: #ccc; vertical-align: middle; }
+  .admin-table tbody tr:last-child td { border-bottom: none; }
+  .admin-table tbody tr:hover td { background: #232323; }
+
+  .role-badge { display: inline-block; padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; }
+  .role-admin { background: rgba(232,93,4,.18); color: #e85d04; border: 1px solid rgba(232,93,4,.35); }
+  .role-user  { background: rgba(255,255,255,.06); color: #888; border: 1px solid #333; }
+
+  .action-wrap      { display: flex; align-items: center; gap: 6px; }
+  .action-wrap form { display: flex; align-items: center; }
+
+  .btn-action { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 7px 12px; border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: inherit; transition: background .2s, border-color .2s, color .2s, box-shadow .2s; white-space: nowrap; border: none; }
+  .btn-action svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.2; flex-shrink: 0; }
+  .btn-delete { border: 1px solid rgba(224,36,52,.4); color: #ff6070; background: rgba(224,36,52,.08); }
+  .btn-delete:hover { background: rgba(200,40,30,0.18); border-color: #cc3322; color: #ff5544; box-shadow: 0 0 10px rgba(200,40,30,0.15); }
+  .btn-unban  { border: 1px solid rgba(0,200,80,.3); color: #00d966; background: rgba(0,200,80,.08); }
+  .btn-unban:hover { background: rgba(0,200,80,0.18); border-color: #00d966; color: #00ff77; box-shadow: 0 0 10px rgba(0,200,80,0.12); }
+
+  /* Detail Modal */
+  .report-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center; }
+  .report-overlay.open { display: flex; }
+  .report-detail-modal { background: #1a1a1a; border: 1px solid #2e2e2e; border-radius: 16px; padding: 28px; width: 480px; box-shadow: 0 24px 60px rgba(0,0,0,0.6); animation: modalIn .2s ease; }
+  @keyframes modalIn { from { opacity: 0; transform: translateY(-12px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  .rdm-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+  .rdm-title  { font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  .rdm-sub    { font-size: 13px; color: #666; }
+  .rdm-sub strong { color: #aaa; }
+  .rdm-close  { background: none; border: 1px solid #2c2c2c; color: #666; border-radius: 8px; width: 32px; height: 32px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: all .15s; flex-shrink: 0; }
+  .rdm-close:hover { border-color: #444; color: #aaa; }
+  .rdm-section-label { font-size: 11px; color: #555; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px; }
+  .rdm-message-box { background: #141414; border: 1px solid #2c2c2c; border-radius: 8px; padding: 12px 14px; font-size: 13px; color: #bbb; line-height: 1.6; min-height: 60px; word-break: break-word; margin-bottom: 4px; }
+  .rdm-actions { display: flex; gap: 8px; margin-top: 20px; }
+  .rdm-actions form { flex: 1; display: flex; }
+  .rdm-view-btn { flex: 1; text-align: center; padding: 10px; border-radius: 8px; border: 1px solid #2c2c2c; background: transparent; color: #aaa; font-size: 13px; font-weight: 500; text-decoration: none; transition: all .15s; display: flex; align-items: center; justify-content: center; }
+  .rdm-view-btn:hover { border-color: #555; color: #fff; }
+</style>
+
+<div class="admin-main">
+
+  <div class="admin-page-header">
+    <h1 class="admin-page-title">Meldungen</h1>
+    <p class="admin-page-subtitle">Gemeldete Inhalte – offen und unbearbeitet.</p>
+  </div>
+
+  {% for msg in app.flashes('success') %}
+    <div class="ku-flash success">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>
+      {{ msg }}
+    </div>
+  {% endfor %}
+  {% for msg in app.flashes('error') %}
+    <div class="ku-flash error">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      {{ msg }}
+    </div>
+  {% endfor %}
+
+  <div class="stat-row">
+    <div class="stat-box">
+      <div class="stat-val">{{ reports|length }}</div>
+      <div class="stat-lbl">Offene Meldungen</div>
+    </div>
+  </div>
+
+  <div class="admin-card">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Inhalt</th>
+          <th>Gemeldet von</th>
+          <th>Grund</th>
+          <th>Nachricht</th>
+          <th>Datum</th>
+          <th>Aktionen</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in reports %}
+        <tr style="cursor:pointer" onclick="openReport({
+            id: {{ r.id }},
+            content: '{{ r.fkContent.title|e('js') }}',
+            contentId: {{ r.fkContent.id }},
+            user: '{{ r.fkUser ? r.fkUser.username|e('js') : '–' }}',
+            reason: '{{ r.fkReason.name|e('js') }}',
+            message: '{{ r.message ? r.message|e('js') : '' }}',
+            date: '{{ r.createdAt|date('d.m.Y H:i') }}',
+            closeUrl: '{{ path('app_admin_report_close', {id: r.id}) }}',
+            deleteUrl: '{{ path('app_admin_report_delete_content', {id: r.id}) }}'
+        })">
+          <td style="color:#555">{{ r.id }}</td>
+          <td>
+            <a href="{{ path('app_content_detail', {id: r.fkContent.id}) }}"
+               style="color:#e63946;text-decoration:none;font-weight:500"
+               onclick="event.stopPropagation()">
+              {{ r.fkContent.title }}
+            </a>
+          </td>
+          <td>{{ r.fkUser ? r.fkUser.username : '–' }}</td>
+          <td><span class="role-badge role-admin">{{ r.fkReason.name }}</span></td>
+          <td style="color:#bbb;font-size:13px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+            <span title="{{ r.message ?? '' }}">{{ r.message ?? '–' }}</span>
+          </td>
+          <td>{{ r.createdAt|date('d.m.Y H:i') }}</td>
+          <td onclick="event.stopPropagation()">
+            <div class="action-wrap">
+              <form method="post" action="{{ path('app_admin_report_close', {id: r.id}) }}">
+                <button type="submit" class="btn-action btn-unban" title="Erledigt">
+                  <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+                </button>
+              </form>
+              <form method="post" action="{{ path('app_admin_report_delete_content', {id: r.id}) }}"
+                    onsubmit="return confirm('Inhalt wirklich löschen?')">
+                <button type="submit" class="btn-action btn-delete" title="Inhalt löschen">
+                  <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="7" style="text-align:center;color:#555;padding:32px">Keine offenen Meldungen.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+{# Detail Modal #}
+<div class="report-overlay" id="reportDetailOverlay" onclick="closeDetail(event)">
+  <div class="report-detail-modal">
+    <div class="rdm-header">
+      <div>
+        <div class="rdm-title" id="rdm-title"></div>
+        <div class="rdm-sub">gemeldet von <strong id="rdm-user"></strong></div>
+      </div>
+      <button class="rdm-close" onclick="closeDetailDirect()">✕</button>
+    </div>
+    <div class="rdm-section-label">Grund</div>
+    <span id="rdm-reason" class="role-badge role-admin" style="display:inline-block;margin-bottom:16px"></span>
+    <div class="rdm-section-label">Nachricht</div>
+    <div class="rdm-message-box" id="rdm-message"></div>
+    <div class="rdm-section-label" style="margin-top:16px">Datum</div>
+    <div id="rdm-date" style="font-size:13px;color:#bbb;margin-bottom:4px"></div>
+    <div class="rdm-actions">
+      <a id="rdm-content-link" href="#" class="rdm-view-btn">Inhalt ansehen</a>
+      <form method="post" id="rdm-close-form">
+        <button type="submit" class="btn-action btn-unban" style="width:100%;justify-content:center;padding:10px 16px">
+          <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+          Erledigt
+        </button>
+      </form>
+      <form method="post" id="rdm-delete-form" onsubmit="return confirm('Inhalt wirklich löschen?')">
+        <button type="submit" class="btn-action btn-delete" style="width:100%;justify-content:center;padding:10px 16px">
+          <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
+          Inhalt löschen
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openReport(r) {
+    document.getElementById('rdm-title').textContent   = r.content;
+    document.getElementById('rdm-user').textContent    = r.user;
+    document.getElementById('rdm-reason').textContent  = r.reason;
+    document.getElementById('rdm-message').textContent = r.message || '–';
+    document.getElementById('rdm-date').textContent    = r.date;
+    document.getElementById('rdm-content-link').href   = '/content/' + r.contentId;
+    document.getElementById('rdm-close-form').action   = r.closeUrl;
+    document.getElementById('rdm-delete-form').action  = r.deleteUrl;
+    document.getElementById('reportDetailOverlay').classList.add('open');
+  }
+  function closeDetail(e) { if (e.target === document.getElementById('reportDetailOverlay')) closeDetailDirect(); }
+  function closeDetailDirect() { document.getElementById('reportDetailOverlay').classList.remove('open'); }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDetailDirect(); });
+</script>
+
+{% endblock %}
