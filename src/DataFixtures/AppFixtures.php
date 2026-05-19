@@ -10,6 +10,7 @@ use App\Entity\Favorite;
 use App\Entity\Rating;
 use App\Entity\Reason;
 use App\Entity\Report;
+use App\Entity\License;
 use App\Entity\Tag;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -27,6 +28,23 @@ class AppFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {   
         $faker = Factory::create();
+
+        // --- LICENSES ---
+        $licenseData = [
+            ['CC BY',       'Creative Commons Namensnennung 4.0 International'],
+            ['CC BY-SA',    'Creative Commons Namensnennung-Share Alike 4.0 International'],
+            ['CC BY-ND',    'Creative Commons Namensnennung-Keine Bearbeitungen 4.0 International'],
+            ['CC BY-NC',    'Creative Commons Namensnennung-Nicht kommerziell 4.0 International'],
+            ['CC BY-NC-SA', 'Creative Commons Namensnennung-Nicht kommerziell-Share Alike 4.0 International'],
+            ['CC BY-NC-ND', 'Creative Commons Namensnennung-Nicht kommerziell-Keine Bearbeitungen 4.0 International'],
+        ];
+        foreach ($licenseData as [$shortCode, $fullName]) {
+            $license = new License();
+            $license->setShortCode($shortCode);
+            $license->setFullName($fullName);
+            $manager->persist($license);
+        }
+
         // --- CATEGORIES ---
         $categoryNames = ['Tracks', 'Beats', 'Samples', 'Sound Kits', 'Andere'];
         $categories = [];
