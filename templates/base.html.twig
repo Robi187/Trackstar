@@ -5,6 +5,7 @@
 		<title>
 			{% block title %}Trackstar{% endblock %}
 		</title>
+		<link rel="icon" href="{{ asset('Logo.svg') }}" type="image/svg+xml">
 		{% block stylesheets %}
 			<link rel="stylesheet" href="{{ asset('css/app.css') }}">
 			<style>
@@ -68,14 +69,16 @@
 				}
 
 				.navbar-logo {
-					font-size: 1.4rem;
-					font-weight: 800;
-					letter-spacing: -0.5px;
+					display: flex;
+					align-items: center;
 					text-decoration: none;
-					color: #ffffff;
 				}
 
-				.navbar-logo span { color: var(--orange); }
+				.navbar-logo img {
+					display: block;
+					height: 32px;
+					width: auto;
+				}
 
 				.navbar-search {
 					flex: 1;
@@ -649,7 +652,9 @@
 		{# ── NAVBAR ── außerhalb von block body, immer sichtbar #}
 		{% block navbar %}
 		<nav class="navbar">
-			<a href="/home" class="navbar-logo">Track<span>Star</span></a>
+			<a href="/home" class="navbar-logo">
+				<img src="{{ asset('Logo.svg') }}" alt="TrackStar" height="32">
+			</a>
 
 			<form class="navbar-search" action="{{ path('app_search') }}" method="GET">
 				<div class="navbar-search-inner">
