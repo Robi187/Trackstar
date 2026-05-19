@@ -56,6 +56,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 180, nullable: true)]
     private ?string $pendingEmail = null;
+  
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $bannedUntil = null;
 
     public function getId(): ?int
     {
@@ -202,5 +205,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->pendingEmail = $pendingEmail;
 
         return $this;
+    }
+  
+    public function getBannedUntil(): ?\DateTimeImmutable
+    {
+        return $this->bannedUntil;
+    }
+
+    public function setBannedUntil(?\DateTimeImmutable $bannedUntil): static
+    {
+        $this->bannedUntil = $bannedUntil;
+
+        return $this;
+    }
+
+    public function isBanned(): bool
+    {
+        return $this->bannedUntil !== null && $this->bannedUntil > new \DateTimeImmutable();
     }
 }
