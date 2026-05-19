@@ -130,9 +130,17 @@ final class ContentController extends AbstractController
             return new JsonResponse(['error' => 'Nicht eingeloggt'], 401);
         }
 
-        // Doppelmeldung verhindern
-        $existing = $em->getRepository(Report::class)
-            ->findOneBy(['fk_user' => $user, 'fk_content' => $content]);
+        // Doppelmeldung verhindern - nur wenn die Report noch offen ist
+        $qb = $em->getRepository(Report::class)->createQueryBuilder('r');
+        $existing = $qb
+            ->where('r.fk_user = :user')
+            ->andWhere('r.fk_content = :content')
+            ->andWhere("r.status != 'closed'")
+            ->setParameter('user', $user)
+            ->setParameter('content', $content)
+            ->getQuery()
+            ->getOneOrNullResult();
+        
         if ($existing) {
             return new JsonResponse(['error' => 'Bereits gemeldet'], 409);
         }

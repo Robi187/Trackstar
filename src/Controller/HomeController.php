@@ -25,16 +25,28 @@ final class HomeController extends AbstractController
         $response = $this->forward('App\Controller\ContentController::getContentByCategory', [
             'category_name' => $categoryName,
         ]);
+
         $raw = json_decode($response->getContent(), true);
+
+        // Sicherheitscheck: kein Array oder leer → früh raus
+        if (!is_array($raw) || empty($raw)) {
+            return [[], []];
+        }
 
         $contents      = [];
         $tagsByContent = [];
 
         foreach ($raw as $contentData) {
+            // Sicherheitscheck: muss ein Array mit 'id' sein
+            if (!is_array($contentData) || !isset($contentData['id'])) {
+                continue;
+            }
+
             $content = $em->getRepository(Content::class)->find($contentData['id']);
             if (!$content || $content->isSuspended()) {
-                continue; // gesperrte Inhalte überspringen
+                continue;
             }
+
             $contents[] = $contentData;
             $tagsByContent[$contentData['id']] = $em->getRepository(ContentTag::class)->findTagsByContent($content);
         }

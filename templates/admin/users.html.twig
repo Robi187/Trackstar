@@ -48,7 +48,7 @@
   .btn-unban:hover { background: rgba(0,200,80,0.18); border-color: #00d966; color: #00ff77; box-shadow: 0 0 10px rgba(0,200,80,0.12); }
   .self-badge { font-size: 12px; color: #555; font-style: italic; }
 
-  /* Ban Modal */
+  /* Shared Modal Base */
   .ban-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center; }
   .ban-overlay.open { display: flex; }
   .ban-modal { background: #1a1a1a; border: 1px solid #2e2e2e; border-radius: 16px; padding: 28px; width: 360px; box-shadow: 0 24px 60px rgba(0,0,0,0.6); animation: modalIn .2s ease; }
@@ -69,6 +69,18 @@
   .ban-modal-cancel:hover { border-color: #444; color: #aaa; }
   .ban-modal-confirm { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid rgba(232,93,4,.5); background: rgba(232,93,4,0.12); color: #e85d04; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all .15s; }
   .ban-modal-confirm:hover { background: rgba(232,93,4,0.22); border-color: #e85d04; color: #ff7722; box-shadow: 0 0 12px rgba(232,93,4,0.2); }
+
+  /* Delete Modal specifics */
+  .delete-icon-wrap { display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 12px; background: rgba(224,36,52,.12); border: 1px solid rgba(224,36,52,.3); margin: 0 auto 16px; }
+  .delete-warning-box { background: rgba(224,36,52,.07); border: 1px solid rgba(224,36,52,.25); border-radius: 8px; padding: 10px 14px; margin-bottom: 20px; }
+  .delete-warning-box p { margin: 0; font-size: 12px; color: #ff6070; display: flex; align-items: flex-start; gap: 8px; }
+  .delete-warning-box svg { flex-shrink: 0; margin-top: 1px; }
+  .delete-confirm-input { width: 100%; box-sizing: border-box; background: #141414; border: 1px solid #2c2c2c; border-radius: 8px; color: #fff; font-size: 13px; padding: 9px 12px; outline: none; font-family: inherit; transition: border-color .15s; }
+  .delete-confirm-input:focus { border-color: rgba(224,36,52,.6); }
+  .delete-confirm-input.match { border-color: rgba(224,36,52,.6); }
+  .btn-delete-confirm { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(224,36,52,.4); background: rgba(224,36,52,.10); color: #ff6070; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all .2s; }
+  .btn-delete-confirm:not(:disabled):hover { background: rgba(224,36,52,.22); border-color: #cc3322; color: #ff5544; box-shadow: 0 0 12px rgba(200,40,30,0.2); }
+  .btn-delete-confirm:disabled { opacity: .35; cursor: not-allowed; }
 </style>
 
 <div class="admin-main">
@@ -168,12 +180,10 @@
                     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
                   </button>
                 {% endif %}
-                <form method="post" action="{{ path('app_admin_delete_user', {id: u.id}) }}"
-                      onsubmit="return confirm('Benutzer „{{ u.username }}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.')">
-                  <button type="submit" class="btn-action btn-delete" title="Löschen">
-                    <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6m4-6v6"/><path d="M9 6V4h6v2"/></svg>
-                  </button>
-                </form>
+                <button type="button" class="btn-action btn-delete" title="Löschen"
+                        onclick="openDeleteModal('{{ u.id }}', '{{ u.username|e('js') }}')">
+                  <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6m4-6v6"/><path d="M9 6V4h6v2"/></svg>
+                </button>
               </div>
             {% endif %}
           </td>
@@ -189,7 +199,7 @@
 
 </div>
 
-{# Ban Modal #}
+{# ── Ban Modal ────────────────────────────────────────────── #}
 <div class="ban-overlay" id="banOverlay" onclick="closeBanModal(event)">
   <div class="ban-modal">
     <div class="ban-modal-title">Benutzer sperren</div>
@@ -222,7 +232,65 @@
   </div>
 </div>
 
+{# ── Delete Modal ─────────────────────────────────────────── #}
+<div class="ban-overlay" id="deleteOverlay" onclick="closeDeleteModal(event)">
+  <div class="ban-modal">
+
+    <div class="delete-icon-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#ff6070" stroke-width="2.2" width="22" height="22">
+        <polyline points="3 6 5 6 21 6"/>
+        <path d="M19 6l-1 14H6L5 6"/>
+        <path d="M10 11v6m4-6v6"/>
+        <path d="M9 6V4h6v2"/>
+      </svg>
+    </div>
+
+    <div class="ban-modal-title" style="text-align:center">Benutzer löschen</div>
+    <div class="ban-modal-sub" style="text-align:center;margin-bottom:8px">
+      <strong id="deleteUsername"></strong> wird permanent gelöscht.
+    </div>
+    <p style="font-size:12px;color:#555;text-align:center;margin:0 0 20px;line-height:1.6">
+      Alle Inhalte, Kommentare, Bewertungen und Aktivitäten dieses Kontos werden unwiderruflich entfernt.
+    </p>
+
+    <div class="delete-warning-box">
+      <p>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="15" height="15">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        Diese Aktion kann nicht rückgängig gemacht werden.
+      </p>
+    </div>
+
+    <div style="margin-bottom:20px">
+      <label class="ban-modal-label">Zur Bestätigung Benutzernamen eingeben</label>
+      <input type="text"
+             class="delete-confirm-input"
+             id="deleteConfirmInput"
+             placeholder=""
+             oninput="checkDeleteConfirm()"
+             autocomplete="off" />
+    </div>
+
+    <div class="ban-modal-actions">
+      <button class="ban-modal-cancel" onclick="closeDeleteModalDirect()">Abbrechen</button>
+      <form method="post" id="deleteForm" action="" style="flex:1;display:flex;">
+        <button type="submit"
+                class="btn-delete-confirm"
+                id="deleteConfirmBtn"
+                disabled>
+          Endgültig löschen
+        </button>
+      </form>
+    </div>
+
+  </div>
+</div>
+
 <script>
+  /* ── Ban Modal ─────────────────────────────────────────── */
   function openBanModal(userId, username) {
     document.getElementById('banUsername').textContent = username;
     document.getElementById('banForm').action = '{{ path('app_admin_ban_user', {id: '__ID__'}) }}'.replace('__ID__', userId);
@@ -245,7 +313,38 @@
     const unit = document.getElementById('banCustomUnit').value;
     if (num) document.getElementById('banDurationInput').value = num + ' ' + unit;
   }
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeBanModalDirect(); });
+
+  /* ── Delete Modal ──────────────────────────────────────── */
+  let _deleteUsername = '';
+
+  function openDeleteModal(userId, username) {
+    _deleteUsername = username;
+    document.getElementById('deleteUsername').textContent = username;
+    document.getElementById('deleteConfirmInput').placeholder = username;
+    document.getElementById('deleteConfirmInput').value = '';
+    document.getElementById('deleteConfirmInput').classList.remove('match');
+    document.getElementById('deleteForm').action =
+      '{{ path('app_admin_delete_user', {id: '__ID__'}) }}'.replace('__ID__', userId);
+    checkDeleteConfirm();
+    document.getElementById('deleteOverlay').classList.add('open');
+    setTimeout(() => document.getElementById('deleteConfirmInput').focus(), 80);
+  }
+
+  function checkDeleteConfirm() {
+    const input = document.getElementById('deleteConfirmInput');
+    const btn   = document.getElementById('deleteConfirmBtn');
+    const match = input.value === _deleteUsername;
+    btn.disabled = !match;
+    input.classList.toggle('match', match);
+  }
+
+  function closeDeleteModal(e) { if (e.target === document.getElementById('deleteOverlay')) closeDeleteModalDirect(); }
+  function closeDeleteModalDirect() { document.getElementById('deleteOverlay').classList.remove('open'); }
+
+  /* ── Shared: Escape key ────────────────────────────────── */
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeBanModalDirect(); closeDeleteModalDirect(); }
+  });
 </script>
 
 {% endblock %}

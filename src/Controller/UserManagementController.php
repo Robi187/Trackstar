@@ -123,26 +123,34 @@ final class UserManagementController extends AbstractController
             return $this->redirectToRoute('app_admin_users');
         }
 
+        // 1. Reports auf Content des Users löschen (VOR Content!)
+        $em->createQuery('DELETE FROM App\Entity\Report r WHERE r.fk_content IN (SELECT c FROM App\Entity\Content c WHERE c.fk_user = :u)')->setParameter('u', $user)->execute();
+
+        // 2. Reports die der User selbst erstellt hat
+        $em->createQuery('DELETE FROM App\Entity\Report r WHERE r.fk_user = :u')->setParameter('u', $user)->execute();
+
+        // 3. Abhängigkeiten des Contents löschen
         $em->createQuery('DELETE FROM App\Entity\ContentTag ct WHERE ct.fk_content IN (SELECT c FROM App\Entity\Content c WHERE c.fk_user = :u)')->setParameter('u', $user)->execute();
         $em->createQuery('DELETE FROM App\Entity\Comment cm WHERE cm.fk_content IN (SELECT c FROM App\Entity\Content c WHERE c.fk_user = :u)')->setParameter('u', $user)->execute();
         $em->createQuery('DELETE FROM App\Entity\Favorite f WHERE f.fk_content IN (SELECT c FROM App\Entity\Content c WHERE c.fk_user = :u)')->setParameter('u', $user)->execute();
         $em->createQuery('DELETE FROM App\Entity\Rating r WHERE r.fk_content IN (SELECT c FROM App\Entity\Content c WHERE c.fk_user = :u)')->setParameter('u', $user)->execute();
+
+        // 4. Content selbst löschen
         $em->createQuery('DELETE FROM App\Entity\Content c WHERE c.fk_user = :u')->setParameter('u', $user)->execute();
 
+        // 5. Eigene Aktivitäten des Users löschen
         $em->createQuery('DELETE FROM App\Entity\Comment cm WHERE cm.fk_user = :u')->setParameter('u', $user)->execute();
         $em->createQuery('DELETE FROM App\Entity\Favorite f WHERE f.fk_user = :u')->setParameter('u', $user)->execute();
         $em->createQuery('DELETE FROM App\Entity\Rating r WHERE r.fk_user = :u')->setParameter('u', $user)->execute();
-        // Reports auf Content des Users löschen
-        $em->createQuery('DELETE FROM App\Entity\Report r WHERE r.fk_content IN (SELECT c FROM App\Entity\Content c WHERE c.fk_user = :u)')->setParameter('u', $user)->execute();
 
-        // Reports die der User selbst erstellt hat
-        $em->createQuery('DELETE FROM App\Entity\Report r WHERE r.fk_user = :u')->setParameter('u', $user)->execute();
+        // 6. User löschen
         $em->remove($user);
         $em->flush();
 
         $this->addFlash('success', sprintf('Benutzer „%s" wurde gelöscht.', $user->getUsername()));
         return $this->redirectToRoute('app_admin_users');
     }
+
     #[Route('/admin/meldungen', name: 'app_admin_reports')]
     public function adminReports(EntityManagerInterface $em): Response
     {
