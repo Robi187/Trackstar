@@ -604,6 +604,70 @@
     .select2-container--open.select2-container--above .select2-selection--single {
         border-radius: 8px !important;
     }
+
+    /* ── License Section ── */
+    .ts-license-preview {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        margin-top: 0.85rem;
+        min-height: 36px;
+        flex-wrap: wrap;
+    }
+
+    .ts-license-preview.hidden {
+        display: none;
+    }
+
+    .cc-badge-set {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+    }
+
+    .cc-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: #222;
+        border: 1.5px solid #666;
+        color: #ddd;
+        font-size: 0.55rem;
+        font-weight: 900;
+        font-family: 'Arial', 'Helvetica Neue', sans-serif;
+        letter-spacing: -0.3px;
+        user-select: none;
+        flex-shrink: 0;
+    }
+
+    .cc-badge.cc-cc  { border-color: #aaa; color: #fff; }
+    .cc-badge.cc-by  { border-color: #aaa; color: #fff; }
+    .cc-badge.cc-sa  { border-color: #aaa; color: #fff; }
+    .cc-badge.cc-nd  { border-color: #aaa; color: #fff; }
+    .cc-badge.cc-nc  { border-color: #aaa; color: #fff; }
+
+    .ts-license-name {
+        font-size: 0.82rem;
+        color: #aaa;
+        font-family: var(--font-body, sans-serif);
+    }
+
+    .ts-license-details {
+        font-size: 0.75rem;
+        color: #555;
+        text-decoration: underline;
+        font-family: var(--font-body, sans-serif);
+        cursor: pointer;
+        transition: color 0.2s;
+        margin-left: 0.2rem;
+    }
+
+    .ts-license-details:hover {
+        color: #ff5a00;
+    }
 </style>
 {% endblock %}
 
@@ -735,6 +799,24 @@
 
                 <div class="ts-tags-row" id="tag-chips-row">
                     
+                </div>
+            </div>
+
+            {# ── Section 5: Lizenz ── #}
+            <div class="ts-section">
+                <p class="ts-section-title">Lizenz</p>
+                <p class="ts-section-subtitle">Wähle eine Creative Commons Lizenz für deinen Track ~ Optional</p>
+
+                <div class="ts-field">
+                    {{ form_label(form.license, 'Creative Commons Lizenz') }}
+                    {{ form_widget(form.license) }}
+                    {{ form_errors(form.license) }}
+
+                    <div class="ts-license-preview hidden" id="license-preview">
+                        <div class="cc-badge-set" id="license-badge-set"></div>
+                        <span class="ts-license-name" id="license-name-text"></span>
+                        <a class="ts-license-details" id="license-details-link" href="#" target="_blank" rel="noopener noreferrer">(Details)</a>
+                    </div>
                 </div>
             </div>
 
@@ -880,6 +962,76 @@ document.addEventListener('DOMContentLoaded', function () {
             updateAudioField();
         });
         updateAudioField(); // beim Laden prüfen
+    }
+
+    /* ── Lizenz-Icon-Vorschau ── */
+    const licenseSelect = document.getElementById('license-select');
+    const licensePreview = document.getElementById('license-preview');
+    const licenseBadgeSet = document.getElementById('license-badge-set');
+    const licenseNameText = document.getElementById('license-name-text');
+    const licenseDetailsLink = document.getElementById('license-details-link');
+
+    const licenseData = {
+        'CC BY': {
+            badges: ['CC', 'BY'],
+            classes: ['cc-cc', 'cc-by'],
+            name: 'Namensnennung 4.0 International',
+            url: 'https://creativecommons.org/licenses/by/4.0/deed.de',
+        },
+        'CC BY-SA': {
+            badges: ['CC', 'BY', 'SA'],
+            classes: ['cc-cc', 'cc-by', 'cc-sa'],
+            name: 'Namensnennung-Share Alike 4.0 International',
+            url: 'https://creativecommons.org/licenses/by-sa/4.0/deed.de',
+        },
+        'CC BY-ND': {
+            badges: ['CC', 'BY', 'ND'],
+            classes: ['cc-cc', 'cc-by', 'cc-nd'],
+            name: 'Namensnennung-Keine Bearbeitungen 4.0 International',
+            url: 'https://creativecommons.org/licenses/by-nd/4.0/deed.de',
+        },
+        'CC BY-NC': {
+            badges: ['CC', 'BY', '€'],
+            classes: ['cc-cc', 'cc-by', 'cc-nc'],
+            name: 'Namensnennung-Nicht kommerziell 4.0 International',
+            url: 'https://creativecommons.org/licenses/by-nc/4.0/deed.de',
+        },
+        'CC BY-NC-SA': {
+            badges: ['CC', 'BY', '€', 'SA'],
+            classes: ['cc-cc', 'cc-by', 'cc-nc', 'cc-sa'],
+            name: 'Namensnennung-Nicht kommerziell-Share Alike 4.0 International',
+            url: 'https://creativecommons.org/licenses/by-nc-sa/4.0/deed.de',
+        },
+        'CC BY-NC-ND': {
+            badges: ['CC', 'BY', '€', 'ND'],
+            classes: ['cc-cc', 'cc-by', 'cc-nc', 'cc-nd'],
+            name: 'Namensnennung-Nicht kommerziell-Keine Bearbeitungen 4.0 International',
+            url: 'https://creativecommons.org/licenses/by-nc-nd/4.0/deed.de',
+        },
+    };
+
+    function updateLicensePreview() {
+        const val = licenseSelect ? licenseSelect.value : '';
+        const data = licenseData[val];
+        if (!data) {
+            licensePreview.classList.add('hidden');
+            return;
+        }
+        licenseBadgeSet.innerHTML = '';
+        data.badges.forEach((label, i) => {
+            const span = document.createElement('span');
+            span.className = 'cc-badge ' + (data.classes[i] || '');
+            span.textContent = label;
+            licenseBadgeSet.appendChild(span);
+        });
+        licenseNameText.textContent = data.name;
+        licenseDetailsLink.href = data.url;
+        licensePreview.classList.remove('hidden');
+    }
+
+    if (licenseSelect) {
+        licenseSelect.addEventListener('change', updateLicensePreview);
+        updateLicensePreview();
     }
 
     /* ── Submit-Validierung: Kategorie ↔ Dateityp ── */
