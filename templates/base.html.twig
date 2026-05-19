@@ -208,6 +208,30 @@
 					transform: translateY(-7px) rotate(-45deg);
 				}
 
+				.navbar-admin-btn {
+					display: inline-flex;
+					align-items: center;
+					gap: 6px;
+					padding: 6px 13px;
+					border-radius: 5px;
+					background: rgba(255, 90, 0, 0.1);
+					border: 1px solid rgba(255, 90, 0, 0.3);
+					color: var(--orange);
+					text-decoration: none;
+					font-size: 0.8rem;
+					font-weight: 700;
+					letter-spacing: 0.03em;
+					font-family: var(--font-heading);
+					font-style: italic;
+					transition: all 0.2s;
+				}
+
+				.navbar-admin-btn:hover {
+					background: rgba(255, 90, 0, 0.2);
+					border-color: var(--orange);
+					color: #ffffff;
+				}
+
 				/* ── SLIDE-IN OVERLAY ── */
 				.menu-overlay {
 					position: fixed;
@@ -569,6 +593,14 @@
 			</div>
 
 			<div class="navbar-right">
+				{% if app.user and 'ROLE_ADMIN' in app.user.roles %}
+				<a href="{{ path('app_admin_users') }}" class="navbar-admin-btn">
+					<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor">
+						<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2h16zm-5-10a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm6 2v2h2v-2h2v-2h-2v-2h-2v2h-2v2h2z"/>
+					</svg>
+					Admin
+				</a>
+				{% endif %}
 				<a href="/upload" class="navbar-upload-btn">+</a>
 				<a href="/deine-inhalte" class="navbar-shop">Deine Inhalte</a>
 
@@ -624,6 +656,19 @@
 					</span>
 					Kontodetails
 				</a>
+				{% endif %}
+
+				{% if app.user and 'ROLE_ADMIN' in app.user.roles %}
+				<div class="sidebar-divider"></div>
+				<a href="{{ path('app_admin_users') }}" class="sidebar-nav-item">
+					<span class="sidebar-nav-icon">
+						<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+							<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2h16zm-5-10a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm6 2v2h2v-2h2v-2h-2v-2h-2v2h-2v2h2z"/>
+						</svg>
+					</span>
+					Admin Dashboard
+				</a>
+				<div class="sidebar-divider"></div>
 				{% endif %}
 
 				<a href="{{ path('app_favorites') }}" class="sidebar-nav-item">

@@ -15,6 +15,9 @@ use App\Entity\Content;
 use App\Repository\ContentRepository;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpFoundation\Request;
+use App\Entity\Report;
+use App\Entity\Reason;
 
 
 final class ContentController extends AbstractController
@@ -31,11 +34,12 @@ final class ContentController extends AbstractController
             ->findOneBy(['fk_user' => $user, 'fk_content' => $content]) !== null;
 
         return $this->render('content/index.html.twig', [
-            'content' => $content,
-            'favoriteCount' => $em->getRepository(Favorite::class)->countByContent($content),
-            'averageRating' => $em->getRepository(Rating::class)->averageByContent($content),
-            'tags' => $em->getRepository(ContentTag::class)->findTagsByContent($content),
-            'isFavorited' => $isFavorited,
+            'content'        => $content,
+            'favoriteCount'  => $em->getRepository(Favorite::class)->countByContent($content),
+            'averageRating'  => $em->getRepository(Rating::class)->averageByContent($content),
+            'tags'           => $em->getRepository(ContentTag::class)->findTagsByContent($content),
+            'isFavorited'    => $isFavorited,
+            'reasons'        => $em->getRepository(Reason::class)->findAll(), // NEU
         ]);
     }
 
@@ -111,5 +115,45 @@ final class ContentController extends AbstractController
             'contents' => $contents,
             'tagsByContent' => $tagsByContent,
         ]);
+    }
+
+    #[Route('/content/{id}/melden', name: 'content_report', methods: ['POST'])]
+    public function report(int $id, Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        $content = $em->getRepository(Content::class)->find($id);
+        if (!$content) {
+            return new JsonResponse(['error' => 'Nicht gefunden'], 404);
+        }
+
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse(['error' => 'Nicht eingeloggt'], 401);
+        }
+
+        // Doppelmeldung verhindern
+        $existing = $em->getRepository(Report::class)
+            ->findOneBy(['fk_user' => $user, 'fk_content' => $content]);
+        if ($existing) {
+            return new JsonResponse(['error' => 'Bereits gemeldet'], 409);
+        }
+
+        $reasonId = $request->request->get('reason_id');
+        $reason = $em->getRepository(Reason::class)->find($reasonId);
+        if (!$reason) {
+            return new JsonResponse(['error' => 'Ungültiger Grund'], 400);
+        }
+
+        $report = new Report();
+        $report->setFkContent($content);
+        $report->setFkUser($user);
+        $report->setFkReason($reason);
+        $report->setMessage($request->request->get('message', null));
+        $report->setStatus('open');
+        $report->setCreatedAt(new \DateTime());
+
+        $em->persist($report);
+        $em->flush();
+
+        return new JsonResponse(['success' => true]);
     }
 }

@@ -17,24 +17,37 @@ final class HomeController extends AbstractController
         return $this->redirectToRoute('app_home');
     }
 
+    /**
+     * Hilfsmethode: JSON-Inhalte laden, gesperrte rausfiltern, Tags aufbauen.
+     */
+    private function buildContents(EntityManagerInterface $em, string $categoryName): array
+    {
+        $response = $this->forward('App\Controller\ContentController::getContentByCategory', [
+            'category_name' => $categoryName,
+        ]);
+        $raw = json_decode($response->getContent(), true);
+
+        $contents      = [];
+        $tagsByContent = [];
+
+        foreach ($raw as $contentData) {
+            $content = $em->getRepository(Content::class)->find($contentData['id']);
+            if (!$content || $content->isSuspended()) {
+                continue; // gesperrte Inhalte überspringen
+            }
+            $contents[] = $contentData;
+            $tagsByContent[$contentData['id']] = $em->getRepository(ContentTag::class)->findTagsByContent($content);
+        }
+
+        return [$contents, $tagsByContent];
+    }
+
     #[Route('/home', name: 'app_home')]
     public function index(EntityManagerInterface $em): Response
     {
-        $response = $this->forward('App\Controller\ContentController::getContentByCategory', [
-            'category_name' => 'Tracks',
-        ]);
-        $contents = json_decode($response->getContent(), true);
-
-        $tagsByContent = [];
-        foreach ($contents as $contentData) {
-            $content = $em->getRepository(Content::class)->find($contentData['id']);
-            if ($content) {
-                $tagsByContent[$contentData['id']] = $em->getRepository(ContentTag::class)->findTagsByContent($content);
-            }
-        }
-
+        [$contents, $tagsByContent] = $this->buildContents($em, 'Tracks');
         return $this->render('home/index.html.twig', [
-            'contents' => $contents,
+            'contents'      => $contents,
             'tagsByContent' => $tagsByContent,
         ]);
     }
@@ -42,21 +55,9 @@ final class HomeController extends AbstractController
     #[Route('/entdecke-tracks', name: 'app_tracks')]
     public function exploreTracks(EntityManagerInterface $em): Response
     {
-        $response = $this->forward('App\Controller\ContentController::getContentByCategory', [
-            'category_name' => 'Tracks',
-        ]);
-        $contents = json_decode($response->getContent(), true);
-
-        $tagsByContent = [];
-        foreach ($contents as $contentData) {
-            $content = $em->getRepository(Content::class)->find($contentData['id']);
-            if ($content) {
-                $tagsByContent[$contentData['id']] = $em->getRepository(ContentTag::class)->findTagsByContent($content);
-            }
-        }
-
-        return $this->render('home/index.html.twig', [
-            'contents' => $contents,
+        [$contents, $tagsByContent] = $this->buildContents($em, 'Tracks');
+        return $this->render('home/tracks.html.twig', [
+            'contents'      => $contents,
             'tagsByContent' => $tagsByContent,
         ]);
     }
@@ -64,21 +65,9 @@ final class HomeController extends AbstractController
     #[Route('/entdecke-beats', name: 'app_beats')]
     public function exploreBeats(EntityManagerInterface $em): Response
     {
-        $response = $this->forward('App\Controller\ContentController::getContentByCategory', [
-            'category_name' => 'Beats',
-        ]);
-        $contents = json_decode($response->getContent(), true);
-
-        $tagsByContent = [];
-        foreach ($contents as $contentData) {
-            $content = $em->getRepository(Content::class)->find($contentData['id']);
-            if ($content) {
-                $tagsByContent[$contentData['id']] = $em->getRepository(ContentTag::class)->findTagsByContent($content);
-            }
-        }
-
-        return $this->render('home/index.html.twig', [
-            'contents' => $contents,
+        [$contents, $tagsByContent] = $this->buildContents($em, 'Beats');
+        return $this->render('home/beats.html.twig', [
+            'contents'      => $contents,
             'tagsByContent' => $tagsByContent,
         ]);
     }
@@ -86,21 +75,9 @@ final class HomeController extends AbstractController
     #[Route('/entdecke-sound-kits', name: 'app_sound_kits')]
     public function exploreSoundKits(EntityManagerInterface $em): Response
     {
-        $response = $this->forward('App\Controller\ContentController::getContentByCategory', [
-            'category_name' => 'Sound Kits',
-        ]);
-        $contents = json_decode($response->getContent(), true);
-
-        $tagsByContent = [];
-        foreach ($contents as $contentData) {
-            $content = $em->getRepository(Content::class)->find($contentData['id']);
-            if ($content) {
-                $tagsByContent[$contentData['id']] = $em->getRepository(ContentTag::class)->findTagsByContent($content);
-            }
-        }
-
-        return $this->render('home/index.html.twig', [
-            'contents' => $contents,
+        [$contents, $tagsByContent] = $this->buildContents($em, 'Sound Kits');
+        return $this->render('home/soundkits.html.twig', [
+            'contents'      => $contents,
             'tagsByContent' => $tagsByContent,
         ]);
     }
@@ -108,21 +85,9 @@ final class HomeController extends AbstractController
     #[Route('/entdecke-loop-und-samples', name: 'app_loop_und_samples')]
     public function exploreLoopUndSamples(EntityManagerInterface $em): Response
     {
-        $response = $this->forward('App\Controller\ContentController::getContentByCategory', [
-            'category_name' => 'Samples',
-        ]);
-        $contents = json_decode($response->getContent(), true);
-
-        $tagsByContent = [];
-        foreach ($contents as $contentData) {
-            $content = $em->getRepository(Content::class)->find($contentData['id']);
-            if ($content) {
-                $tagsByContent[$contentData['id']] = $em->getRepository(ContentTag::class)->findTagsByContent($content);
-            }
-        }
-
-        return $this->render('home/index.html.twig', [
-            'contents' => $contents,
+        [$contents, $tagsByContent] = $this->buildContents($em, 'Samples');
+        return $this->render('home/samples.html.twig', [
+            'contents'      => $contents,
             'tagsByContent' => $tagsByContent,
         ]);
     }

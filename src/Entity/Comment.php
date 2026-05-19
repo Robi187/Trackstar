@@ -28,6 +28,9 @@ class Comment
     #[ORM\JoinColumn(nullable: false)]
     private ?Content $fk_content = null;
 
+    #[ORM\Column(options: ['default' => false])]
+    private bool $isSuspended = false;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -78,6 +81,17 @@ class Comment
     {
         $this->fk_content = $fk_content;
 
+        return $this;
+    }
+
+    public function isSuspended(): bool
+    {
+        return $this->isSuspended;
+    }
+    
+    public function setIsSuspended(bool $isSuspended): static
+    {
+        $this->isSuspended = $isSuspended;
         return $this;
     }
 }

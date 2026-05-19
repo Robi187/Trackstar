@@ -286,6 +286,70 @@
 			font-size: 14px;
 			color: #666;
 		}
+
+		.report-overlay {
+			display: none; position: fixed; inset: 0;
+			background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+			z-index: 1000; align-items: center; justify-content: center;
+		}
+		.report-overlay.open { display: flex; }
+		.report-modal {
+			background: #1a1a1a; border: 1px solid #2e2e2e;
+			border-radius: 16px; padding: 28px; width: 380px;
+			box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+			animation: modalIn .2s ease;
+		}
+		@keyframes modalIn {
+			from { opacity: 0; transform: translateY(-12px) scale(0.97); }
+			to   { opacity: 1; transform: translateY(0) scale(1); }
+		}
+		.report-modal-title { font-size: 16px; font-weight: 700; color: #fff; margin: 0 0 4px; }
+		.report-modal-sub   { font-size: 13px; color: #666; margin: 0 0 20px; }
+		.report-label { font-size: 12px; color: #888; margin-bottom: 6px; display: block; letter-spacing: 0.03em; }
+
+		.report-presets { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+		.report-preset {
+			padding: 9px 10px; border-radius: 10px;
+			border: 1px solid #2c2c2c; background: #141414;
+			color: #888; font-size: 12px; font-weight: 500;
+			cursor: pointer; text-align: center; font-family: inherit;
+			transition: all .15s;
+		}
+		.report-preset:hover,
+		.report-preset.selected { border-color: #e63946; color: #e63946; background: rgba(230,57,70,0.08); }
+
+		.report-textarea {
+			width: 100%; background: #141414; border: 1px solid #2c2c2c;
+			border-radius: 8px; color: #fff; font-size: 13px;
+			padding: 10px 12px; outline: none; font-family: inherit;
+			resize: vertical; min-height: 80px; box-sizing: border-box;
+			transition: border-color .15s; margin-bottom: 16px;
+		}
+		.report-textarea:focus { border-color: #e63946; }
+
+		.report-modal-actions { display: flex; gap: 8px; }
+		.report-cancel {
+			flex: 1; padding: 10px; border-radius: 8px;
+			border: 1px solid #2c2c2c; background: transparent;
+			color: #666; font-size: 13px; font-weight: 500;
+			cursor: pointer; font-family: inherit; transition: all .15s;
+		}
+		.report-cancel:hover { border-color: #444; color: #aaa; }
+		.report-confirm {
+			flex: 1; padding: 10px; border-radius: 8px;
+			border: 1px solid rgba(230,57,70,0.5); background: rgba(230,57,70,0.12);
+			color: #e63946; font-size: 13px; font-weight: 600;
+			cursor: pointer; font-family: inherit; transition: all .15s;
+		}
+		.report-confirm:hover { background: rgba(230,57,70,0.22); border-color: #e63946; }
+		.report-confirm:disabled { opacity: 0.4; cursor: not-allowed; }
+
+		.report-feedback {
+			font-size: 13px; text-align: center; padding: 10px;
+			border-radius: 8px; margin-bottom: 12px; display: none;
+		}
+		.report-feedback.success { background: rgba(0,200,80,.10); color: #00d966; border: 1px solid rgba(0,200,80,.3); }
+		.report-feedback.error   { background: rgba(224,36,52,.12); color: #ff6070; border: 1px solid rgba(224,36,52,.4); }
 	</style>
 
 	<div class="page-wrapper">
@@ -412,7 +476,15 @@
 					<span class="rating-max">/ 5.0</span>
 				</div>
 			</div>
+			<div class="social-divider"></div>
 
+			<button class="social-btn" id="report-btn">
+				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+					<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+					<line x1="4" y1="22" x2="4" y2="15" stroke-width="2" stroke-linecap="round"/>
+				</svg>
+				Melden
+			</button>
 		</div>
 	</div>
 
@@ -478,5 +550,103 @@
 		ws.on('finish', () => { btn.textContent = '▶'; });
 	</script>
 	{% endif %}
+	<div class="report-overlay" id="reportOverlay" onclick="closeReportModal(event)">
+    <div class="report-modal">
+        <div class="report-modal-title">Inhalt melden</div>
+        <div class="report-modal-sub">Was stimmt mit diesem Inhalt nicht?</div>
 
+        <span class="report-label">Grund *</span>
+        <div class="report-presets">
+            {% for reason in reasons %}
+                <button class="report-preset"
+                        data-id="{{ reason.id }}"
+                        onclick="selectReason(this, {{ reason.id }})">
+                    {{ reason.name }}
+                </button>
+            {% endfor %}
+        </div>
+
+        <span class="report-label">Zusätzliche Nachricht (optional)</span>
+        <textarea class="report-textarea" id="reportMessage"
+                  placeholder="Beschreibe das Problem genauer …"></textarea>
+
+        <div class="report-feedback" id="reportFeedback"></div>
+
+        <div class="report-modal-actions">
+            <button class="report-cancel" onclick="closeReportModalDirect()">Abbrechen</button>
+            <button class="report-confirm" id="reportSubmit" onclick="submitReport()">Melden</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let selectedReasonId = null;
+
+    document.getElementById('report-btn').addEventListener('click', () => {
+        document.getElementById('reportOverlay').classList.add('open');
+    });
+
+    function closeReportModal(e) {
+        if (e.target === document.getElementById('reportOverlay')) closeReportModalDirect();
+    }
+
+    function closeReportModalDirect() {
+        document.getElementById('reportOverlay').classList.remove('open');
+        document.getElementById('reportFeedback').style.display = 'none';
+        document.getElementById('reportFeedback').className = 'report-feedback';
+        document.getElementById('reportMessage').value = '';
+        document.getElementById('reportSubmit').disabled = false;
+        document.querySelectorAll('.report-preset').forEach(b => b.classList.remove('selected'));
+        selectedReasonId = null;
+    }
+
+    function selectReason(el, id) {
+        document.querySelectorAll('.report-preset').forEach(b => b.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedReasonId = id;
+    }
+
+    async function submitReport() {
+        if (!selectedReasonId) {
+            showReportFeedback('error', 'Bitte wähle einen Grund aus.');
+            return;
+        }
+
+        document.getElementById('reportSubmit').disabled = true;
+
+        const form = new FormData();
+        form.append('reason_id', selectedReasonId);
+        form.append('message', document.getElementById('reportMessage').value.trim());
+
+        const res = await fetch('/content/{{ content.id }}/melden', {
+            method: 'POST',
+            body: form
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+            showReportFeedback('success', 'Danke! Der Inhalt wurde gemeldet.');
+            setTimeout(closeReportModalDirect, 1100);
+        } else if (res.status === 409) {
+            showReportFeedback('error', 'Du hast diesen Inhalt bereits gemeldet.');
+        } else if (res.status === 401) {
+            showReportFeedback('error', 'Du musst eingeloggt sein um zu melden.');
+            document.getElementById('reportSubmit').disabled = false;
+        } else {
+            showReportFeedback('error', data.error ?? 'Fehler beim Senden.');
+            document.getElementById('reportSubmit').disabled = false;
+        }
+    }
+
+    function showReportFeedback(type, msg) {
+        const el = document.getElementById('reportFeedback');
+        el.textContent = msg;
+        el.className = 'report-feedback ' + type;
+        el.style.display = 'block';
+    }
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeReportModalDirect();
+    });
+</script>
 {% endblock %}
