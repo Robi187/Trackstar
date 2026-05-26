@@ -20,6 +20,8 @@ use App\Repository\CommentLikeRepository;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\Request;
+use App\Entity\Report;
+use App\Entity\Reason;
 
 
 final class ContentController extends AbstractController
@@ -63,7 +65,55 @@ final class ContentController extends AbstractController
             'comments'     => $topLevelComments,
             'likeCounts'   => $likeCounts,
             'likedByUser'  => $likedByUser,
+            'reasons'        => $em->getRepository(Reason::class)->findAll(),
         ]);
+    }
+
+    #[Route('/comment/{id}/melden', name: 'comment_report', methods: ['POST'])]
+    public function reportComment(int $id, Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse(['error' => 'Nicht eingeloggt'], 401);
+        }
+
+        $comment = $em->getRepository(Comment::class)->find($id);
+        if (!$comment) {
+            return new JsonResponse(['error' => 'Nicht gefunden'], 404);
+        }
+
+        // Doppelmeldung verhindern
+        $existing = $em->getRepository(Report::class)->createQueryBuilder('r')
+            ->where('r.fk_user = :user')
+            ->andWhere('r.fk_comment = :comment')
+            ->andWhere("r.status != 'closed'")
+            ->setParameter('user', $user)
+            ->setParameter('comment', $comment)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if ($existing) {
+            return new JsonResponse(['error' => 'Bereits gemeldet'], 409);
+        }
+
+        $reasonId = $request->request->get('reason_id');
+        $reason = $em->getRepository(Reason::class)->find($reasonId);
+        if (!$reason) {
+            return new JsonResponse(['error' => 'Ungültiger Grund'], 400);
+        }
+
+        $report = new Report();
+        $report->setFkComment($comment);
+        $report->setFkUser($user);
+        $report->setFkReason($reason);
+        $report->setMessage($request->request->get('message', null));
+        $report->setStatus('open');
+        $report->setCreatedAt(new \DateTime());
+
+        $em->persist($report);
+        $em->flush();
+
+        return new JsonResponse(['success' => true]);
     }
 
     #[Route('/content/{id}/comment', name: 'content_comment', methods: ['POST'], requirements: ['id' => '\d+'])]
@@ -320,5 +370,53 @@ final class ContentController extends AbstractController
             'contents' => $contents,
             'tagsByContent' => $tagsByContent,
         ]);
+    }
+
+    #[Route('/content/{id}/melden', name: 'content_report', methods: ['POST'])]
+    public function report(int $id, Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        $content = $em->getRepository(Content::class)->find($id);
+        if (!$content) {
+            return new JsonResponse(['error' => 'Nicht gefunden'], 404);
+        }
+
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse(['error' => 'Nicht eingeloggt'], 401);
+        }
+
+        // Doppelmeldung verhindern - nur wenn die Report noch offen ist
+        $qb = $em->getRepository(Report::class)->createQueryBuilder('r');
+        $existing = $qb
+            ->where('r.fk_user = :user')
+            ->andWhere('r.fk_content = :content')
+            ->andWhere("r.status != 'closed'")
+            ->setParameter('user', $user)
+            ->setParameter('content', $content)
+            ->getQuery()
+            ->getOneOrNullResult();
+        
+        if ($existing) {
+            return new JsonResponse(['error' => 'Bereits gemeldet'], 409);
+        }
+
+        $reasonId = $request->request->get('reason_id');
+        $reason = $em->getRepository(Reason::class)->find($reasonId);
+        if (!$reason) {
+            return new JsonResponse(['error' => 'Ungültiger Grund'], 400);
+        }
+
+        $report = new Report();
+        $report->setFkContent($content);
+        $report->setFkUser($user);
+        $report->setFkReason($reason);
+        $report->setMessage($request->request->get('message', null));
+        $report->setStatus('open');
+        $report->setCreatedAt(new \DateTime());
+
+        $em->persist($report);
+        $em->flush();
+
+        return new JsonResponse(['success' => true]);
     }
 }
