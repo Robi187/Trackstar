@@ -3,6 +3,7 @@
 namespace App\Controller;
  
 use App\Entity\Content;
+use App\Entity\License;
 use App\Form\ContentUploadType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -146,8 +147,19 @@ class UploadController extends AbstractController
             }
         }
  
+        $licenses = $em->getRepository(License::class)->findAll();
+        $licenseMap = [];
+        foreach ($licenses as $license) {
+            $licenseMap[$license->getId()] = [
+                'shortCode'   => $license->getShortCode(),
+                'fullName'    => $license->getFullName(),
+                'description' => $license->getDescription(),
+            ];
+        }
+
         return $this->render('upload/index.html.twig', [
-            'form' => $form->createView(),
+            'form'        => $form->createView(),
+            'licenseData' => $licenseMap,
         ]);
     }
 }
