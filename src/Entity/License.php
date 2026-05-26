@@ -19,6 +19,9 @@ class License
     #[ORM\Column(length: 255)]
     private ?string $fullName = null;
 
+    #[ORM\Column(length: 512, nullable: true)]
+    private ?string $description = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -44,6 +47,18 @@ class License
     public function setFullName(string $fullName): static
     {
         $this->fullName = $fullName;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
 
         return $this;
     }

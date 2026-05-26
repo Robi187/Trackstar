@@ -608,11 +608,9 @@
     /* ── License Section ── */
     .ts-license-preview {
         display: flex;
-        align-items: center;
-        gap: 0.6rem;
+        flex-direction: column;
+        gap: 0.4rem;
         margin-top: 0.85rem;
-        min-height: 36px;
-        flex-wrap: wrap;
     }
 
     .ts-license-preview.hidden {
@@ -667,6 +665,20 @@
 
     .ts-license-details:hover {
         color: #ff5a00;
+    }
+
+    .ts-license-row {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        flex-wrap: wrap;
+    }
+
+    .ts-license-description {
+        font-size: 0.78rem;
+        color: #666;
+        font-family: var(--font-body, sans-serif);
+        line-height: 1.4;
     }
 </style>
 {% endblock %}
@@ -813,9 +825,12 @@
                     {{ form_errors(form.license) }}
 
                     <div class="ts-license-preview hidden" id="license-preview">
-                        <div class="cc-badge-set" id="license-badge-set"></div>
-                        <span class="ts-license-name" id="license-name-text"></span>
-                        <a class="ts-license-details" id="license-details-link" href="#" target="_blank" rel="noopener noreferrer">(Details)</a>
+                        <div class="ts-license-row">
+                            <div class="cc-badge-set" id="license-badge-set"></div>
+                            <span class="ts-license-name" id="license-name-text"></span>
+                            <a class="ts-license-details" id="license-details-link" href="#" target="_blank" rel="noopener noreferrer">(Details)</a>
+                        </div>
+                        <span class="ts-license-description" id="license-description-text"></span>
                     </div>
                 </div>
             </div>
@@ -965,72 +980,61 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     /* ── Lizenz-Icon-Vorschau ── */
-    const licenseSelect = document.getElementById('license-select');
+    const licenseSelect = document.querySelector('select[name*="[license]"]');
     const licensePreview = document.getElementById('license-preview');
     const licenseBadgeSet = document.getElementById('license-badge-set');
     const licenseNameText = document.getElementById('license-name-text');
     const licenseDetailsLink = document.getElementById('license-details-link');
+    const licenseDescText = document.getElementById('license-description-text');
 
-    const licenseData = {
-        'CC BY': {
-            badges: ['CC', 'BY'],
-            classes: ['cc-cc', 'cc-by'],
-            name: 'Namensnennung 4.0 International',
-            url: 'https://creativecommons.org/licenses/by/4.0/deed.de',
-        },
-        'CC BY-SA': {
-            badges: ['CC', 'BY', 'SA'],
-            classes: ['cc-cc', 'cc-by', 'cc-sa'],
-            name: 'Namensnennung-Share Alike 4.0 International',
-            url: 'https://creativecommons.org/licenses/by-sa/4.0/deed.de',
-        },
-        'CC BY-ND': {
-            badges: ['CC', 'BY', 'ND'],
-            classes: ['cc-cc', 'cc-by', 'cc-nd'],
-            name: 'Namensnennung-Keine Bearbeitungen 4.0 International',
-            url: 'https://creativecommons.org/licenses/by-nd/4.0/deed.de',
-        },
-        'CC BY-NC': {
-            badges: ['CC', 'BY', '€'],
-            classes: ['cc-cc', 'cc-by', 'cc-nc'],
-            name: 'Namensnennung-Nicht kommerziell 4.0 International',
-            url: 'https://creativecommons.org/licenses/by-nc/4.0/deed.de',
-        },
-        'CC BY-NC-SA': {
-            badges: ['CC', 'BY', '€', 'SA'],
-            classes: ['cc-cc', 'cc-by', 'cc-nc', 'cc-sa'],
-            name: 'Namensnennung-Nicht kommerziell-Share Alike 4.0 International',
-            url: 'https://creativecommons.org/licenses/by-nc-sa/4.0/deed.de',
-        },
-        'CC BY-NC-ND': {
-            badges: ['CC', 'BY', '€', 'ND'],
-            classes: ['cc-cc', 'cc-by', 'cc-nc', 'cc-nd'],
-            name: 'Namensnennung-Nicht kommerziell-Keine Bearbeitungen 4.0 International',
-            url: 'https://creativecommons.org/licenses/by-nc-nd/4.0/deed.de',
-        },
-    };
+    const licenseData = {{ licenseData|json_encode|raw }};
+
+    function badgesFromShortCode(shortCode) {
+        const modifiers = shortCode.replace(/^CC\s*/, '').split('-');
+        const labels  = ['CC', ...modifiers.map(m => m === 'NC' ? '€' : m)];
+        const classes = labels.map(l => ({ CC: 'cc-cc', BY: 'cc-by', SA: 'cc-sa', ND: 'cc-nd', '€': 'cc-nc' }[l] || ''));
+        return { labels, classes };
+    }
+
+    function urlFromShortCode(shortCode) {
+        const slug = shortCode.replace(/^CC\s*/i, '').toLowerCase();
+        return 'https://creativecommons.org/licenses/' + slug + '/4.0/deed.de';
+    }
 
     function updateLicensePreview() {
-        const val = licenseSelect ? licenseSelect.value : '';
-        const data = licenseData[val];
+        const id = licenseSelect ? licenseSelect.value : '';
+        const data = licenseData[id];
         if (!data) {
             licensePreview.classList.add('hidden');
             return;
         }
+        const { labels, classes } = badgesFromShortCode(data.shortCode);
         licenseBadgeSet.innerHTML = '';
-        data.badges.forEach((label, i) => {
+        labels.forEach((label, i) => {
             const span = document.createElement('span');
-            span.className = 'cc-badge ' + (data.classes[i] || '');
+            span.className = 'cc-badge ' + (classes[i] || '');
             span.textContent = label;
             licenseBadgeSet.appendChild(span);
         });
-        licenseNameText.textContent = data.name;
-        licenseDetailsLink.href = data.url;
+        licenseNameText.textContent = data.fullName;
+        licenseDetailsLink.href = urlFromShortCode(data.shortCode);
+        licenseDescText.textContent = data.description ?? '';
         licensePreview.classList.remove('hidden');
     }
 
     if (licenseSelect) {
-        licenseSelect.addEventListener('change', updateLicensePreview);
+        jQuery(licenseSelect).select2({
+            placeholder: 'Lizenz wählen...',
+            allowClear: false,
+            width: '100%',
+            minimumResultsForSearch: Infinity,
+            templateResult: function (option) {
+                if (!option.id) return null;
+                return option.text;
+            },
+        });
+
+        jQuery(licenseSelect).on('change', updateLicensePreview);
         updateLicensePreview();
     }
 

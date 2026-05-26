@@ -31,17 +31,18 @@ class AppFixtures extends Fixture
 
         // --- LICENSES ---
         $licenseData = [
-            ['CC BY',       'Creative Commons Namensnennung 4.0 International'],
-            ['CC BY-SA',    'Creative Commons Namensnennung-Share Alike 4.0 International'],
-            ['CC BY-ND',    'Creative Commons Namensnennung-Keine Bearbeitungen 4.0 International'],
-            ['CC BY-NC',    'Creative Commons Namensnennung-Nicht kommerziell 4.0 International'],
-            ['CC BY-NC-SA', 'Creative Commons Namensnennung-Nicht kommerziell-Share Alike 4.0 International'],
-            ['CC BY-NC-ND', 'Creative Commons Namensnennung-Nicht kommerziell-Keine Bearbeitungen 4.0 International'],
+            ['CC BY',       'Creative Commons Namensnennung 4.0 International',                                          'Teilen & Bearbeiten erlaubt, auch kommerziell – Namensnennung erforderlich.'],
+            ['CC BY-SA',    'Creative Commons Namensnennung-Share Alike 4.0 International',                              'Bearbeitung erlaubt, aber Weitergabe unter gleicher Lizenz – Namensnennung erforderlich.'],
+            ['CC BY-ND',    'Creative Commons Namensnennung-Keine Bearbeitungen 4.0 International',                      'Nur unveränderte Weitergabe erlaubt – keine Bearbeitungen, Namensnennung erforderlich.'],
+            ['CC BY-NC',    'Creative Commons Namensnennung-Nicht kommerziell 4.0 International',                        'Teilen & Bearbeiten erlaubt, aber nur nicht-kommerziell – Namensnennung erforderlich.'],
+            ['CC BY-NC-SA', 'Creative Commons Namensnennung-Nicht kommerziell-Share Alike 4.0 International',            'Nicht-kommerziell, Bearbeitung erlaubt, Weitergabe unter gleicher Lizenz – Namensnennung erforderlich.'],
+            ['CC BY-NC-ND', 'Creative Commons Namensnennung-Nicht kommerziell-Keine Bearbeitungen 4.0 International',   'Nur unveränderte, nicht-kommerzielle Weitergabe erlaubt – restriktivste CC-Lizenz.'],
         ];
-        foreach ($licenseData as [$shortCode, $fullName]) {
+        foreach ($licenseData as [$shortCode, $fullName, $description]) {
             $license = new License();
             $license->setShortCode($shortCode);
             $license->setFullName($fullName);
+            $license->setDescription($description);
             $manager->persist($license);
         }
 
