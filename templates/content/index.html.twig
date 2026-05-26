@@ -484,7 +484,31 @@
 			padding-top: 16px;
 			border-top: 1px solid #2a2a2a;
 		}
-	</style>
+
+		.comment-report-btn {
+			display: flex;
+			align-items: center;
+			gap: 5px;
+			background: none;
+			border: none;
+			color: #555;
+			font-size: 12px;
+			font-family: 'DM Sans', sans-serif;
+			cursor: pointer;
+			padding: 0;
+			transition: color 0.15s;
+		}
+
+		.comment-report-btn svg {
+			width: 14px;
+			height: 14px;
+			fill: currentColor;
+		}
+
+		.comment-report-btn:hover {
+			color: #e63946;
+		}
+			</style>
 
 	<div class="content-outer">
 	<div class="page-wrapper">
@@ -952,10 +976,11 @@
 	</style>
 
 	{# ── Macro: render one comment card (used for top-level and replies) ── #}
-	{% macro commentCard(comment, likeCounts, likedByUser, contentId, isReply, currentUserId) %}
+		{% macro commentCard(comment, likeCounts, likedByUser, contentId, isReply, currentUserId) %}
 		{% set cid = comment.id %}
 		{% set liked = likedByUser[cid] is defined %}
 		{% set likeCount = likeCounts[cid] ?? 0 %}
+
 		<div class="comment-header">
 			<div class="comment-avatar">
 				{% if comment.fkUser.profilePicture %}
@@ -964,11 +989,15 @@
 					{{ comment.fkUser.username|slice(0,1)|upper }}
 				{% endif %}
 			</div>
+
 			<span class="comment-username">{{ comment.fkUser.username }}</span>
 			<span class="comment-date">{{ comment.createdAt|date('d.m.Y H:i') }}</span>
 		</div>
+
 		<p class="comment-text">{{ comment.text }}</p>
+
 		<div class="comment-actions">
+
 			<button class="comment-like-btn {{ liked ? 'liked' : '' }}"
 					data-comment-id="{{ cid }}">
 				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -976,6 +1005,7 @@
 				</svg>
 				<span class="like-count">{{ likeCount }}</span>
 			</button>
+
 			{% if not isReply %}
 				<button class="comment-reply-btn" data-target="reply-form-{{ cid }}">
 					<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -984,10 +1014,31 @@
 					Antworten
 				</button>
 			{% endif %}
+
+			<button class="comment-report-btn"
+					data-comment-id="{{ cid }}"
+					onclick="openCommentReportModal({{ cid }})">
+				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+					<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+					<line x1="4"
+						y1="22"
+						x2="4"
+						y2="15"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"/>
+				</svg>
+				Melden
+			</button>
+
 			{% if currentUserId == comment.fkUser.id %}
-				<form method="POST" action="/comment/{{ cid }}/delete" style="margin-left:auto;">
+				<form method="POST"
+					action="/comment/{{ cid }}/delete"
+					style="margin-left:auto;">
+
 					<button type="submit" class="comment-delete-btn">
-						<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+						<svg viewBox="0 0 24 24"
+							xmlns="http://www.w3.org/2000/svg">
 							<path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
 						</svg>
 						Löschen
@@ -1019,7 +1070,7 @@
 		<div class="comment-list">
 			{% if comments|length > 0 %}
 				{% for comment in comments %}
-					<div class="comment-item">
+					<div class="comment-item" id="comment-{{ comment.id }}">
 						{{ macros.commentCard(comment, likeCounts, likedByUser, content.id, false, currentUserId) }}
 
 						{# ── inline reply form ── #}
@@ -1037,7 +1088,7 @@
 						{# ── replies ── #}
 						<div class="reply-thread" id="replies-{{ comment.id }}"{% if comment.replies|length == 0 %} style="display:none"{% endif %}>
 							{% for reply in comment.replies %}
-								<div class="reply-item">
+								<div class="reply-item" id="comment-{{ reply.id }}">
 									{{ macros.commentCard(reply, likeCounts, likedByUser, content.id, true, currentUserId) }}
 								</div>
 							{% endfor %}
@@ -1095,6 +1146,7 @@
 
 				const wrap = document.createElement('div');
 				wrap.className = isReply ? 'reply-item' : 'comment-item';
+				wrap.id = 'comment-' + data.id;
 				wrap.innerHTML = `
 					<div class="comment-header">
 						<div class="comment-avatar">${buildAvatar(data.profilePicture, data.username)}</div>
@@ -1425,6 +1477,63 @@
 		ws.on('finish', () => { btn.textContent = '▶'; });
 	</script>
 	{% endif %}
+	<div class="comment-report-overlay report-overlay"
+     id="commentReportOverlay"
+     onclick="closeCommentReportModal(event)">
+
+		<div class="report-modal">
+
+			<div class="report-modal-title">
+				Kommentar melden
+			</div>
+
+			<div class="report-modal-sub">
+				Was stimmt mit diesem Kommentar nicht?
+			</div>
+
+			<span class="report-label">Grund *</span>
+
+			<div class="report-presets" id="commentReportPresets">
+				{% for reason in reasons %}
+					<button class="report-preset"
+							data-id="{{ reason.id }}"
+							onclick="selectCommentReason(this, {{ reason.id }})">
+
+						{{ reason.name }}
+					</button>
+				{% endfor %}
+			</div>
+
+			<span class="report-label">
+				Zusätzliche Nachricht (optional)
+			</span>
+
+			<textarea class="report-textarea"
+					id="commentReportMessage"
+					placeholder="Beschreibe das Problem genauer …"></textarea>
+
+			<div class="report-feedback"
+				id="commentReportFeedback"></div>
+
+			<div class="report-modal-actions">
+
+				<button class="report-cancel"
+						onclick="closeCommentReportModalDirect()">
+
+					Abbrechen
+				</button>
+
+				<button class="report-confirm"
+						id="commentReportSubmit"
+						onclick="submitCommentReport()">
+
+					Melden
+				</button>
+
+			</div>
+
+		</div>
+	</div>
 	<div class="report-overlay" id="reportOverlay" onclick="closeReportModal(event)">
     <div class="report-modal">
         <div class="report-modal-title">Inhalt melden</div>
@@ -1523,5 +1632,217 @@
     document.addEventListener('keydown', e => {
         if (e.key === 'Escape') closeReportModalDirect();
     });
+
+	let selectedCommentReasonId = null;
+    let currentReportedCommentId = null;
+
+    function openCommentReportModal(commentId) {
+        currentReportedCommentId = commentId;
+
+        document
+            .getElementById('commentReportOverlay')
+            .classList.add('open');
+    }
+
+    function closeCommentReportModal(e) {
+        if (
+            e.target === document.getElementById('commentReportOverlay')
+        ) {
+            closeCommentReportModalDirect();
+        }
+    }
+
+    function closeCommentReportModalDirect() {
+
+        document
+            .getElementById('commentReportOverlay')
+            .classList.remove('open');
+
+        document.getElementById(
+            'commentReportFeedback'
+        ).style.display = 'none';
+
+        document.getElementById(
+            'commentReportFeedback'
+        ).className = 'report-feedback';
+
+        document.getElementById(
+            'commentReportMessage'
+        ).value = '';
+
+        document.getElementById(
+            'commentReportSubmit'
+        ).disabled = false;
+
+        document.querySelectorAll(
+            '#commentReportPresets .report-preset'
+        ).forEach(b => b.classList.remove('selected'));
+
+        selectedCommentReasonId = null;
+        currentReportedCommentId = null;
+    }
+
+    function selectCommentReason(el, id) {
+
+        document.querySelectorAll(
+            '#commentReportPresets .report-preset'
+        ).forEach(b => b.classList.remove('selected'));
+
+        el.classList.add('selected');
+
+        selectedCommentReasonId = id;
+    }
+
+    async function submitCommentReport() {
+
+        if (!selectedCommentReasonId) {
+            showCommentReportFeedback(
+                'error',
+                'Bitte wähle einen Grund aus.'
+            );
+            return;
+        }
+
+        if (!currentReportedCommentId) {
+            showCommentReportFeedback(
+                'error',
+                'Kommentar nicht gefunden.'
+            );
+            return;
+        }
+
+        document.getElementById(
+            'commentReportSubmit'
+        ).disabled = true;
+
+        const form = new FormData();
+
+        form.append(
+            'reason_id',
+            selectedCommentReasonId
+        );
+
+        form.append(
+            'message',
+            document.getElementById(
+                'commentReportMessage'
+            ).value.trim()
+        );
+
+        const res = await fetch(
+            '/comment/' +
+            currentReportedCommentId +
+            '/melden',
+            {
+                method: 'POST',
+                body: form
+            }
+        );
+
+        let data = {};
+
+        try {
+            data = await res.json();
+        } catch (e) {}
+
+        if (res.ok) {
+
+            showCommentReportFeedback(
+                'success',
+                'Danke! Der Kommentar wurde gemeldet.'
+            );
+
+            setTimeout(
+                closeCommentReportModalDirect,
+                1100
+            );
+
+        } else if (res.status === 409) {
+
+            showCommentReportFeedback(
+                'error',
+                'Du hast diesen Kommentar bereits gemeldet.'
+            );
+
+            document.getElementById(
+                'commentReportSubmit'
+            ).disabled = false;
+
+        } else if (res.status === 401) {
+
+            showCommentReportFeedback(
+                'error',
+                'Du musst eingeloggt sein um zu melden.'
+            );
+
+            document.getElementById(
+                'commentReportSubmit'
+            ).disabled = false;
+
+        } else {
+
+            showCommentReportFeedback(
+                'error',
+                data.error ?? 'Fehler beim Senden.'
+            );
+
+            document.getElementById(
+                'commentReportSubmit'
+            ).disabled = false;
+        }
+    }
+
+    function showCommentReportFeedback(type, msg) {
+
+        const el = document.getElementById(
+            'commentReportFeedback'
+        );
+
+        el.textContent = msg;
+
+        el.className = 'report-feedback ' + type;
+
+        el.style.display = 'block';
+    }
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+            closeCommentReportModalDirect();
+        }
+    });
+
+	document.addEventListener('DOMContentLoaded', function () {
+		const hash = window.location.hash;
+		if (!hash.startsWith('#comment-')) return;
+
+		// Hash sofort aus URL entfernen damit Browser nicht nativ springt
+		history.replaceState(null, '', window.location.pathname + window.location.search);
+
+		function tryScroll(attemptsLeft) {
+			const el = document.querySelector(hash);
+			if (!el) {
+				if (attemptsLeft > 0) setTimeout(() => tryScroll(attemptsLeft - 1), 100);
+				return;
+			}
+
+			// Erst ans Ende scrollen damit smooth von oben kommt
+			window.scrollTo(0, 0);
+
+			setTimeout(() => {
+				el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+				el.style.transition = 'box-shadow 0.4s ease, border-color 0.4s ease';
+				el.style.boxShadow  = '0 0 0 2px #e63946';
+				el.style.borderColor = '#e63946';
+
+				setTimeout(() => {
+					el.style.boxShadow   = '';
+					el.style.borderColor = '';
+				}, 2500);
+			}, 300);
+		}
+
+		tryScroll(10);
+	});
 </script>
 {% endblock %}

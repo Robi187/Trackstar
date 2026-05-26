@@ -63,7 +63,6 @@ final class UserManagementController extends AbstractController
 
         $user->setBannedUntil(new \DateTimeImmutable('+' . $duration));
 
-        // Alle Inhalte des Users sperren
         $contents = $em->getRepository(Content::class)->findBy(['fk_user' => $user]);
         foreach ($contents as $content) {
             $content->setIsSuspended(true);
@@ -92,7 +91,6 @@ final class UserManagementController extends AbstractController
 
         $user->setBannedUntil(null);
 
-        // Gesperrte Inhalte wieder freischalten
         $contents = $em->getRepository(Content::class)->findBy([
             'fk_user'     => $user,
             'isSuspended' => true,
@@ -108,7 +106,7 @@ final class UserManagementController extends AbstractController
     }
 
     #[Route('/admin/benutzer/{id}/loeschen', name: 'app_admin_delete_user', methods: ['POST'])]
-    public function adminDeleteUser(int $id, EntityManagerInterface $em): RedirectResponse 
+    public function adminDeleteUser(int $id, EntityManagerInterface $em): RedirectResponse
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
@@ -123,33 +121,30 @@ final class UserManagementController extends AbstractController
             return $this->redirectToRoute('app_admin_users');
         }
 
-        // 1. Reports auf Content des Users löschen (VOR Content!)
+        // Reports zuerst (Foreign Key!)
         $em->createQuery('DELETE FROM App\Entity\Report r WHERE r.fk_content IN (SELECT c FROM App\Entity\Content c WHERE c.fk_user = :u)')->setParameter('u', $user)->execute();
-
-        // 2. Reports die der User selbst erstellt hat
         $em->createQuery('DELETE FROM App\Entity\Report r WHERE r.fk_user = :u')->setParameter('u', $user)->execute();
+        // Kommentar-Reports
+        $em->createQuery('DELETE FROM App\Entity\Report r WHERE r.fk_comment IN (SELECT cm FROM App\Entity\Comment cm WHERE cm.fk_user = :u)')->setParameter('u', $user)->execute();
 
-        // 3. Abhängigkeiten des Contents löschen
         $em->createQuery('DELETE FROM App\Entity\ContentTag ct WHERE ct.fk_content IN (SELECT c FROM App\Entity\Content c WHERE c.fk_user = :u)')->setParameter('u', $user)->execute();
         $em->createQuery('DELETE FROM App\Entity\Comment cm WHERE cm.fk_content IN (SELECT c FROM App\Entity\Content c WHERE c.fk_user = :u)')->setParameter('u', $user)->execute();
         $em->createQuery('DELETE FROM App\Entity\Favorite f WHERE f.fk_content IN (SELECT c FROM App\Entity\Content c WHERE c.fk_user = :u)')->setParameter('u', $user)->execute();
         $em->createQuery('DELETE FROM App\Entity\Rating r WHERE r.fk_content IN (SELECT c FROM App\Entity\Content c WHERE c.fk_user = :u)')->setParameter('u', $user)->execute();
-
-        // 4. Content selbst löschen
         $em->createQuery('DELETE FROM App\Entity\Content c WHERE c.fk_user = :u')->setParameter('u', $user)->execute();
 
-        // 5. Eigene Aktivitäten des Users löschen
         $em->createQuery('DELETE FROM App\Entity\Comment cm WHERE cm.fk_user = :u')->setParameter('u', $user)->execute();
         $em->createQuery('DELETE FROM App\Entity\Favorite f WHERE f.fk_user = :u')->setParameter('u', $user)->execute();
         $em->createQuery('DELETE FROM App\Entity\Rating r WHERE r.fk_user = :u')->setParameter('u', $user)->execute();
 
-        // 6. User löschen
         $em->remove($user);
         $em->flush();
 
         $this->addFlash('success', sprintf('Benutzer „%s" wurde gelöscht.', $user->getUsername()));
         return $this->redirectToRoute('app_admin_users');
     }
+
+    // ── MELDUNGEN ──────────────────────────────────────────────────────────────
 
     #[Route('/admin/meldungen', name: 'app_admin_reports')]
     public function adminReports(EntityManagerInterface $em): Response
@@ -189,6 +184,25 @@ final class UserManagementController extends AbstractController
             $em->remove($content);
             $em->flush();
             $this->addFlash('success', 'Inhalt wurde gelöscht.');
+        }
+        return $this->redirectToRoute('app_admin_reports');
+    }
+
+    #[Route('/admin/meldungen/{id}/kommentar-loeschen', name: 'app_admin_report_delete_comment', methods: ['POST'])]
+    public function adminReportDeleteComment(int $id, EntityManagerInterface $em): RedirectResponse
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $report = $em->getRepository(Report::class)->find($id);
+        if ($report) {
+            $comment = $report->getFkComment();
+            if ($comment) {
+                // Alle Reports auf diesen Kommentar schließen
+                $em->createQuery('DELETE FROM App\Entity\Report r WHERE r.fk_comment = :c')
+                    ->setParameter('c', $comment)->execute();
+                $em->remove($comment);
+                $em->flush();
+                $this->addFlash('success', 'Kommentar wurde gelöscht.');
+            }
         }
         return $this->redirectToRoute('app_admin_reports');
     }
