@@ -66,6 +66,24 @@
         border-color: #888 transparent transparent transparent;
     }
 
+    .ts-field .select2-container--default .select2-selection--single .select2-selection__clear {
+        position: absolute;
+        top: 50%;
+        right: 28px;
+        transform: translateY(-50%);
+        margin: 0;
+        padding: 0 6px;
+        color: #888;
+        font-size: 1.1rem;
+        line-height: 1;
+        cursor: pointer;
+        z-index: 2;
+    }
+
+    .ts-field .select2-container--default .select2-selection--single .select2-selection__clear:hover {
+        color: #ff5a00;
+    }
+
     /* ── Dropdown panel ── */
     .select2-dropdown {
         background: #1a1a1a;
@@ -1025,7 +1043,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (licenseSelect) {
         jQuery(licenseSelect).select2({
             placeholder: 'Lizenz wählen...',
-            allowClear: false,
+            allowClear: true,
             width: '100%',
             minimumResultsForSearch: Infinity,
             templateResult: function (option) {

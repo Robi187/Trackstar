@@ -603,13 +603,14 @@
 							'CC BY-NC-SA': ['CC','BY','€','SA'],
 							'CC BY-NC-ND': ['CC','BY','€','ND']
 						} %}
+						{% set licenseCode = content.license.shortCode %}
 						<span class="cc-badge-inline">
-							{% for badge in licenseBadges[content.license] %}
+							{% for badge in licenseBadges[licenseCode] %}
 								<span class="cc-icon">{{ badge }}</span>
 							{% endfor %}
 						</span>
-						{% if licenseUrls[content.license] is defined %}
-							<a class="license-details-link" href="{{ licenseUrls[content.license] }}" target="_blank" rel="noopener noreferrer">(Details)</a>
+						{% if licenseUrls[licenseCode] is defined %}
+							<a class="license-details-link" href="{{ licenseUrls[licenseCode] }}" target="_blank" rel="noopener noreferrer">(Details)</a>
 						{% endif %}
 					</span>
 				</div>
