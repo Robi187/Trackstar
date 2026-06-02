@@ -21,7 +21,7 @@ class Rating
     private ?User $fk_user = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Content $fk_content = null;
 
     public function getId(): ?int

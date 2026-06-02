@@ -27,6 +27,27 @@ class RatingRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
+    public function averagesByContentIds(array $ids): array
+    {
+        if (empty($ids)) {
+            return [];
+        }
+
+        $rows = $this->createQueryBuilder('r')
+            ->select('IDENTITY(r.fk_content) AS cid, AVG(r.value) AS avg')
+            ->where('r.fk_content IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->groupBy('r.fk_content')
+            ->getQuery()
+            ->getArrayResult();
+
+        $map = [];
+        foreach ($rows as $row) {
+            $map[(int) $row['cid']] = round((float) $row['avg'], 1);
+        }
+        return $map;
+    }
+
     //    /**
     //     * @return Rating[] Returns an array of Rating objects
     //     */

@@ -81,6 +81,64 @@
         color: #888;
         line-height: 1.5;
     }
+
+    /* ── ADMIN RESPONSIVE ── */
+    @media (max-width: 1024px) {
+        .admin-main {
+            padding: 32px 24px 64px;
+        }
+        .admin-page-title {
+            font-size: 1.6rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .admin-subnav {
+            padding: 0 14px;
+            gap: 2px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .admin-subnav::-webkit-scrollbar {
+            display: none;
+        }
+        .admin-subnav-item {
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .admin-subnav-item.active::after {
+            left: 12px;
+            right: 12px;
+        }
+        .admin-main {
+            padding: 24px 14px 48px;
+        }
+        .admin-page-title {
+            font-size: 1.4rem;
+        }
+        .admin-page-subtitle {
+            font-size: 13px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .admin-subnav {
+            padding: 0 10px;
+        }
+        .admin-subnav-item {
+            padding: 8px 10px;
+            font-size: 0.76rem;
+        }
+        .admin-main {
+            padding: 18px 10px 32px;
+        }
+        .admin-page-title {
+            font-size: 1.25rem;
+        }
+    }
 </style>
 
 <nav class="admin-subnav">

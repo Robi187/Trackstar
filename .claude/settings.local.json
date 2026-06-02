@@ -27,7 +27,11 @@
       "Bash(docker compose logs *)",
       "Bash(docker compose *)",
       "Bash(php /home/stanku/Repos/Trackstar/bin/console doctrine:migrations:status --no-interaction)",
-      "Bash(xargs ls -la)"
+      "Bash(xargs ls -la)",
+      "Bash(php bin/console debug:router)",
+      "Bash(php *)",
+      "Read(//usr/bin/**)",
+      "Read(//usr/local/bin/**)"
     ],
     "additionalDirectories": [
       "\\home\\stanku\\Repos\\Trackstar\\templates\\content",

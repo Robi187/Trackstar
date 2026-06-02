@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Content;
 use App\Entity\ContentTag;
 use App\Entity\Favorite;
+use App\Repository\RatingRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,13 +15,14 @@ use Symfony\Component\Routing\Attribute\Route;
 final class FavoritesController extends AbstractController
 {
     #[Route('/favoriten', name: 'app_favorites')]
-    public function index(EntityManagerInterface $em): Response
+    public function index(EntityManagerInterface $em, RatingRepository $ratingRepository): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-        $user = $this->getUser();
+        $user      = $this->getUser();
         $favorites = $em->getRepository(Favorite::class)->findBy(['fk_user' => $user]);
-        $contents = array_map(fn($f) => $f->getFkContent(), $favorites);
+        $contents  = array_map(fn($f) => $f->getFkContent(), $favorites);
+        $ids       = array_map(fn($c) => $c->getId(), $contents);
 
         $tagsByContent = [];
         foreach ($contents as $content) {
@@ -28,9 +30,10 @@ final class FavoritesController extends AbstractController
         }
 
         return $this->render('favorites/index.html.twig', [
-            'contents' => $contents,
-            'tagsByContent' => $tagsByContent,
-            'user_data' => $user,
+            'contents'         => $contents,
+            'tagsByContent'    => $tagsByContent,
+            'ratingsByContent' => $ratingRepository->averagesByContentIds($ids),
+            'user_data'        => $user,
         ]);
     }
 

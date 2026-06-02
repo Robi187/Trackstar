@@ -24,9 +24,11 @@ class Report
     private ?\DateTime $created_at = null;
 
     #[ORM\ManyToOne]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?Content $fk_content = null;
 
     #[ORM\ManyToOne]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?Comment $fk_comment = null;
 
     #[ORM\ManyToOne]
