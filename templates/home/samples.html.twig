@@ -45,6 +45,17 @@
                                 {% endfor %}
                             {% endif %}
                         </div>
+                        <div class="card-stats">
+                            {% if ratingsByContent[item.id] is defined %}
+                            <span class="card-stat" style="color:var(--orange)">&#9733; {{ ratingsByContent[item.id]|number_format(1) }}</span>
+                            {% endif %}
+                            {% if item.download_count is defined and item.download_count > 0 %}
+                            <span class="card-stat">
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                                {{ item.download_count }}
+                            </span>
+                            {% endif %}
+                        </div>
 
                     </div>
                 </div>

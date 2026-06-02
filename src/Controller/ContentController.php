@@ -17,6 +17,7 @@ use App\Entity\Content;
 use App\Repository\ContentRepository;
 use App\Repository\CommentRepository;
 use App\Repository\CommentLikeRepository;
+use App\Repository\RatingRepository;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\Request;
@@ -239,14 +240,15 @@ final class ContentController extends AbstractController
         $contentArray = [];
         foreach ($contents as $content) {
             $contentArray[] = [
-                'id' => $content->getId(),
-                'title' => $content->getTitle(),
-                'description' => $content->getDescription(),
-                'file_path' => $content->getFilePath(),
-                'category' => $content->getType() ? $content->getType()->getName() : null, // Beispiel für die Kategorie
-                'created_at' => $content->getCreatedAt()->format('Y-m-d H:i:s'),
-                'user' => $content->getFkUser() ? $content->getFkUser()->getUsername() : null, // Beispiel für den User
-                'image_path' => $content->getImageFile(),
+                'id'             => $content->getId(),
+                'title'          => $content->getTitle(),
+                'description'    => $content->getDescription(),
+                'file_path'      => $content->getFilePath(),
+                'category'       => $content->getType() ? $content->getType()->getName() : null,
+                'created_at'     => $content->getCreatedAt()->format('Y-m-d H:i:s'),
+                'user'           => $content->getFkUser() ? $content->getFkUser()->getUsername() : null,
+                'image_path'     => $content->getImageFile(),
+                'download_count' => $content->getDownloadCount(),
             ];
         }
 
@@ -339,36 +341,60 @@ final class ContentController extends AbstractController
     }
   
     #[Route('/suche', name: 'app_search')]
-    public function search(Request $request, ContentRepository $contentRepository, EntityManagerInterface $em): Response
+    public function search(Request $request, ContentRepository $contentRepository, RatingRepository $ratingRepository, EntityManagerInterface $em): Response
     {
         $query = trim($request->query->get('q', ''));
-        $results = $query !== '' ? $contentRepository->search($query) : [];
 
-        $tagsByContent = [];
+        $filters = [
+            'date_range' => $request->query->get('date_range', 'all'),
+            'categories' => $request->query->all('categories') ?: [],
+            'tags'       => array_values(array_filter(array_map('trim', explode(',', $request->query->get('tags', ''))))),
+            'min_rating' => $request->query->get('min_rating', ''),
+            'sort'       => $request->query->get('sort', 'newest'),
+        ];
+
+        $hasSearch = $query !== ''
+            || $filters['date_range'] !== 'all'
+            || !empty($filters['categories'])
+            || !empty($filters['tags'])
+            || $filters['min_rating'] !== ''
+            || $filters['sort'] !== 'newest';
+
+        $results = $hasSearch ? $contentRepository->searchFiltered($query, $filters) : [];
+
+        $ids = array_map(fn($c) => $c->getId(), $results);
+        $tagsByContent    = [];
         foreach ($results as $content) {
             $tagsByContent[$content->getId()] = $em->getRepository(ContentTag::class)->findTagsByContent($content);
         }
 
         return $this->render('search/index.html.twig', [
-            'query' => $query,
-            'results' => $results,
-            'tagsByContent' => $tagsByContent,
+            'query'            => $query,
+            'results'          => $results,
+            'tagsByContent'    => $tagsByContent,
+            'ratingsByContent' => $ratingRepository->averagesByContentIds($ids),
+            'filters'          => $filters,
+            'hasSearch'        => $hasSearch,
         ]);
     }
 
     #[Route('/deine-inhalte', name: 'app_deine_inhalte')]
-    public function uploads(ContentRepository $contentRepository, EntityManagerInterface $em): Response
-    {   
-        $tagsByContent = [];
-        $user = $this->getUser();
+    public function uploads(ContentRepository $contentRepository, RatingRepository $ratingRepository, EntityManagerInterface $em): Response
+    {
+        $user     = $this->getUser();
         $contents = $contentRepository->findBy(['fk_user' => $user]);
+        $ids      = array_map(fn($c) => $c->getId(), $contents);
+
+        $tagsByContent = [];
         foreach ($contents as $content) {
             $tagsByContent[$content->getId()] = $em->getRepository(ContentTag::class)->findTagsByContent($content);
         }
+
         return $this->render('deine_inhalte/index.html.twig', [
-            'user_data' => $user,
-            'contents' => $contents,
-            'tagsByContent' => $tagsByContent,
+            'user_data'        => $user,
+            'contents'         => $contents,
+            'tagsByContent'    => $tagsByContent,
+            'ratingsByContent' => $ratingRepository->averagesByContentIds($ids),
         ]);
     }
 

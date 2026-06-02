@@ -154,6 +154,220 @@
 
 				.navbar-search-btn:hover { background: var(--orange-h); }
 
+				/* ── FILTER BUTTON ── */
+				.filter-toggle-btn {
+					width: 34px;
+					height: 34px;
+					background-color: #2a2a2a;
+					border: 1px solid #3a3a3a;
+					border-radius: 6px;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					cursor: pointer;
+					color: #aaa;
+					transition: all 0.2s;
+					flex-shrink: 0;
+					position: relative;
+				}
+
+				.filter-toggle-btn:hover,
+				.filter-toggle-btn.is-open {
+					border-color: var(--orange);
+					color: var(--orange);
+					background-color: rgba(255,90,0,0.08);
+				}
+
+				.filter-toggle-btn svg {
+					width: 16px;
+					height: 16px;
+					fill: currentColor;
+				}
+
+				.filter-toggle-btn.has-active::after {
+					content: '';
+					position: absolute;
+					top: 5px;
+					right: 5px;
+					width: 7px;
+					height: 7px;
+					background: var(--orange);
+					border-radius: 50%;
+					border: 2px solid #111;
+				}
+
+				/* ── FILTER PANEL ── */
+				.filter-panel {
+					position: absolute;
+					top: calc(100% + 8px);
+					left: 50%;
+					transform: translateX(-50%) translateY(-8px);
+					width: 560px;
+					max-width: calc(100vw - 32px);
+					background: #111111;
+					border: 1px solid #2a2a2a;
+					border-radius: 10px;
+					box-shadow: 0 8px 40px rgba(0,0,0,0.7);
+					z-index: 200;
+					opacity: 0;
+					pointer-events: none;
+					transition: opacity 0.2s ease, transform 0.2s ease;
+				}
+
+				.filter-panel.is-open {
+					opacity: 1;
+					pointer-events: all;
+					transform: translateX(-50%) translateY(0);
+				}
+
+				.filter-panel-header {
+					display: flex;
+					align-items: center;
+					justify-content: space-between;
+					padding: 14px 20px;
+					border-bottom: 1px solid #1e1e1e;
+				}
+
+				.filter-panel-title {
+					font-size: 0.78rem;
+					font-weight: 700;
+					letter-spacing: 0.08em;
+					text-transform: uppercase;
+					color: #666;
+					font-family: var(--font-heading);
+					font-style: italic;
+				}
+
+				.filter-panel-actions {
+					display: flex;
+					gap: 8px;
+				}
+
+				.filter-btn-reset {
+					background: none;
+					border: 1px solid #333;
+					border-radius: 5px;
+					color: #777;
+					font-size: 0.78rem;
+					padding: 5px 12px;
+					cursor: pointer;
+					transition: all 0.2s;
+					font-family: var(--font-body);
+				}
+
+				.filter-btn-reset:hover { border-color: #555; color: #ccc; }
+
+				.filter-btn-apply {
+					background: var(--orange);
+					border: none;
+					border-radius: 5px;
+					color: #fff;
+					font-size: 0.78rem;
+					font-weight: 600;
+					padding: 5px 14px;
+					cursor: pointer;
+					transition: background 0.2s;
+					font-family: var(--font-body);
+				}
+
+				.filter-btn-apply:hover { background: var(--orange-h); }
+
+				.filter-panel-body {
+					padding: 16px 20px 20px;
+					display: grid;
+					grid-template-columns: 1fr 1fr;
+					gap: 18px 24px;
+				}
+
+				.filter-section {
+					display: flex;
+					flex-direction: column;
+					gap: 8px;
+				}
+
+				.filter-section.full-width {
+					grid-column: 1 / -1;
+				}
+
+				.filter-label {
+					font-size: 0.68rem;
+					font-weight: 700;
+					letter-spacing: 0.07em;
+					text-transform: uppercase;
+					color: #555;
+					font-family: var(--font-heading);
+					font-style: italic;
+				}
+
+				.filter-options {
+					display: flex;
+					flex-wrap: wrap;
+					gap: 6px;
+				}
+
+				.filter-chip {
+					display: inline-flex;
+					align-items: center;
+					padding: 5px 10px;
+					border-radius: 5px;
+					border: 1px solid #2a2a2a;
+					background: #1a1a1a;
+					color: #aaa;
+					font-size: 0.78rem;
+					cursor: pointer;
+					transition: all 0.15s;
+					user-select: none;
+				}
+
+				.filter-chip input { display: none; }
+
+				.filter-chip:hover { border-color: #3a3a3a; color: #ccc; }
+
+				.filter-chip.is-selected {
+					border-color: var(--orange);
+					color: var(--orange);
+					background: rgba(255,90,0,0.08);
+				}
+
+				.filter-stars {
+					display: flex;
+					gap: 2px;
+					align-items: center;
+				}
+
+				.filter-star {
+					font-size: 1.45rem;
+					color: #333;
+					cursor: pointer;
+					transition: color 0.1s, transform 0.1s;
+					line-height: 1;
+				}
+
+				.filter-star:hover { transform: scale(1.15); }
+				.filter-star.is-active { color: var(--orange); }
+
+				.filter-stars-hint {
+					font-size: 0.72rem;
+					color: #555;
+					margin-left: 8px;
+				}
+
+				.filter-tags-input {
+					width: 100%;
+					background: #1a1a1a;
+					border: 1px solid #2a2a2a;
+					border-radius: 5px;
+					color: #ccc;
+					font-size: 0.8rem;
+					padding: 7px 10px;
+					outline: none;
+					transition: border-color 0.2s;
+					font-family: var(--font-body);
+				}
+
+				.filter-tags-input::placeholder { color: #3a3a3a; }
+				.filter-tags-input:focus { border-color: #444; }
+
 				.navbar-right {
 					display: flex;
 					align-items: center;
@@ -570,7 +784,31 @@
 					text-align: center;
 					font-size: 0.78rem;
 					color: #888888;
-					margin-bottom: 10px;
+					margin-bottom: 6px;
+				}
+
+				.card-stats {
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					gap: 32px;
+					margin-top: 10px;
+					margin-bottom: 8px;
+					font-size: 0.85rem;
+					color: #666;
+				}
+
+				.card-stat {
+					display: flex;
+					align-items: center;
+					gap: 3px;
+				}
+
+				.card-stat svg {
+					width: 14px;
+					height: 14px;
+					fill: currentColor;
+					flex-shrink: 0;
 				}
 
 				.card-footer {
@@ -828,7 +1066,72 @@
 					<input type="text" name="q" placeholder="Titel, Beschreibung oder Autor …" value="{{ app.request.query.get('q') }}"/>
 				</div>
 				<button type="submit" class="navbar-search-btn">Suchen</button>
+				<button type="button" class="filter-toggle-btn" id="filterToggle" aria-label="Filter">
+					<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+						<path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/>
+					</svg>
+				</button>
 			</form>
+
+			{# ── FILTER PANEL ── #}
+			<div class="filter-panel" id="filterPanel" role="dialog" aria-label="Filter">
+				<div class="filter-panel-header">
+					<span class="filter-panel-title">Filter &amp; Sortierung</span>
+					<div class="filter-panel-actions">
+						<button type="button" class="filter-btn-reset" id="filterReset">Zurücksetzen</button>
+						<button type="button" class="filter-btn-apply" id="filterApply">Anwenden</button>
+					</div>
+				</div>
+				<div class="filter-panel-body">
+
+					<div class="filter-section">
+						<div class="filter-label">Datum</div>
+						<div class="filter-options">
+							<label class="filter-chip"><input type="radio" name="filter-date" value="all"> Alle</label>
+							<label class="filter-chip"><input type="radio" name="filter-date" value="week"> Letzte Woche</label>
+							<label class="filter-chip"><input type="radio" name="filter-date" value="month"> Letzter Monat</label>
+							<label class="filter-chip"><input type="radio" name="filter-date" value="year"> Letztes Jahr</label>
+						</div>
+					</div>
+
+					<div class="filter-section">
+						<div class="filter-label">Sortieren nach</div>
+						<div class="filter-options">
+							<label class="filter-chip"><input type="radio" name="filter-sort" value="downloads"> Downloads</label>
+							<label class="filter-chip"><input type="radio" name="filter-sort" value="favorites"> Favoriten</label>
+							<label class="filter-chip"><input type="radio" name="filter-sort" value="rating"> Bewertung</label>
+						</div>
+					</div>
+
+					<div class="filter-section">
+						<div class="filter-label">Kategorie</div>
+						<div class="filter-options">
+							<label class="filter-chip"><input type="checkbox" name="filter-category" value="Tracks"> Tracks</label>
+							<label class="filter-chip"><input type="checkbox" name="filter-category" value="Beats"> Beats</label>
+							<label class="filter-chip"><input type="checkbox" name="filter-category" value="Sound Kits"> Sound Kits</label>
+							<label class="filter-chip"><input type="checkbox" name="filter-category" value="Samples"> Samples</label>
+						</div>
+					</div>
+
+					<div class="filter-section">
+						<div class="filter-label">Mindest-Bewertung</div>
+						<div class="filter-stars" id="filterStars">
+							<span class="filter-star" data-value="1">&#9733;</span>
+							<span class="filter-star" data-value="2">&#9733;</span>
+							<span class="filter-star" data-value="3">&#9733;</span>
+							<span class="filter-star" data-value="4">&#9733;</span>
+							<span class="filter-star" data-value="5">&#9733;</span>
+							<span class="filter-stars-hint" id="filterStarsHint">Alle</span>
+						</div>
+					</div>
+
+					<div class="filter-section full-width">
+						<div class="filter-label">Tags <span style="font-style:normal;font-weight:400;text-transform:none;letter-spacing:0;color:#444;">(kommagetrennt)</span></div>
+						<input type="text" class="filter-tags-input" id="filterTagsInput" placeholder="z. B. melodic, trap, 808 …">
+					</div>
+
+				</div>
+			</div>
 
 			<div class="navbar-right">
 				{% if app.user and 'ROLE_ADMIN' in app.user.roles %}
@@ -959,6 +1262,158 @@
 				Beats
 			</a>
 		</nav>
+
+		{# ── FILTER JAVASCRIPT ── #}
+		<script>
+		(function () {
+			const filterToggle = document.getElementById('filterToggle');
+			const filterPanel  = document.getElementById('filterPanel');
+			const filterApply  = document.getElementById('filterApply');
+			const filterReset  = document.getElementById('filterReset');
+			const filterStars  = document.getElementById('filterStars');
+			const filterStarsHint = document.getElementById('filterStarsHint');
+
+			let filterRatingVal = 0;
+
+			/* ── Stars ── */
+			function updateFilterStars(rating) {
+				filterRatingVal = rating;
+				filterStars.querySelectorAll('.filter-star').forEach(function (s) {
+					s.classList.toggle('is-active', parseInt(s.dataset.value) <= rating);
+				});
+				filterStarsHint.textContent = rating > 0 ? rating + '+ Sterne' : 'Alle';
+			}
+
+			filterStars.querySelectorAll('.filter-star').forEach(function (star) {
+				star.addEventListener('click', function () {
+					var val = parseInt(star.dataset.value);
+					updateFilterStars(filterRatingVal === val ? 0 : val);
+				});
+				star.addEventListener('mouseenter', function () {
+					var val = parseInt(star.dataset.value);
+					filterStars.querySelectorAll('.filter-star').forEach(function (s) {
+						s.classList.toggle('is-active', parseInt(s.dataset.value) <= val);
+					});
+				});
+				star.addEventListener('mouseleave', function () {
+					updateFilterStars(filterRatingVal);
+				});
+			});
+
+			/* ── Chip selection ── */
+			function updateChips() {
+				filterPanel.querySelectorAll('.filter-chip').forEach(function (chip) {
+					var input = chip.querySelector('input');
+					if (input) chip.classList.toggle('is-selected', input.checked);
+				});
+			}
+
+			filterPanel.querySelectorAll('.filter-chip input').forEach(function (input) {
+				input.addEventListener('change', updateChips);
+			});
+
+			/* ── Toggle panel ── */
+			filterToggle.addEventListener('click', function (e) {
+				e.stopPropagation();
+				var open = filterPanel.classList.toggle('is-open');
+				filterToggle.classList.toggle('is-open', open);
+			});
+
+			document.addEventListener('click', function (e) {
+				if (!filterPanel.contains(e.target) && !filterToggle.contains(e.target)) {
+					filterPanel.classList.remove('is-open');
+					filterToggle.classList.remove('is-open');
+				}
+			});
+
+			document.addEventListener('keydown', function (e) {
+				if (e.key === 'Escape') {
+					filterPanel.classList.remove('is-open');
+					filterToggle.classList.remove('is-open');
+				}
+			});
+
+			/* ── Build filter URL (shared by apply + search form) ── */
+			function buildFilterUrl(q, dateRange, categories, tags, ratingVal, sort) {
+				var url = new URL('/suche', window.location.origin);
+				if (q) url.searchParams.set('q', q);
+				if (dateRange && dateRange !== 'all') url.searchParams.set('date_range', dateRange);
+				categories.forEach(function (c) { url.searchParams.append('categories[]', c); });
+				if (tags.length > 0) url.searchParams.set('tags', tags.join(','));
+				if (ratingVal > 0) url.searchParams.set('min_rating', ratingVal);
+				if (sort) url.searchParams.set('sort', sort);
+				return url.toString();
+			}
+
+			function readPanelState() {
+				return {
+					dateRange:  (filterPanel.querySelector('input[name="filter-date"]:checked') || {}).value || 'all',
+					categories: Array.from(filterPanel.querySelectorAll('input[name="filter-category"]:checked')).map(function (el) { return el.value; }),
+					tags:       document.getElementById('filterTagsInput').value.split(',').map(function (t) { return t.trim(); }).filter(Boolean),
+					sort:       (filterPanel.querySelector('input[name="filter-sort"]:checked') || {}).value || '',
+				};
+			}
+
+			/* ── Apply filters ── */
+			filterApply.addEventListener('click', function () {
+				var q   = document.querySelector('.navbar-search input[name="q"]').value.trim();
+				var s   = readPanelState();
+				window.location.href = buildFilterUrl(q, s.dateRange, s.categories, s.tags, filterRatingVal, s.sort);
+			});
+
+			/* ── Search form: preserve active filters ── */
+			var searchForm = document.querySelector('.navbar-search');
+			if (searchForm) {
+				searchForm.addEventListener('submit', function (e) {
+					e.preventDefault();
+					var q = searchForm.querySelector('input[name="q"]').value.trim();
+					var s = readPanelState();
+					window.location.href = buildFilterUrl(q, s.dateRange, s.categories, s.tags, filterRatingVal, s.sort);
+				});
+			}
+
+			/* ── Reset ── */
+			filterReset.addEventListener('click', function () {
+				var q = document.querySelector('.navbar-search input[name="q"]').value.trim();
+				var url = new URL('/suche', window.location.origin);
+				if (q) url.searchParams.set('q', q);
+				window.location.href = url.toString();
+			});
+
+			/* ── Init from URL ── */
+			(function initFromUrl() {
+				var params = new URLSearchParams(window.location.search);
+
+				var dateRange = params.get('date_range') || 'all';
+				var dateRadio = filterPanel.querySelector('input[name="filter-date"][value="' + dateRange + '"]');
+				if (dateRadio) dateRadio.checked = true;
+				else {
+					var allRadio = filterPanel.querySelector('input[name="filter-date"][value="all"]');
+					if (allRadio) allRadio.checked = true;
+				}
+
+				var activeCategories = params.getAll('categories[]');
+				filterPanel.querySelectorAll('input[name="filter-category"]').forEach(function (cb) {
+					cb.checked = activeCategories.includes(cb.value);
+				});
+
+				var tagsStr = params.get('tags') || '';
+				document.getElementById('filterTagsInput').value = tagsStr;
+
+				var minRating = parseInt(params.get('min_rating')) || 0;
+				updateFilterStars(minRating);
+
+				var sort = params.get('sort') || '';
+				var sortRadio = sort ? filterPanel.querySelector('input[name="filter-sort"][value="' + sort + '"]') : null;
+				if (sortRadio) sortRadio.checked = true;
+
+				updateChips();
+
+				var hasActive = dateRange !== 'all' || activeCategories.length > 0 || tagsStr !== '' || minRating > 0 || sort !== '';
+				filterToggle.classList.toggle('has-active', hasActive);
+			})();
+		})();
+		</script>
 
 		{# ── MENU JAVASCRIPT ── #}
 		<script>
