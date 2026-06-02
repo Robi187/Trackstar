@@ -190,6 +190,33 @@
         font-size: 0.8rem;
         font-weight: 600;
     }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+        .profile-header {
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .profile-page { padding: 28px 16px 48px; }
+        .profile-card { padding: 28px 20px; }
+        .about-box { padding: 24px; }
+        .profile-avatar { width: 84px; height: 84px; font-size: 2rem; }
+        .profile-username { font-size: 1.3rem; }
+        .works-heading { margin-bottom: 20px; }
+        .works-heading h2 { font-size: 1.2rem; }
+    }
+
+    @media (max-width: 480px) {
+        .profile-page { padding: 20px 10px 36px; }
+        .profile-card { padding: 22px 16px; border-radius: 12px; }
+        .about-box { padding: 18px; border-radius: 12px; }
+        .profile-stats { gap: 16px; }
+        .stat-value { font-size: 1.15rem; }
+    }
 </style>
 
 <div class="profile-page">

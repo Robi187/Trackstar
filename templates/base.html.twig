@@ -2,6 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>
 			{% block title %}Trackstar{% endblock %}
 		</title>
@@ -641,6 +642,158 @@
 
 				footer a:hover {
 					color: var(--text);
+				}
+
+				/* ─────────────────────────────────────────
+				   RESPONSIVE LAYER
+				   - tablet:  ≤ 1024px
+				   - phone-L: ≤ 768px
+				   - phone:   ≤ 480px
+				   ───────────────────────────────────────── */
+
+				/* Tablet */
+				@media (max-width: 1024px) {
+					.navbar {
+						padding: 12px 20px;
+					}
+					.navbar-search {
+						margin: 0 16px;
+						max-width: none;
+					}
+					.subnav {
+						gap: 24px;
+						padding: 12px 16px;
+					}
+					.main {
+						padding: 32px 20px 48px;
+					}
+					.section-title {
+						font-size: 1.5rem;
+						margin-bottom: 28px;
+					}
+					.content-grid {
+						grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+						gap: 20px;
+					}
+				}
+
+				/* Large phone / small tablet */
+				@media (max-width: 768px) {
+					.navbar {
+						padding: 10px 14px;
+						gap: 8px;
+						flex-wrap: wrap;
+					}
+					.navbar-logo img {
+						height: 28px;
+					}
+					/* Search wraps to its own second row on small screens */
+					.navbar-search {
+						order: 3;
+						flex-basis: 100%;
+						margin: 6px 0 0;
+						max-width: none;
+					}
+					.navbar-search-btn {
+						padding: 8px 12px;
+					}
+					.navbar-right {
+						gap: 8px;
+					}
+					.navbar-shop {
+						display: none;
+					}
+					.navbar-admin-btn {
+						padding: 5px 9px;
+						font-size: 0.72rem;
+					}
+					.navbar-admin-btn svg {
+						width: 12px;
+						height: 12px;
+					}
+
+					/* Subnav: allow horizontal scroll on small screens */
+					.subnav {
+						gap: 18px;
+						padding: 10px 14px;
+						justify-content: flex-start;
+						overflow-x: auto;
+						-webkit-overflow-scrolling: touch;
+						scrollbar-width: none;
+					}
+					.subnav::-webkit-scrollbar {
+						display: none;
+					}
+					.subnav a {
+						white-space: nowrap;
+						font-size: 0.85rem;
+						flex-shrink: 0;
+					}
+
+					.menu-sidebar {
+						width: min(320px, 88vw);
+					}
+
+					.main {
+						padding: 24px 14px 40px;
+					}
+					.section-title {
+						font-size: 1.35rem;
+						margin-bottom: 22px;
+					}
+					.content-grid {
+						grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+						gap: 16px;
+					}
+
+					footer {
+						padding: 18px 14px;
+						font-size: 0.75rem;
+					}
+				}
+
+				/* Small phone */
+				@media (max-width: 480px) {
+					.navbar {
+						padding: 8px 10px;
+					}
+					.navbar-logo img {
+						height: 26px;
+					}
+					.navbar-upload-btn,
+					.navbar-avatar,
+					.navbar-menu-btn {
+						width: 36px;
+						height: 36px;
+					}
+					.subnav {
+						gap: 14px;
+						padding: 8px 10px;
+					}
+					.subnav a {
+						font-size: 0.78rem;
+					}
+					.subnav a svg {
+						width: 13px;
+						height: 13px;
+					}
+					.main {
+						padding: 18px 10px 32px;
+					}
+					.content-grid {
+						grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+						gap: 12px;
+					}
+					.card-title {
+						font-size: 0.8rem;
+					}
+					.card-user {
+						font-size: 0.72rem;
+					}
+					.menu-sidebar {
+						width: 100vw;
+						border-left: none;
+					}
 				}
 			</style>
 		{% endblock %}
