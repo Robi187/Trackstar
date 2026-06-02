@@ -14,10 +14,42 @@
         {% endif %}
     </h1>
 
-    {% if query %}
-        <p style="text-align:center; color:#888; font-size:0.85rem; margin-top:-28px; margin-bottom:36px;">
+    {% if hasSearch is defined and hasSearch %}
+        {# Active filter chips #}
+        {% set activeFilters = [] %}
+        {% if filters.date_range is defined and filters.date_range != 'all' %}
+            {% set labelMap = {'week': 'Letzte Woche', 'month': 'Letzter Monat', 'year': 'Letztes Jahr'} %}
+            {% set activeFilters = activeFilters|merge([labelMap[filters.date_range] ?? filters.date_range]) %}
+        {% endif %}
+        {% if filters.categories is defined and filters.categories is not empty %}
+            {% for cat in filters.categories %}
+                {% set activeFilters = activeFilters|merge([cat]) %}
+            {% endfor %}
+        {% endif %}
+        {% if filters.tags is defined and filters.tags is not empty %}
+            {% for tag in filters.tags %}
+                {% set activeFilters = activeFilters|merge(['#' ~ tag]) %}
+            {% endfor %}
+        {% endif %}
+        {% if filters.min_rating is defined and filters.min_rating != '' %}
+            {% set activeFilters = activeFilters|merge([filters.min_rating ~ '+ Sterne']) %}
+        {% endif %}
+        {% if filters.sort is defined and filters.sort != 'newest' %}
+            {% set sortLabels = {'downloads': 'Downloads ↓', 'favorites': 'Favoriten ↓', 'rating': 'Beste Bewertung'} %}
+            {% set activeFilters = activeFilters|merge([sortLabels[filters.sort] ?? filters.sort]) %}
+        {% endif %}
+
+        <p style="text-align:center; color:#888; font-size:0.85rem; margin-top:-28px; margin-bottom:{% if activeFilters is not empty %}16px{% else %}36px{% endif %};">
             {{ results|length }} Ergebnis{{ results|length != 1 ? 'se' : '' }} gefunden
         </p>
+
+        {% if activeFilters is not empty %}
+        <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-bottom:32px;">
+            {% for chip in activeFilters %}
+            <span style="display:inline-flex; align-items:center; padding:4px 10px; border-radius:4px; border:1px solid #333; color:#aaa; font-size:0.75rem; background:#1a1a1a;">{{ chip }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
     {% endif %}
 
     {% if results|length > 0 %}
@@ -48,17 +80,34 @@
                                 {% endfor %}
                             {% endif %}
                         </div>
+                        <div class="card-stats">
+                            {% if ratingsByContent[content.id] is defined %}
+                            <span class="card-stat" style="color:var(--orange)">&#9733; {{ ratingsByContent[content.id]|number_format(1) }}</span>
+                            {% endif %}
+                            {% if content.downloadCount is defined and content.downloadCount > 0 %}
+                            <span class="card-stat">
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                                {{ content.downloadCount }}
+                            </span>
+                            {% endif %}
+                        </div>
                     </div>
 
                 </div>
             {% endfor %}
         </div>
 
-    {% elseif query %}
-        <div class="empty-state">Keine Inhalte für &ldquo;{{ query }}&rdquo; gefunden.</div>
+    {% elseif hasSearch is defined and hasSearch %}
+        <div class="empty-state">
+            {% if query %}
+                Keine Inhalte für &ldquo;{{ query }}&rdquo; gefunden.
+            {% else %}
+                Keine Inhalte für die gewählten Filter gefunden.
+            {% endif %}
+        </div>
 
     {% else %}
-        <div class="empty-state">Gib einen Suchbegriff ein.</div>
+        <div class="empty-state">Gib einen Suchbegriff ein oder wähle Filter aus.</div>
     {% endif %}
 </main>
 {% endblock %}

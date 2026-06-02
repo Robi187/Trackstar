@@ -16,7 +16,7 @@ class Favorite
 
     #[ORM\Id]
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Content $fk_content = null;
 
     public function getFkUser(): ?User
