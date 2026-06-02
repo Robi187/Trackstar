@@ -57,6 +57,14 @@
 					flex-direction: column;
 				}
 
+				/* Wrapper around the page-content block — fills available height
+				   so the footer always sits at the very bottom on short pages. */
+				.page-shell {
+					flex: 1;
+					display: flex;
+					flex-direction: column;
+				}
+
 				/* ── NAVBAR ── */
 				.navbar {
 					display: flex;
@@ -992,8 +1000,10 @@
 		</script>
 		{% endblock navbar %}
 
-		{# ── PAGE CONTENT ── Kind-Templates füllen diesen Block #}
-		{% block body %}{% endblock %}
+		{# ── PAGE CONTENT ── Kind-Templates füllen diesen Block. Wrapper expands to push the footer to the bottom on short pages. #}
+		<div class="page-shell">
+			{% block body %}{% endblock %}
+		</div>
 
 		<script>
 			document.addEventListener('DOMContentLoaded', function () {
