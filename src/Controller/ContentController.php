@@ -8,6 +8,9 @@ use App\Entity\CommentLike;
 use App\Entity\Favorite;
 use App\Entity\Rating;
 use App\Entity\ContentTag;
+use App\Entity\Tag;
+use App\Entity\License;
+use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -22,6 +25,7 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Report;
 use App\Entity\Reason;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 
 final class ContentController extends AbstractController
@@ -370,6 +374,227 @@ final class ContentController extends AbstractController
             'contents' => $contents,
             'tagsByContent' => $tagsByContent,
         ]);
+    }
+
+    #[Route('/content/{id}/bearbeiten', name: 'app_content_edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
+    public function edit(int $id, Request $request, EntityManagerInterface $em, SluggerInterface $slugger): Response
+    {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $content = $em->getRepository(Content::class)->find($id);
+        if (!$content || $content->getFkUser() !== $user) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $existingTags = $em->getRepository(ContentTag::class)->findTagsByContent($content);
+        $selectedTags = [];
+        $bpmValue = null;
+        foreach ($existingTags as $contentTag) {
+            $tag = $contentTag->getFkTag();
+            $name = $tag->getName();
+            if (preg_match('/^(\d{1,3})\s*BPM$/i', $name, $matches)) {
+                $bpmValue = (int) $matches[1];
+                continue;
+            }
+            $selectedTags[] = $tag;
+        }
+
+        $form = $this->createForm(\App\Form\ContentUploadType::class, $content, [
+            'is_edit' => true,
+        ]);
+        $form->get('fk_tag')->setData($selectedTags);
+        $form->get('bpm')->setData($bpmValue);
+        $form->handleRequest($request);
+
+        $currentAudioExtension = strtolower(pathinfo($content->getFilePath() ?? '', PATHINFO_EXTENSION));
+        $hasExistingAudio = (bool) $content->getFilePath();
+
+        if ($form->isSubmitted()) {
+            $audioFile = $form->get('audioFile')->getData();
+            $category = $form->get('type')->getData();
+
+            if ($category) {
+                $name = strtolower($category->getName());
+                $isSoundkit = str_contains($name, 'soundkit') || str_contains($name, 'sound kit');
+                $newFileExtension = $audioFile ? strtolower($audioFile->getClientOriginalExtension()) : null;
+                $existingIsZip = $hasExistingAudio && $currentAudioExtension === 'zip';
+
+                if ($audioFile) {
+                    if ($isSoundkit && $newFileExtension !== 'zip') {
+                        $form->get('audioFile')->addError(
+                            new \Symfony\Component\Form\FormError('Für Sound Kits bitte nur eine ZIP-Datei hochladen.')
+                        );
+                    } elseif (!$isSoundkit && $newFileExtension === 'zip') {
+                        $form->get('audioFile')->addError(
+                            new \Symfony\Component\Form\FormError('ZIP-Dateien sind nur für die Kategorie "Sound Kits" erlaubt.')
+                        );
+                    }
+                } else {
+                    if ($hasExistingAudio) {
+                        if ($isSoundkit && !$existingIsZip) {
+                            $form->get('audioFile')->addError(
+                                new \Symfony\Component\Form\FormError('Für Sound Kits wird eine neue ZIP-Datei benötigt.')
+                            );
+                        } elseif (!$isSoundkit && $existingIsZip) {
+                            $form->get('audioFile')->addError(
+                                new \Symfony\Component\Form\FormError('Für diese Kategorie wird eine neue Audiodatei (MP3, WAV, FLAC, AIFF) benötigt.')
+                            );
+                        }
+                    } else {
+                        $form->get('audioFile')->addError(
+                            new \Symfony\Component\Form\FormError('Bitte lade eine Audiodatei hoch.')
+                        );
+                    }
+                }
+            }
+        }
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $audioFile = $form->get('audioFile')->getData();
+            $imageFile = $form->get('imageFile')->getData();
+
+            if ($audioFile) {
+                $userId = $user->getId();
+                $originalFilename = pathinfo($audioFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $ext = $audioFile->guessExtension();
+                if (!$ext || $ext === 'bin') {
+                    $ext = $audioFile->getClientOriginalExtension();
+                }
+
+                $categoryName = strtolower($content->getType()->getName());
+                $folderMap = [
+                    'beat' => 'beats',
+                    'beats' => 'beats',
+                    'sample' => 'samples',
+                    'samples' => 'samples',
+                    'soundkit' => 'soundkits',
+                    'soundkits' => 'soundkits',
+                    'track' => 'tracks',
+                    'tracks' => 'tracks',
+                ];
+                $subfolder = $folderMap[$categoryName] ?? 'misc';
+                $uploadBase = $this->getParameter('uploads_directory');
+
+                $newFilename = $safeFilename . '_' . $userId . '.' . $ext;
+                $audioFile->move($uploadBase . '/' . $subfolder, $newFilename);
+                $content->setFilePath($subfolder . '/' . $newFilename);
+            }
+
+            if ($imageFile) {
+                $userId = $user->getId();
+                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '_' . $userId . '.' . $imageFile->guessExtension();
+
+                $imageFile->move($this->getParameter('images_directory'), $newFilename);
+                $content->setImageFile('images/' . $newFilename);
+            }
+
+            foreach ($existingTags as $contentTag) {
+                $em->remove($contentTag);
+            }
+            $em->flush();
+
+            $selectedTags = $form->get('fk_tag')->getData() ?: [];
+            foreach ($selectedTags as $tag) {
+                if (preg_match('/^\d{1,3}\s*BPM$/i', $tag->getName())) {
+                    continue;
+                }
+                $contentTag = new ContentTag();
+                $contentTag->setFkContent($content);
+                $contentTag->setFkTag($tag);
+                $em->persist($contentTag);
+            }
+
+            $bpm = $form->get('bpm')->getData();
+            if ($bpm) {
+                $tagName = $bpm . ' BPM';
+                $bpmTag = $em->getRepository(Tag::class)->findOneBy(['name' => $tagName]);
+                if (!$bpmTag) {
+                    $bpmTag = new Tag();
+                    $bpmTag->setName($tagName);
+                    $em->persist($bpmTag);
+                }
+                $bpmContentTag = new ContentTag();
+                $bpmContentTag->setFkContent($content);
+                $bpmContentTag->setFkTag($bpmTag);
+                $em->persist($bpmContentTag);
+            }
+
+            $em->persist($content);
+            $em->flush();
+
+            $this->addFlash('success', 'Inhalt erfolgreich aktualisiert.');
+            return $this->redirectToRoute('app_deine_inhalte');
+        }
+
+        /** @var License[] $licenses */
+        $licenses = $em->getRepository(License::class)->findAll();
+        $licenseMap = [];
+        foreach ($licenses as $license) {
+            $licenseMap[$license->getId()] = [
+                'shortCode' => $license->getShortCode(),
+                'fullName' => $license->getFullName(),
+                'description' => $license->getDescription(),
+            ];
+        }
+
+        return $this->render('upload/index.html.twig', [
+            'form' => $form->createView(),
+            'licenseData' => $licenseMap,
+            'pageTitle' => 'Inhalt bearbeiten',
+            'pageSubtitle' => 'Passe deinen Track an und speichere die Änderungen.',
+            'submitText' => 'Speichern',
+            'existingImage' => $content->getImageFile(),
+            'existingAudioName' => $content->getFilePath() ? basename($content->getFilePath()) : null,
+        ]);
+    }
+
+    #[Route('/content/{id}/delete', name: 'app_content_delete', methods: ['POST'], requirements: ['id' => '\d+'])]
+    public function deleteContent(int $id, Request $request, EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $content = $em->getRepository(Content::class)->find($id);
+        if (!$content) {
+            throw $this->createNotFoundException('Inhalt nicht gefunden');
+        }
+
+        if ($content->getFkUser() !== $user) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $em->createQuery('DELETE FROM App\Entity\Report r WHERE r.fk_content = :content')
+            ->setParameter('content', $content)
+            ->execute();
+        $em->createQuery('DELETE FROM App\Entity\Report r WHERE r.fk_comment IN (SELECT c FROM App\Entity\Comment c WHERE c.fk_content = :content)')
+            ->setParameter('content', $content)
+            ->execute();
+        $em->createQuery('DELETE FROM App\Entity\Comment c WHERE c.fk_content = :content')
+            ->setParameter('content', $content)
+            ->execute();
+        $em->createQuery('DELETE FROM App\Entity\ContentTag ct WHERE ct.fk_content = :content')
+            ->setParameter('content', $content)
+            ->execute();
+        $em->createQuery('DELETE FROM App\Entity\Favorite f WHERE f.fk_content = :content')
+            ->setParameter('content', $content)
+            ->execute();
+        $em->createQuery('DELETE FROM App\Entity\Rating r WHERE r.fk_content = :content')
+            ->setParameter('content', $content)
+            ->execute();
+
+        $em->remove($content);
+        $em->flush();
+
+        $this->addFlash('success', 'Inhalt erfolgreich gelöscht.');
+        return $this->redirectToRoute('app_deine_inhalte');
     }
 
     #[Route('/content/{id}/melden', name: 'content_report', methods: ['POST'])]

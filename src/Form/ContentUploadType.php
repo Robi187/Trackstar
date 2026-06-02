@@ -83,10 +83,10 @@ class ContentUploadType extends AbstractType
             ->add('audioFile', FileType::class, [
                 'label' => 'Audio-Datei',
                 'mapped' => false,
-                'required' => true,
+                'required' => !$options['is_edit'],
                 'attr' => ['class' => 'ts-file-input', 'accept' => 'audio/*,.mp3,.wav,.flac,.aiff'],
-                'constraints' => [
-                    new NotBlank(message: 'Bitte lade eine Audio-Datei hoch.'),
+                'constraints' => array_filter([
+                    !$options['is_edit'] ? new NotBlank(message: 'Bitte lade eine Audio-Datei hoch.') : null,
                     new File(
                         maxSize: '200M',
                         mimeTypes: [
@@ -107,7 +107,7 @@ class ContentUploadType extends AbstractType
                         ],
                         mimeTypesMessage: 'Bitte lade eine gültige Audio-Datei (MP3, WAV, FLAC, AIFF) oder ZIP-Datei hoch.',
                     ),
-                ],
+                ]),
             ])
             ->add('license', EntityType::class, [
                 'label' => 'Lizenz',
@@ -120,16 +120,16 @@ class ContentUploadType extends AbstractType
             ->add('imageFile', FileType::class, [
                 'label' => 'Titelbild',
                 'mapped' => false,
-                'required' => true,
+                'required' => !$options['is_edit'],
                 'attr' => ['class' => 'ts-file-input', 'accept' => 'image/*'],
-                'constraints' => [
-                    new NotBlank(message: 'Bitte lade ein Titelbild hoch.'),
+                'constraints' => array_filter([
+                    !$options['is_edit'] ? new NotBlank(message: 'Bitte lade ein Titelbild hoch.') : null,
                     new File(
                         maxSize: '5M',
                         mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
                         mimeTypesMessage: 'Bitte lade eine gültige Bilddatei hoch (JPG, PNG, WEBP).',
                     ),
-                ],
+                ]),
             ])
         ;
     }
@@ -138,6 +138,7 @@ class ContentUploadType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Content::class,
+            'is_edit' => false,
         ]);
     }
 }
