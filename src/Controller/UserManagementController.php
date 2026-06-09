@@ -247,4 +247,37 @@ $em->flush();
         }
         return $this->redirectToRoute('app_admin_reports');
     }
+
+    #[Route('/konto/loeschen', name: 'app_delete_own_account', methods: ['POST'])]
+    public function deleteOwnAccount(Request $request, EntityManagerInterface $em): RedirectResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        if (!$this->isCsrfTokenValid('delete_account', $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException();
+        }
+
+        // Reports zuerst (Foreign Key!)
+        $em->createQuery('DELETE FROM App\Entity\Report r WHERE r.fk_content IN (SELECT c FROM App\Entity\Content c WHERE c.fk_user = :u)')->setParameter('u', $user)->execute();
+        $em->createQuery('DELETE FROM App\Entity\Report r WHERE r.fk_user = :u')->setParameter('u', $user)->execute();
+        $em->createQuery('DELETE FROM App\Entity\Report r WHERE r.fk_comment IN (SELECT cm FROM App\Entity\Comment cm WHERE cm.fk_user = :u)')->setParameter('u', $user)->execute();
+
+        $em->createQuery('DELETE FROM App\Entity\ContentTag ct WHERE ct.fk_content IN (SELECT c FROM App\Entity\Content c WHERE c.fk_user = :u)')->setParameter('u', $user)->execute();
+        $em->createQuery('DELETE FROM App\Entity\Comment cm WHERE cm.fk_content IN (SELECT c FROM App\Entity\Content c WHERE c.fk_user = :u)')->setParameter('u', $user)->execute();
+        $em->createQuery('DELETE FROM App\Entity\Favorite f WHERE f.fk_content IN (SELECT c FROM App\Entity\Content c WHERE c.fk_user = :u)')->setParameter('u', $user)->execute();
+        $em->createQuery('DELETE FROM App\Entity\Rating r WHERE r.fk_content IN (SELECT c FROM App\Entity\Content c WHERE c.fk_user = :u)')->setParameter('u', $user)->execute();
+        $em->createQuery('DELETE FROM App\Entity\Content c WHERE c.fk_user = :u')->setParameter('u', $user)->execute();
+
+        $em->createQuery('DELETE FROM App\Entity\Comment cm WHERE cm.fk_user = :u')->setParameter('u', $user)->execute();
+        $em->createQuery('DELETE FROM App\Entity\Favorite f WHERE f.fk_user = :u')->setParameter('u', $user)->execute();
+        $em->createQuery('DELETE FROM App\Entity\Rating r WHERE r.fk_user = :u')->setParameter('u', $user)->execute();
+
+        $em->remove($user);
+        $em->flush();
+
+        return $this->redirectToRoute('app_logout');
+    }
 }
