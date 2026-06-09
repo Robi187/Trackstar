@@ -715,8 +715,8 @@
     <div class="ts-upload-inner">
 
         <div class="ts-page-header">
-            <h1>Neuen Track hochladen</h1>
-            <p>Teile deinen sound mit der TrackStar Community!</p>
+            <h1>{{ pageTitle|default('Neuen Track hochladen') }}</h1>
+            <p>{{ pageSubtitle|default('Teile deinen sound mit der TrackStar Community!') }}</p>
         </div>
 
         {% for message in app.flashes('success') %}
@@ -737,14 +737,14 @@
 
                 <div class="ts-file-row">
                     <div class="ts-cover-thumb-wrap" id="cover-thumb-wrap">
-                        <div class="ts-cover-thumb-placeholder">
+                        <div class="ts-cover-thumb-placeholder" id="cover-thumb-placeholder" style="{{ existingImage|default('') ? 'display:none;' : '' }}">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                                 <rect x="3" y="3" width="18" height="18" rx="2"/>
                                 <circle cx="8.5" cy="8.5" r="1.5"/>
                                 <polyline points="21 15 16 10 5 21"/>
                             </svg>
                         </div>
-                        <img id="cover-thumb-img" src="" alt="Cover">
+                        <img id="cover-thumb-img" src="{{ existingImage|default('') ? asset(existingImage) : '' }}" alt="Cover" class="{{ existingImage|default('') ? 'visible' : '' }}">
                     </div>
 
                     <div class="ts-upload-cols">
@@ -757,8 +757,8 @@
                                     <line x1="12" y1="12" x2="12" y2="21"/>
                                     <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
                                 </svg>
-                                <span class="btn-label">Datei auswählen</span>
-                                <span class="btn-sub">jpg oder png datei<br>hochladen</span>
+                                <span class="btn-label">{{ existingImage|default('') ? existingImage|split('/')|last : 'Datei auswählen' }}</span>
+                                <span class="btn-sub">{{ existingImage|default('') ? 'Aktuelles Cover anzeigen' : 'jpg oder png datei<br>hochladen' }}</span>
                             </div>
                             {{ form_errors(form.imageFile) }}
                         </div>
@@ -772,8 +772,8 @@
                                     <line x1="12" y1="12" x2="12" y2="21"/>
                                     <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
                                 </svg>
-                                <span class="btn-label">Datei auswählen</span>
-                                <span class="btn-sub" id="audio-btn-sub">Audiodatei hochladen<br>Achtung: bei Soundkits ZIP Dateien</span>
+                                <span class="btn-label">{{ existingAudioName|default('') ? existingAudioName : 'Datei auswählen' }}</span>
+                                <span class="btn-sub" id="audio-btn-sub">{{ existingAudioName|default('') ? 'Neue Datei hochladen' : 'Audiodatei hochladen<br>Achtung: bei Soundkits ZIP Dateien' }}</span>
                             </div>
                             {{ form_errors(form.audioFile) }}
                         </div>
@@ -864,7 +864,7 @@
 
             {# ── Submit ── #}
             <div class="ts-submit-wrap">
-                <button type="submit" class="ts-submit-btn">Veröffentlichen</button>
+                <button type="submit" class="ts-submit-btn">{{ submitText|default('Veröffentlichen') }}</button>
             </div>
 
         </div>
@@ -891,6 +891,9 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     jQuery('#tag-picker-container').append($fakeSelect);
 
+    const chipsContainer = document.getElementById('tag-chips-row');
+    const addBtn = document.getElementById('add-tag-btn');
+
     $fakeSelect.select2({
         placeholder: 'Tag suchen...',
         allowClear: false,
@@ -902,8 +905,14 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    const chipsContainer = document.getElementById('tag-chips-row');
-    const addBtn = document.getElementById('add-tag-btn');
+    $realSelect.find('option:selected').each(function () {
+        const $option = jQuery(this);
+        const val = $option.val();
+        const text = $option.text();
+        if (val) {
+            addChip(val, text);
+        }
+    });
 
     function addChip(id, text) {
         if (chipsContainer.querySelector(`[data-tag-id="${id}"]`)) return;
@@ -977,6 +986,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const categorySelect  = document.querySelector('.ts-field select:not([multiple])');
     const audioFileLabel  = document.getElementById('audio-file-label');
     const audioBtnSub     = document.getElementById('audio-btn-sub');
+    const audioBtnLabel   = document.querySelector('#audio-btn .btn-label');
+    const existingAudioExt = '{{ existingAudioName|default('')|split('.')|last|lower }}';
 
     function updateAudioField() {
         const text = categorySelect?.options[categorySelect.selectedIndex]?.text?.toLowerCase() ?? '';
@@ -991,6 +1002,16 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         if (audioBtnSub) {
             audioBtnSub.innerHTML = isSoundkit ? '<br>ZIP-Datei hochladen' : 'Audiodatei <br> hochladen';
+        }
+
+        if (!audioInput?.files[0] && existingAudioExt) {
+            if (!isSoundkit && existingAudioExt === 'zip') {
+                if (audioBtnLabel) audioBtnLabel.textContent = 'Datei auswählen';
+                if (audioBtnSub) audioBtnSub.innerHTML = 'ZIP-Datei entfernen und Audiodatei hochladen';
+            } else if (isSoundkit && existingAudioExt !== 'zip') {
+                if (audioBtnLabel) audioBtnLabel.textContent = 'Datei auswählen';
+                if (audioBtnSub) audioBtnSub.innerHTML = 'Neue ZIP-Datei für Soundkit hochladen';
+            }
         }
     }
 

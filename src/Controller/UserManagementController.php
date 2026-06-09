@@ -122,23 +122,54 @@ final class UserManagementController extends AbstractController
         }
 
         // Reports zuerst (Foreign Key!)
-        $em->createQuery('DELETE FROM App\Entity\Report r WHERE r.fk_content IN (SELECT c FROM App\Entity\Content c WHERE c.fk_user = :u)')->setParameter('u', $user)->execute();
-        $em->createQuery('DELETE FROM App\Entity\Report r WHERE r.fk_user = :u')->setParameter('u', $user)->execute();
-        // Kommentar-Reports
-        $em->createQuery('DELETE FROM App\Entity\Report r WHERE r.fk_comment IN (SELECT cm FROM App\Entity\Comment cm WHERE cm.fk_user = :u)')->setParameter('u', $user)->execute();
+        // 1. Reports auf Content des Users
+$em->createQuery('DELETE FROM App\Entity\Report r WHERE r.fk_content IN (SELECT c FROM App\Entity\Content c WHERE c.fk_user = :u)')->setParameter('u', $user)->execute();
 
-        $em->createQuery('DELETE FROM App\Entity\ContentTag ct WHERE ct.fk_content IN (SELECT c FROM App\Entity\Content c WHERE c.fk_user = :u)')->setParameter('u', $user)->execute();
-        $em->createQuery('DELETE FROM App\Entity\Comment cm WHERE cm.fk_content IN (SELECT c FROM App\Entity\Content c WHERE c.fk_user = :u)')->setParameter('u', $user)->execute();
-        $em->createQuery('DELETE FROM App\Entity\Favorite f WHERE f.fk_content IN (SELECT c FROM App\Entity\Content c WHERE c.fk_user = :u)')->setParameter('u', $user)->execute();
-        $em->createQuery('DELETE FROM App\Entity\Rating r WHERE r.fk_content IN (SELECT c FROM App\Entity\Content c WHERE c.fk_user = :u)')->setParameter('u', $user)->execute();
-        $em->createQuery('DELETE FROM App\Entity\Content c WHERE c.fk_user = :u')->setParameter('u', $user)->execute();
+// 2. Reports auf Kommentare des Users (eigene Kommentare)
+$em->createQuery('DELETE FROM App\Entity\Report r WHERE r.fk_comment IN (SELECT cm FROM App\Entity\Comment cm WHERE cm.fk_user = :u)')->setParameter('u', $user)->execute();
 
-        $em->createQuery('DELETE FROM App\Entity\Comment cm WHERE cm.fk_user = :u')->setParameter('u', $user)->execute();
-        $em->createQuery('DELETE FROM App\Entity\Favorite f WHERE f.fk_user = :u')->setParameter('u', $user)->execute();
-        $em->createQuery('DELETE FROM App\Entity\Rating r WHERE r.fk_user = :u')->setParameter('u', $user)->execute();
+// 3. Reports auf Kommentare die ANDERE auf dem Content des Users hinterlassen haben
+$em->createQuery('DELETE FROM App\Entity\Report r WHERE r.fk_comment IN (SELECT cm FROM App\Entity\Comment cm WHERE cm.fk_content IN (SELECT c FROM App\Entity\Content c WHERE c.fk_user = :u))')->setParameter('u', $user)->execute();
 
-        $em->remove($user);
-        $em->flush();
+// 4. Reports die der User selbst erstellt hat
+$em->createQuery('DELETE FROM App\Entity\Report r WHERE r.fk_user = :u')->setParameter('u', $user)->execute();
+
+// 5. CommentLikes auf Kommentare des Contents des Users
+$em->createQuery('DELETE FROM App\Entity\CommentLike cl WHERE cl.fk_comment IN (SELECT cm FROM App\Entity\Comment cm WHERE cm.fk_content IN (SELECT c FROM App\Entity\Content c WHERE c.fk_user = :u))')->setParameter('u', $user)->execute();
+
+// 6. CommentLikes auf eigene Kommentare des Users
+$em->createQuery('DELETE FROM App\Entity\CommentLike cl WHERE cl.fk_comment IN (SELECT cm FROM App\Entity\Comment cm WHERE cm.fk_user = :u)')->setParameter('u', $user)->execute();
+
+// 7. CommentLikes die der User selbst vergeben hat
+$em->createQuery('DELETE FROM App\Entity\CommentLike cl WHERE cl.fk_user = :u')->setParameter('u', $user)->execute();
+
+// 8. ContentTags
+$em->createQuery('DELETE FROM App\Entity\ContentTag ct WHERE ct.fk_content IN (SELECT c FROM App\Entity\Content c WHERE c.fk_user = :u)')->setParameter('u', $user)->execute();
+
+// 9. Kommentare auf Content des Users (von anderen)
+// Replies zuerst (Kommentare die auf andere Kommentare verweisen)
+$em->createQuery('DELETE FROM App\Entity\Comment cm WHERE cm.fk_parent IS NOT NULL AND cm.fk_content IN (SELECT c FROM App\Entity\Content c WHERE c.fk_user = :u)')->setParameter('u', $user)->execute();
+
+// Dann Top-Level Kommentare auf Content des Users
+$em->createQuery('DELETE FROM App\Entity\Comment cm WHERE cm.fk_content IN (SELECT c FROM App\Entity\Content c WHERE c.fk_user = :u)')->setParameter('u', $user)->execute();
+
+// 10. Favorites, Ratings auf Content des Users
+$em->createQuery('DELETE FROM App\Entity\Favorite f WHERE f.fk_content IN (SELECT c FROM App\Entity\Content c WHERE c.fk_user = :u)')->setParameter('u', $user)->execute();
+$em->createQuery('DELETE FROM App\Entity\Rating r WHERE r.fk_content IN (SELECT c FROM App\Entity\Content c WHERE c.fk_user = :u)')->setParameter('u', $user)->execute();
+
+// 11. Content selbst
+$em->createQuery('DELETE FROM App\Entity\Content c WHERE c.fk_user = :u')->setParameter('u', $user)->execute();
+
+// 12. Eigene Kommentare des Users (auf fremdem Content)
+$em->createQuery('DELETE FROM App\Entity\Comment cm WHERE cm.fk_user = :u')->setParameter('u', $user)->execute();
+
+// 13. Eigene Favorites, Ratings des Users
+$em->createQuery('DELETE FROM App\Entity\Favorite f WHERE f.fk_user = :u')->setParameter('u', $user)->execute();
+$em->createQuery('DELETE FROM App\Entity\Rating r WHERE r.fk_user = :u')->setParameter('u', $user)->execute();
+
+// 14. User selbst
+$em->remove($user);
+$em->flush();
 
         $this->addFlash('success', sprintf('Benutzer „%s" wurde gelöscht.', $user->getUsername()));
         return $this->redirectToRoute('app_admin_users');
@@ -180,6 +211,16 @@ final class UserManagementController extends AbstractController
         if ($report) {
             $content = $report->getFkContent();
             $em->createQuery('DELETE FROM App\Entity\Report r WHERE r.fk_content = :c')
+                ->setParameter('c', $content)->execute();
+            $em->createQuery('DELETE FROM App\Entity\Report r WHERE r.fk_comment IN (SELECT c FROM App\Entity\Comment c WHERE c.fk_content = :c)')
+                ->setParameter('c', $content)->execute();
+            $em->createQuery('DELETE FROM App\Entity\Comment c WHERE c.fk_content = :c')
+                ->setParameter('c', $content)->execute();
+            $em->createQuery('DELETE FROM App\Entity\ContentTag ct WHERE ct.fk_content = :c')
+                ->setParameter('c', $content)->execute();
+            $em->createQuery('DELETE FROM App\Entity\Favorite f WHERE f.fk_content = :c')
+                ->setParameter('c', $content)->execute();
+            $em->createQuery('DELETE FROM App\Entity\Rating r WHERE r.fk_content = :c')
                 ->setParameter('c', $content)->execute();
             $em->remove($content);
             $em->flush();
